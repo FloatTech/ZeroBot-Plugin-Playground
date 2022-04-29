@@ -7,9 +7,9 @@ import (
 
 func main() {
 	zero.OnCommand("hello").
-            Handle(func(ctx *zero.Ctx) {
-                ctx.Send("world")
-            })
+		Handle(func(ctx *zero.Ctx) {
+			ctx.Send("world")
+		})
 
 	zero.RunAndBlock(zero.Config{
 		NickName:      []string{"bot"},
