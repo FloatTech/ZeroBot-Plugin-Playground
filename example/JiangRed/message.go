@@ -35,7 +35,7 @@ func init() {
 				"你好啊",
 				"做出了回应",
 				"好的哟",
-			}[rand.Intn(2)]))
+			}[rand.Intn(3)]))
 			// 另一种实现 来自zbp的插件 atri
 			ctx.SendChain(randText(
 				"你好啊",
