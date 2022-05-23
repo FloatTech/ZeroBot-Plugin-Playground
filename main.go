@@ -2,6 +2,8 @@ package main
 
 import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/github/yydz"
+
 	// 程序主体
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/driver"
