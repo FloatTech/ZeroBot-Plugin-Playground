@@ -34,9 +34,9 @@ func command(arg ...string) (result string, err error) {
 		return "", fmt.Errorf("ReadAll Stdout,%s\n", err)
 	}
 
-	// if err = cmd.Wait(); err != nil {
-	// 	return "", fmt.Errorf("Wait,%s\n", err)
-	// }
+	if err = cmd.Wait(); err != nil {
+		return "", fmt.Errorf("Wait,%s\n", err)
+	}
 
 	result = string(bytes)
 	return
