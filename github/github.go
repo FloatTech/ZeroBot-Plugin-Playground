@@ -8,15 +8,15 @@ var (
 	Githubhost = "https://github.com"
 )
 
-// github文件类
+// Githubfile github文件类
 type Githubfile struct {
 	Name string
 	Type string
 	Href string
 }
 
-// GithubFiles 取得某个目录的github文件
-func GithubFiles(githubPath string) (fs []Githubfile, ds []Githubfile, err error) {
+// Files 取得某个目录的github文件
+func Files(githubPath string) (fs []Githubfile, ds []Githubfile, err error) {
 	doc, err := htmlquery.LoadURL(githubPath)
 	if err != nil {
 		return

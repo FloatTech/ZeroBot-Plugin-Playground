@@ -9,7 +9,8 @@ import (
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 
-	control "github.com/FloatTech/zbputils/control"
+	ctrl "github.com/FloatTech/zbpctrl"
+	"github.com/FloatTech/zbputils/control"
 	"github.com/FloatTech/zbputils/ctxext"
 
 	"github.com/FloatTech/ZeroBot-Plugin-Playground/github"
@@ -20,12 +21,12 @@ var (
 )
 
 func init() {
-	control.Register("yydz", &control.Options{
+	control.Register("yydz", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Help:             "一眼丁真\n- 一眼丁真",
 	}).OnFullMatch("一眼丁真", zero.OnlyGroup).SetBlock(true).Limit(ctxext.LimitByGroup).
 		Handle(func(ctx *zero.Ctx) {
-			fs, _, err := github.GithubFiles(dingzhenPath)
+			fs, _, err := github.Files(dingzhenPath)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR:", err))
 			}

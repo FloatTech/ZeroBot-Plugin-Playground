@@ -3,9 +3,12 @@ module github.com/FloatTech/ZeroBot-Plugin-Playground
 go 1.18
 
 require (
-	github.com/FloatTech/zbputils v1.4.0
+	github.com/FloatTech/zbpctrl v1.4.1-0.20220604065149-1ca23316481c
+	github.com/FloatTech/zbputils v1.4.1-0.20220604095022-69b69d618e08
 	github.com/antchfx/htmlquery v1.2.4
 	github.com/wdvxdr1123/ZeroBot v1.5.2-0.20220509035736-f3ad8fa960d7
+	gitlab.com/gomidi/midi v1.23.7
+	gitlab.com/gomidi/midi/v2 v2.0.15
 )
 
 require (
@@ -32,7 +35,6 @@ require (
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
 	golang.org/x/sys v0.0.0-20220429121018-84afa8d3f7b3 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/tools v0.1.10 // indirect
 	modernc.org/libc v1.14.6 // indirect
 	modernc.org/mathutil v1.4.1 // indirect
 	modernc.org/memory v1.0.5 // indirect
