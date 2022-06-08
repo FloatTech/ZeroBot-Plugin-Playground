@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 	"os/exec"
 	"runtime"
+
+	"github.com/sirupsen/logrus"
 )
 
 func command(arg ...string) (result string, err error) {
@@ -14,6 +16,7 @@ func command(arg ...string) (result string, err error) {
 		c = "/C"
 	}
 	arg = append([]string{c}, arg...)
+	logrus.Infoln("命令:", arg)
 	cmd := exec.Command(name, arg...)
 
 	stdout, err := cmd.StdoutPipe()
