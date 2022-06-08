@@ -49,6 +49,7 @@ func init() {
 			result, err := command("timidity", file.BOTPATH+"/"+midiFile, "-Ow", "-o", file.BOTPATH+"/"+cmidiFile)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR:", err))
+				_ = ctx.CallAction("upload_group_file", zero.Params{"group_id:": ctx.Event.GroupID, "file": file.BOTPATH + "/" + midiFile, "name": filepath.Base(midiFile)})
 				return
 			}
 			if !strings.Contains(result, "Notes lost totally: 0") {
