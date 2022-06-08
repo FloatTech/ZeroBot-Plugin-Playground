@@ -28,6 +28,13 @@ func init() {
 		PrivateDataFolder: "midicreate",
 	})
 	cachePath := engine.DataFolder() + "cache/"
+	go func() {
+		_ = os.RemoveAll(cachePath)
+		err := os.MkdirAll(cachePath, 0755)
+		if err != nil {
+			panic(err)
+		}
+	}()
 	engine.OnRegex(`^midi制作\s?(.{1,1000})$`).SetBlock(true).Limit(ctxext.LimitByUser).
 		Handle(func(ctx *zero.Ctx) {
 			uid := ctx.Event.UserID
