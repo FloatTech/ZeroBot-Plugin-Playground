@@ -1,6 +1,7 @@
 package midicreate
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os/exec"
 	"runtime"
@@ -21,20 +22,20 @@ func command(arg ...string) (result string, err error) {
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return
+		return "", fmt.Errorf("Can not obtain stdout pipe for command, %s\n", err)
 	}
 
 	if err = cmd.Start(); err != nil {
-		return
+		return "", fmt.Errorf("The command is err, %s\n", err)
 	}
 
 	bytes, err := ioutil.ReadAll(stdout)
 	if err != nil {
-		return
+		return "", fmt.Errorf("ReadAll Stdout,%s\n", err)
 	}
 
 	if err = cmd.Wait(); err != nil {
-		return
+		return "", fmt.Errorf("Wait,%s\n", err)
 	}
 
 	result = string(bytes)
