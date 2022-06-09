@@ -4,6 +4,7 @@ package midicreate
 import (
 	"bytes"
 	"fmt"
+	"math/rand"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -24,8 +25,9 @@ import (
 
 func init() {
 	engine := control.Register("midicreate", &ctrl.Options[*zero.Ctx]{
-		DisableOnDefault:  false,
-		Help:              "midi音乐制作\n- midi制作 CCGGAAGR FFEEDDCR GGFFEEDR GGFFEEDR CCGGAAGR FFEEDDCR",
+		DisableOnDefault: false,
+		Help: "midi音乐制作\n- midi制作 CCGGAAGR FFEEDDCR GGFFEEDR GGFFEEDR CCGGAAGR FFEEDDCR\n" +
+			"- 听音练习",
 		PrivateDataFolder: "midicreate",
 	})
 	cachePath := engine.DataFolder() + "cache/"
@@ -41,19 +43,150 @@ func init() {
 			uid := ctx.Event.UserID
 			input := ctx.State["regex_matched"].([]string)[1]
 			midiFile := cachePath + strconv.FormatInt(uid, 10) + time.Now().Format("20060102150405") + "_midicreate.mid"
-			err := mkMidi(midiFile, input)
+			cmidiFile, err := str2music(input, midiFile)
 			if err != nil {
-				ctx.SendChain(message.Text("ERROR:", err))
-				return
-			}
-			cmidiFile := strings.ReplaceAll(midiFile, ".mid", ".wav")
-			cmd := exec.Command("timidity", file.BOTPATH+"/"+midiFile, "-Ow", "-o", file.BOTPATH+"/"+cmidiFile)
-			if err = cmd.Run(); err != nil {
-				_ = ctx.CallAction("upload_group_file", zero.Params{"group_id": ctx.Event.GroupID, "file": file.BOTPATH + "/" + midiFile, "name": filepath.Base(midiFile)})
-				ctx.SendChain(message.Text("ERROR: convert midi file error,", err))
+				if file.IsExist(midiFile) {
+					_ = ctx.CallAction("upload_group_file", zero.Params{"group_id": ctx.Event.GroupID, "file": file.BOTPATH + "/" + midiFile, "name": filepath.Base(midiFile)})
+				}
+				ctx.SendChain(message.Text("ERROR:无法转换midi文件,", err))
 				return
 			}
 			ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
+		})
+	engine.OnFullMatch("听音练习").SetBlock(true).Limit(ctxext.LimitByUser).
+		Handle(func(ctx *zero.Ctx) {
+			uid := ctx.Event.UserID
+			ctx.SendChain(message.Text("欢迎来到听音练习，一共有5个问题，每个问题1分"))
+			next := zero.NewFutureEvent("message", 999, false, zero.RegexRule(`^[A-G][b|#]?\d{0,2}$`),
+				zero.OnlyGroup, ctx.CheckSession())
+			recv, cancel := next.Repeat()
+			defer cancel()
+
+			score := 0.0
+			round := 1
+			errorCount := 0
+			target := uint8(55 + rand.Intn(34))
+			answer := name(target) + strconv.Itoa(int(target/12))
+			midiFile := cachePath + strconv.FormatInt(uid, 10) + time.Now().Format("20060102150405") + "_midicreate.mid"
+			cmidiFile, err := str2music(answer, midiFile)
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR:听音练习结束，无法转换midi文件，", err))
+				return
+			}
+			time.Sleep(time.Millisecond * 500)
+			ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
+			ctx.Send(
+				message.ReplyWithMessage(ctx.Event.MessageID,
+					message.Text("判断上面的音频，输入音符，例如C#6"),
+				),
+			)
+			tick := time.NewTimer(45 * time.Second)
+			after := time.NewTimer(60 * time.Second)
+			for {
+				select {
+				case <-tick.C:
+					ctx.SendChain(message.Text("听音练习，你还有15s作答时间"))
+				case <-after.C:
+					ctx.Send(
+						message.ReplyWithMessage(ctx.Event.MessageID,
+							message.Text("听音练习超时，练习结束...答案是: ", answer, "所得分数为", score),
+						),
+					)
+					return
+				case c := <-recv:
+					tick.Reset(105 * time.Second)
+					after.Reset(120 * time.Second)
+					n := processOne(c.Event.Message.String())
+					if n != target {
+						errorCount++
+					}
+					if errorCount == 3 || n == target {
+						if n == target {
+							ctx.Send(
+								message.ReplyWithMessage(ctx.Event.MessageID,
+									message.Text("恭喜你回答正确，答案是: ", answer),
+								),
+							)
+						} else if errorCount == 3 {
+							ctx.Send(
+								message.ReplyWithMessage(ctx.Event.MessageID,
+									message.Text("你的回答是: "),
+								),
+							)
+							midiFile = cachePath + strconv.FormatInt(uid, 10) + time.Now().Format("20060102150405") + "_midicreate.mid"
+							cmidiFile, err = str2music(c.Event.Message.String(), midiFile)
+							if err != nil {
+								ctx.SendChain(message.Text("ERROR: can't convert midi file,", err))
+								return
+							}
+							time.Sleep(time.Millisecond * 500)
+							ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
+							ctx.Send(
+								message.ReplyWithMessage(ctx.Event.MessageID,
+									message.Text("回答错误，答案是: ", answer, "，错误次数已达3次，进入下一关"),
+								),
+							)
+						}
+						// 统计分数
+						switch errorCount {
+						case 0:
+							score += 1.0
+						case 1:
+							score += 0.5
+						case 2:
+							score += 0.2
+						}
+						// 下一关
+						round++
+						if round != 6 {
+							errorCount = 0
+							target = uint8(55 + rand.Intn(34))
+							answer = name(target) + strconv.Itoa(int(target/12))
+							midiFile = cachePath + strconv.FormatInt(uid, 10) + time.Now().Format("20060102150405") + "_midicreate.mid"
+							cmidiFile, err = str2music(answer, midiFile)
+							if err != nil {
+								ctx.SendChain(message.Text("ERROR:听音练习结束，无法转换midi文件，", err))
+								return
+							}
+							time.Sleep(time.Millisecond * 500)
+							ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
+							ctx.Send(
+								message.ReplyWithMessage(ctx.Event.MessageID,
+									message.Text("判断上面的音频，输入音符，例如C#6"),
+								),
+							)
+						}
+					} else if n != target {
+						ctx.Send(
+							message.ReplyWithMessage(ctx.Event.MessageID,
+								message.Text("你的回答是: "),
+							),
+						)
+						time.Sleep(time.Millisecond * 500)
+						midiFile = cachePath + strconv.FormatInt(uid, 10) + time.Now().Format("20060102150405") + "_midicreate.mid"
+						cmidiFile, err = str2music(c.Event.Message.String(), midiFile)
+						if err != nil {
+							ctx.SendChain(message.Text("ERROR: can't convert midi file,", err))
+							return
+						}
+						time.Sleep(time.Millisecond * 500)
+						ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
+						ctx.Send(
+							message.ReplyWithMessage(ctx.Event.MessageID,
+								message.Text("回答错误，错误次数为", errorCount, "，请继续回答"),
+							),
+						)
+					}
+					if round == 6 {
+						ctx.Send(
+							message.ReplyWithMessage(ctx.Event.MessageID,
+								message.Text("回答完毕，所得分数为", score),
+							),
+						)
+						return
+					}
+				}
+			}
 		})
 }
 
@@ -73,6 +206,17 @@ var (
 		"B":  71,
 	}
 )
+
+func str2music(input, midiFile string) (cmidiFile string, err error) {
+	err = mkMidi(midiFile, input)
+	if err != nil {
+		return
+	}
+	cmidiFile = strings.ReplaceAll(midiFile, ".mid", ".wav")
+	cmd := exec.Command("timidity", file.BOTPATH+"/"+midiFile, "-Ow", "-o", file.BOTPATH+"/"+cmidiFile)
+	err = cmd.Run()
+	return
+}
 
 func mkMidi(filePath, input string) error {
 	if file.IsExist(filePath) {
@@ -184,4 +328,37 @@ func o(base uint8, oct uint8) uint8 {
 	}
 
 	return res
+}
+
+func name(n uint8) string {
+	for k, v := range noteMap {
+		if v%12 == n%12 {
+			return k
+		}
+	}
+	return ""
+}
+
+func processOne(note string) uint8 {
+	k := strings.ReplaceAll(note, " ", "")
+	var (
+		base  uint8
+		level uint8
+	)
+	for i := 0; i < len(k); i++ {
+		switch {
+		case k[i] >= 'A' && k[i] <= 'G':
+			base = noteMap[k[i:i+1]] % 12
+		case k[i] == 'b':
+			base--
+		case k[i] == '#':
+			base++
+		case k[i] >= '0' && k[i] <= '9':
+			level = level*10 + k[i] - '0'
+		}
+	}
+	if level == 0 {
+		level = 5
+	}
+	return o(base, level)
 }
