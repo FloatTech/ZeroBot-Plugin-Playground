@@ -70,13 +70,13 @@ func init() {
 			midiFile := cachePath + strconv.FormatInt(uid, 10) + time.Now().Format("20060102150405") + "_midicreate.mid"
 			cmidiFile, err := str2music(answer, midiFile)
 			if err != nil {
-				ctx.SendChain(message.Text("ERROR:听音练习结束,无法转换midi文件,", err))
+				ctx.SendChain(message.Text("ERROR:听音练习结束，无法转换midi文件，", err))
 				return
 			}
 			ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 			ctx.Send(
 				message.ReplyWithMessage(ctx.Event.MessageID,
-					message.Text("判断上面的音频，输入音符,例如C#6"),
+					message.Text("判断上面的音频，输入音符，例如C#6"),
 				),
 			)
 			tick := time.NewTimer(45 * time.Second)
@@ -133,21 +133,23 @@ func init() {
 						}
 						// 下一关
 						round++
-						errorCount = 0
-						target = uint8(55 + rand.Intn(34))
-						answer = name(target) + strconv.Itoa(int(target/12))
-						midiFile = cachePath + strconv.FormatInt(uid, 10) + time.Now().Format("20060102150405") + "_midicreate.mid"
-						cmidiFile, err = str2music(answer, midiFile)
-						if err != nil {
-							ctx.SendChain(message.Text("ERROR:听音练习结束,无法转换midi文件,", err))
-							return
+						if round != 6 {
+							errorCount = 0
+							target = uint8(55 + rand.Intn(34))
+							answer = name(target) + strconv.Itoa(int(target/12))
+							midiFile = cachePath + strconv.FormatInt(uid, 10) + time.Now().Format("20060102150405") + "_midicreate.mid"
+							cmidiFile, err = str2music(answer, midiFile)
+							if err != nil {
+								ctx.SendChain(message.Text("ERROR:听音练习结束，无法转换midi文件，", err))
+								return
+							}
+							ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
+							ctx.Send(
+								message.ReplyWithMessage(ctx.Event.MessageID,
+									message.Text("判断上面的音频，输入音符，例如C#6"),
+								),
+							)
 						}
-						ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
-						ctx.Send(
-							message.ReplyWithMessage(ctx.Event.MessageID,
-								message.Text("判断上面的音频，输入音符，例如C#6"),
-							),
-						)
 					} else if n != target {
 						ctx.Send(
 							message.ReplyWithMessage(ctx.Event.MessageID,
@@ -171,7 +173,7 @@ func init() {
 					if round == 6 {
 						ctx.Send(
 							message.ReplyWithMessage(ctx.Event.MessageID,
-								message.Text("练习结束...答案是: ", answer, ",所得分数为", score),
+								message.Text("回答完毕，所得分数为", score),
 							),
 						)
 						return
