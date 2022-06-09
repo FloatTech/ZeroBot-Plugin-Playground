@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -46,15 +47,10 @@ func init() {
 				return
 			}
 			cmidiFile := strings.ReplaceAll(midiFile, ".mid", ".wav")
-			result, err := command("timidity " + file.BOTPATH + "/" + midiFile + " -Ow -o " + file.BOTPATH + "/" + cmidiFile)
-			if err != nil {
-				ctx.SendChain(message.Text("ERROR:", err))
-				_ = ctx.CallAction("upload_group_file", zero.Params{"group_id:": ctx.Event.GroupID, "file": file.BOTPATH + "/" + midiFile, "name": filepath.Base(midiFile)})
-				return
-			}
-			if !strings.Contains(result, "Notes lost totally: 0") {
-				ctx.SendChain(message.Text("也许你需要安装timidity,用于midi转wav格式,result:", result))
-				_ = ctx.CallAction("upload_group_file", zero.Params{"group_id:": ctx.Event.GroupID, "file": file.BOTPATH + "/" + midiFile, "name": filepath.Base(midiFile)})
+			cmd := exec.Command("timidity", file.BOTPATH+"/"+midiFile, "-Ow", "-o", file.BOTPATH+"/"+cmidiFile)
+			if err = cmd.Run(); err != nil {
+				_ = ctx.CallAction("upload_group_file", zero.Params{"group_id": ctx.Event.GroupID, "file": file.BOTPATH + "/" + midiFile, "name": filepath.Base(midiFile)})
+				ctx.SendChain(message.Text("ERROR: convert midi file error,", err))
 				return
 			}
 			ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
