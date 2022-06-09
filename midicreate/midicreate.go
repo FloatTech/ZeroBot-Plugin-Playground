@@ -73,6 +73,7 @@ func init() {
 				ctx.SendChain(message.Text("ERROR:听音练习结束，无法转换midi文件，", err))
 				return
 			}
+			time.Sleep(time.Millisecond * 500)
 			ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 			ctx.Send(
 				message.ReplyWithMessage(ctx.Event.MessageID,
@@ -112,13 +113,13 @@ func init() {
 									message.Text("你的回答是: "),
 								),
 							)
-							time.Sleep(time.Millisecond * 500)
 							midiFile = cachePath + strconv.FormatInt(uid, 10) + time.Now().Format("20060102150405") + "_midicreate.mid"
 							cmidiFile, err = str2music(c.Event.Message.String(), midiFile)
 							if err != nil {
 								ctx.SendChain(message.Text("ERROR: can't convert midi file,", err))
 								return
 							}
+							time.Sleep(time.Millisecond * 500)
 							ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 							ctx.Send(
 								message.ReplyWithMessage(ctx.Event.MessageID,
@@ -147,6 +148,7 @@ func init() {
 								ctx.SendChain(message.Text("ERROR:听音练习结束，无法转换midi文件，", err))
 								return
 							}
+							time.Sleep(time.Millisecond * 500)
 							ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 							ctx.Send(
 								message.ReplyWithMessage(ctx.Event.MessageID,
@@ -167,6 +169,7 @@ func init() {
 							ctx.SendChain(message.Text("ERROR: can't convert midi file,", err))
 							return
 						}
+						time.Sleep(time.Millisecond * 500)
 						ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 						ctx.Send(
 							message.ReplyWithMessage(ctx.Event.MessageID,
