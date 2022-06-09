@@ -112,6 +112,7 @@ func init() {
 									message.Text("你的回答是: "),
 								),
 							)
+							time.Sleep(time.Millisecond * 500)
 							midiFile = cachePath + strconv.FormatInt(uid, 10) + time.Now().Format("20060102150405") + "_midicreate.mid"
 							cmidiFile, err = str2music(c.Event.Message.String(), midiFile)
 							if err != nil {
@@ -159,6 +160,7 @@ func init() {
 								message.Text("你的回答是: "),
 							),
 						)
+						time.Sleep(time.Millisecond * 500)
 						midiFile = cachePath + strconv.FormatInt(uid, 10) + time.Now().Format("20060102150405") + "_midicreate.mid"
 						cmidiFile, err = str2music(c.Event.Message.String(), midiFile)
 						if err != nil {
