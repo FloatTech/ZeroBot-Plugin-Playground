@@ -56,7 +56,7 @@ func init() {
 	engine.OnFullMatch("听音练习").SetBlock(true).Limit(ctxext.LimitByUser).
 		Handle(func(ctx *zero.Ctx) {
 			uid := ctx.Event.UserID
-			ctx.SendChain(message.Text("欢迎来到听力练习，一共有5个听音问题"))
+			ctx.SendChain(message.Text("欢迎来到听音练习，一共有5个问题，每个问题1分"))
 			next := zero.NewFutureEvent("message", 999, false, zero.RegexRule(`^[A-G][b|#]?\d{0,2}$`),
 				zero.OnlyGroup, ctx.CheckSession())
 			recv, cancel := next.Repeat()
@@ -161,17 +161,17 @@ func init() {
 							return
 						}
 						ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
+						errorCount++
 						ctx.Send(
 							message.ReplyWithMessage(ctx.Event.MessageID,
 								message.Text("回答错误，错误次数为", errorCount, "，请继续回答"),
 							),
 						)
-						errorCount++
 					}
 					if round == 6 {
 						ctx.Send(
 							message.ReplyWithMessage(ctx.Event.MessageID,
-								message.Text("游戏结束...答案是: ", answer, "所得分数为", score),
+								message.Text("练习结束...答案是: ", answer, ",所得分数为", score),
 							),
 						)
 						return
@@ -347,6 +347,9 @@ func processOne(note string) uint8 {
 		case k[i] >= '0' && k[i] <= '9':
 			level = level*10 + k[i] - '0'
 		}
+	}
+	if level == 0 {
+		level = 5
 	}
 	return o(base, level)
 }
