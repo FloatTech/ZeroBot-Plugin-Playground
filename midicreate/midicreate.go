@@ -96,6 +96,9 @@ func init() {
 					tick.Reset(105 * time.Second)
 					after.Reset(120 * time.Second)
 					n := processOne(c.Event.Message.String())
+					if n != target {
+						errorCount++
+					}
 					if errorCount == 3 || n == target {
 						if n == target {
 							ctx.Send(
@@ -118,7 +121,7 @@ func init() {
 							ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 							ctx.Send(
 								message.ReplyWithMessage(ctx.Event.MessageID,
-									message.Text("回答错误，答案是: ", answer, "错误次数已达3次，进入下一关"),
+									message.Text("回答错误，答案是: ", answer, "，错误次数已达3次，进入下一关"),
 								),
 							)
 						}
@@ -163,7 +166,6 @@ func init() {
 							return
 						}
 						ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
-						errorCount++
 						ctx.Send(
 							message.ReplyWithMessage(ctx.Event.MessageID,
 								message.Text("回答错误，错误次数为", errorCount, "，请继续回答"),
