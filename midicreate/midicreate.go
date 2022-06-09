@@ -118,7 +118,7 @@ func init() {
 							ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 							ctx.Send(
 								message.ReplyWithMessage(ctx.Event.MessageID,
-									message.Text("回答错误，答案是: ", answer),
+									message.Text("回答错误，答案是: ", answer, "错误次数已达3次，进入下一关"),
 								),
 							)
 						}
@@ -145,7 +145,7 @@ func init() {
 						ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 						ctx.Send(
 							message.ReplyWithMessage(ctx.Event.MessageID,
-								message.Text("判断上面的音频，输入音符,例如C#6"),
+								message.Text("判断上面的音频，输入音符，例如C#6"),
 							),
 						)
 					} else if n != target {
@@ -163,7 +163,7 @@ func init() {
 						ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 						ctx.Send(
 							message.ReplyWithMessage(ctx.Event.MessageID,
-								message.Text("回答错误，答案是: ", answer),
+								message.Text("回答错误，错误次数为", errorCount, "，请继续回答"),
 							),
 						)
 						errorCount++
