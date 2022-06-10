@@ -199,7 +199,7 @@ func init() {
 					if round == maxRound {
 						var text string
 						for k, v := range score {
-							text += fmt.Sprintf("%s: %f\n", ctx.CardOrNickName(k), v)
+							text += fmt.Sprintf("%s: %.1f\n", ctx.CardOrNickName(k), v)
 						}
 						ctx.Send(
 							message.ReplyWithMessage(c.Event.MessageID,
