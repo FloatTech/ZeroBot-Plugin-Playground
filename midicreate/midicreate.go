@@ -100,9 +100,13 @@ func init() {
 				case <-tick.C:
 					ctx.SendChain(message.Text("听音练习，你还有15s作答时间"))
 				case <-after.C:
+					var text string
+					for k, v := range score {
+						text += fmt.Sprintf("%s: %.1f\n", ctx.CardOrNickName(k), v)
+					}
 					ctx.Send(
 						message.ReplyWithMessage(ctx.Event.MessageID,
-							message.Text("听音练习超时，练习结束...答案是: ", answer, "所得分数为", score),
+							message.Text("听音练习超时，练习结束...答案是: ", answer, "\n所得分数如下:\n", text),
 						),
 					)
 					return
