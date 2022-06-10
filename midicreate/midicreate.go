@@ -27,7 +27,8 @@ func init() {
 	engine := control.Register("midicreate", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Help: "midi音乐制作\n- midi制作 CCGGAAGR FFEEDDCR GGFFEEDR GGFFEEDR CCGGAAGR FFEEDDCR\n" +
-			"- 听音练习",
+			"- 个人听音练习\n" +
+			"- 团队听音练习",
 		PrivateDataFolder: "midicreate",
 	})
 	cachePath := engine.DataFolder() + "cache/"
