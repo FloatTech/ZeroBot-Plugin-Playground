@@ -4,7 +4,6 @@ package yydz
 import (
 	"math/rand"
 	"strings"
-	"time"
 
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
@@ -30,8 +29,7 @@ func init() {
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR:", err))
 			}
-			r := rand.New(rand.NewSource(time.Now().Unix()))
-			imageURL := strings.ReplaceAll(github.Githubhost+fs[r.Intn(len(fs))].Href, "blob", "raw")
+			imageURL := strings.ReplaceAll(github.Githubhost+fs[rand.Intn(len(fs))].Href, "blob", "raw")
 			ctx.SendChain(message.Image(imageURL))
 		})
 }

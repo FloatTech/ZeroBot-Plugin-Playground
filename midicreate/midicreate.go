@@ -16,6 +16,7 @@ import (
 	"github.com/FloatTech/zbputils/control"
 	"github.com/FloatTech/zbputils/ctxext"
 	"github.com/FloatTech/zbputils/file"
+	"github.com/pkg/errors"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 	"gitlab.com/gomidi/midi/gm"
@@ -32,13 +33,11 @@ func init() {
 		PrivateDataFolder: "midicreate",
 	})
 	cachePath := engine.DataFolder() + "cache/"
-	go func() {
-		_ = os.RemoveAll(cachePath)
-		err := os.MkdirAll(cachePath, 0755)
-		if err != nil {
-			panic(err)
-		}
-	}()
+	_ = os.RemoveAll(cachePath)
+	err := os.MkdirAll(cachePath, 0755)
+	if err != nil {
+		panic(err)
+	}
 	engine.OnRegex(`^midi制作\s?(.{1,1000})$`).SetBlock(true).Limit(ctxext.LimitByUser).
 		Handle(func(ctx *zero.Ctx) {
 			uid := ctx.Event.UserID
@@ -47,7 +46,8 @@ func init() {
 			cmidiFile, err := str2music(input, midiFile)
 			if err != nil {
 				if file.IsExist(midiFile) {
-					_ = ctx.CallAction("upload_group_file", zero.Params{"group_id": ctx.Event.GroupID, "file": file.BOTPATH + "/" + midiFile, "name": filepath.Base(midiFile)})
+					ctx.UploadThisGroupFile(file.BOTPATH+"/"+midiFile, filepath.Base(midiFile), "")
+					return
 				}
 				ctx.SendChain(message.Text("ERROR:无法转换midi文件,", err))
 				return
@@ -57,7 +57,7 @@ func init() {
 	engine.OnRegex("^(个人|团队)听音练习$", zero.OnlyGroup).SetBlock(true).Limit(ctxext.LimitByUser).
 		Handle(func(ctx *zero.Ctx) {
 			uid := ctx.Event.UserID
-			ctx.SendChain(message.Text("欢迎来到听音练习，一共有5个问题，每个问题1分"))
+			ctx.SendChain(message.Text("欢迎来到听音练习, 一共有5个问题, 每个问题1分"))
 			var mode int
 			var next *zero.FutureEvent
 			var maxErrorCount int
@@ -84,14 +84,14 @@ func init() {
 			midiFile := cachePath + strconv.FormatInt(uid, 10) + time.Now().Format("20060102150405") + "_midicreate.mid"
 			cmidiFile, err := str2music(answer, midiFile)
 			if err != nil {
-				ctx.SendChain(message.Text("ERROR:听音练习结束，无法转换midi文件，", err))
+				ctx.SendChain(message.Text("ERROR:听音练习结束, 无法转换midi文件, ", err))
 				return
 			}
 			time.Sleep(time.Millisecond * 500)
 			ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 			ctx.Send(
 				message.ReplyWithMessage(ctx.Event.MessageID,
-					message.Text("判断上面的音频，输入音符，例如C#6"),
+					message.Text("判断上面的音频, 输入音符, 例如C#6"),
 				),
 			)
 			tick := time.NewTimer(45 * time.Second)
@@ -99,7 +99,7 @@ func init() {
 			for {
 				select {
 				case <-tick.C:
-					ctx.SendChain(message.Text("听音练习，你还有15s作答时间"))
+					ctx.SendChain(message.Text("听音练习, 你还有15s作答时间"))
 				case <-after.C:
 					var text string
 					for k, v := range score {
@@ -107,7 +107,7 @@ func init() {
 					}
 					ctx.Send(
 						message.ReplyWithMessage(ctx.Event.MessageID,
-							message.Text("听音练习超时，练习结束...答案是: ", answer, "\n所得分数如下:\n", text),
+							message.Text("听音练习超时, 练习结束...答案是: ", answer, "\n所得分数如下:\n", text),
 						),
 					)
 					return
@@ -122,7 +122,7 @@ func init() {
 						if n == target {
 							ctx.Send(
 								message.ReplyWithMessage(c.Event.MessageID,
-									message.Text("恭喜你回答正确，答案是: ", answer),
+									message.Text("恭喜你回答正确, 答案是: ", answer),
 								),
 							)
 						} else if errorCount == maxErrorCount {
@@ -141,7 +141,7 @@ func init() {
 							ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 							ctx.Send(
 								message.ReplyWithMessage(c.Event.MessageID,
-									message.Text("回答错误，答案是: ", answer, "，错误次数已达3次，进入下一关"),
+									message.Text("回答错误, 答案是: ", answer, ", 错误次数已达3次, 进入下一关"),
 								),
 							)
 						}
@@ -169,14 +169,14 @@ func init() {
 							midiFile = cachePath + strconv.FormatInt(uid, 10) + time.Now().Format("20060102150405") + "_midicreate.mid"
 							cmidiFile, err = str2music(answer, midiFile)
 							if err != nil {
-								ctx.SendChain(message.Text("ERROR:听音练习结束，无法转换midi文件，", err))
+								ctx.SendChain(message.Text("ERROR:听音练习结束, 无法转换midi文件, ", err))
 								return
 							}
 							time.Sleep(time.Millisecond * 500)
 							ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 							ctx.Send(
 								message.ReplyWithMessage(c.Event.MessageID,
-									message.Text("判断上面的音频，输入音符，例如C#6"),
+									message.Text("判断上面的音频, 输入音符, 例如C#6"),
 								),
 							)
 						}
@@ -197,7 +197,7 @@ func init() {
 						ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 						ctx.Send(
 							message.ReplyWithMessage(c.Event.MessageID,
-								message.Text("回答错误，错误次数为", errorCount, "，请继续回答"),
+								message.Text("回答错误, 错误次数为", errorCount, ", 请继续回答"),
 							),
 						)
 					}
@@ -208,7 +208,7 @@ func init() {
 						}
 						ctx.Send(
 							message.ReplyWithMessage(c.Event.MessageID,
-								message.Text("回答完毕，所得分数如下:\n", text),
+								message.Text("回答完毕, 所得分数如下:\n", text),
 							),
 						)
 						return
@@ -300,7 +300,7 @@ func mkMidi(filePath, input string) error {
 					i++
 				}
 			default:
-				return fmt.Errorf("无法解析第%d个位置的%c字符", i, k[i])
+				return errors.Errorf("无法解析第%d个位置的%c字符", i, k[i])
 			}
 			if i >= len(k) || (k[i] >= 'A' && k[i] <= 'G') || k[i] == 'R' {
 				break

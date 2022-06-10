@@ -6,6 +6,7 @@ require (
 	github.com/FloatTech/zbpctrl v1.4.1-0.20220604065149-1ca23316481c
 	github.com/FloatTech/zbputils v1.4.1-0.20220604095022-69b69d618e08
 	github.com/antchfx/htmlquery v1.2.4
+	github.com/pkg/errors v0.9.1
 	github.com/wdvxdr1123/ZeroBot v1.5.2-0.20220509035736-f3ad8fa960d7
 	gitlab.com/gomidi/midi v1.23.7
 	gitlab.com/gomidi/midi/v2 v2.0.15

@@ -1,6 +1,9 @@
 package main
 
 import (
+	"math/rand"
+	"time"
+
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/github/yydz"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/midicreate"
@@ -11,6 +14,8 @@ import (
 )
 
 func main() {
+	rand.Seed(time.Now().Unix()) // 全局 seed, 插件无需再 seed
+
 	zero.OnCommand("hello").
 		Handle(func(ctx *zero.Ctx) {
 			ctx.Send("world")
