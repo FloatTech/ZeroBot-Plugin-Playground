@@ -53,17 +53,30 @@ func init() {
 			}
 			ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 		})
-	engine.OnFullMatch("听音练习").SetBlock(true).Limit(ctxext.LimitByUser).
+	engine.OnRegex("^(个人|团队)听音练习$", zero.OnlyGroup).SetBlock(true).Limit(ctxext.LimitByUser).
 		Handle(func(ctx *zero.Ctx) {
 			uid := ctx.Event.UserID
 			ctx.SendChain(message.Text("欢迎来到听音练习，一共有5个问题，每个问题1分"))
-			next := zero.NewFutureEvent("message", 999, false, zero.RegexRule(`^[A-G][b|#]?\d{0,2}$`),
-				zero.OnlyGroup, ctx.CheckSession())
+			var mode int
+			var next *zero.FutureEvent
+			var maxErrorCount int
+			if ctx.State["regex_matched"].([]string)[1] == "个人" {
+				mode = 0
+				next = zero.NewFutureEvent("message", 999, false, zero.RegexRule(`^[A-G][b|#]?\d{0,2}$`),
+					zero.OnlyGroup, ctx.CheckSession())
+				maxErrorCount = 3
+			} else {
+				mode = 1
+				next = zero.NewFutureEvent("message", 999, false, zero.RegexRule(fmt.Sprintf(`^[A-G][b|#]?\d{0,2}$`)),
+					zero.OnlyGroup, zero.CheckGroup(ctx.Event.GroupID))
+				maxErrorCount = 10
+			}
 			recv, cancel := next.Repeat()
 			defer cancel()
 
-			score := 0.0
+			score := make(map[int64]float64)
 			round := 1
+			maxRound := 6
 			errorCount := 0
 			target := uint8(55 + rand.Intn(34))
 			answer := name(target) + strconv.Itoa(int(target/12))
@@ -87,29 +100,33 @@ func init() {
 				case <-tick.C:
 					ctx.SendChain(message.Text("听音练习，你还有15s作答时间"))
 				case <-after.C:
+					var text string
+					for k, v := range score {
+						text += fmt.Sprintf("%s: %.1f\n", ctx.CardOrNickName(k), v)
+					}
 					ctx.Send(
 						message.ReplyWithMessage(ctx.Event.MessageID,
-							message.Text("听音练习超时，练习结束...答案是: ", answer, "所得分数为", score),
+							message.Text("听音练习超时，练习结束...答案是: ", answer, "\n所得分数如下:\n", text),
 						),
 					)
 					return
 				case c := <-recv:
-					tick.Reset(105 * time.Second)
-					after.Reset(120 * time.Second)
+					tick.Reset(45 * time.Second)
+					after.Reset(60 * time.Second)
 					n := processOne(c.Event.Message.String())
 					if n != target {
 						errorCount++
 					}
-					if errorCount == 3 || n == target {
+					if errorCount == maxErrorCount || n == target {
 						if n == target {
 							ctx.Send(
-								message.ReplyWithMessage(ctx.Event.MessageID,
+								message.ReplyWithMessage(c.Event.MessageID,
 									message.Text("恭喜你回答正确，答案是: ", answer),
 								),
 							)
-						} else if errorCount == 3 {
+						} else if errorCount == maxErrorCount {
 							ctx.Send(
-								message.ReplyWithMessage(ctx.Event.MessageID,
+								message.ReplyWithMessage(c.Event.MessageID,
 									message.Text("你的回答是: "),
 								),
 							)
@@ -122,23 +139,29 @@ func init() {
 							time.Sleep(time.Millisecond * 500)
 							ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 							ctx.Send(
-								message.ReplyWithMessage(ctx.Event.MessageID,
+								message.ReplyWithMessage(c.Event.MessageID,
 									message.Text("回答错误，答案是: ", answer, "，错误次数已达3次，进入下一关"),
 								),
 							)
 						}
 						// 统计分数
-						switch errorCount {
-						case 0:
-							score += 1.0
-						case 1:
-							score += 0.5
-						case 2:
-							score += 0.2
+						if mode == 0 {
+							switch errorCount {
+							case 0:
+								score[c.Event.UserID] += 1.0
+							case 1:
+								score[c.Event.UserID] += 0.5
+							case 2:
+								score[c.Event.UserID] += 0.2
+							}
+						} else if mode == 1 {
+							if errorCount != maxErrorCount {
+								score[c.Event.UserID] += 1.0
+							}
 						}
 						// 下一关
 						round++
-						if round != 6 {
+						if round != maxRound {
 							errorCount = 0
 							target = uint8(55 + rand.Intn(34))
 							answer = name(target) + strconv.Itoa(int(target/12))
@@ -151,14 +174,14 @@ func init() {
 							time.Sleep(time.Millisecond * 500)
 							ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 							ctx.Send(
-								message.ReplyWithMessage(ctx.Event.MessageID,
+								message.ReplyWithMessage(c.Event.MessageID,
 									message.Text("判断上面的音频，输入音符，例如C#6"),
 								),
 							)
 						}
 					} else if n != target {
 						ctx.Send(
-							message.ReplyWithMessage(ctx.Event.MessageID,
+							message.ReplyWithMessage(c.Event.MessageID,
 								message.Text("你的回答是: "),
 							),
 						)
@@ -172,15 +195,19 @@ func init() {
 						time.Sleep(time.Millisecond * 500)
 						ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + cmidiFile))
 						ctx.Send(
-							message.ReplyWithMessage(ctx.Event.MessageID,
+							message.ReplyWithMessage(c.Event.MessageID,
 								message.Text("回答错误，错误次数为", errorCount, "，请继续回答"),
 							),
 						)
 					}
-					if round == 6 {
+					if round == maxRound {
+						var text string
+						for k, v := range score {
+							text += fmt.Sprintf("%s: %.1f\n", ctx.CardOrNickName(k), v)
+						}
 						ctx.Send(
-							message.ReplyWithMessage(ctx.Event.MessageID,
-								message.Text("回答完毕，所得分数为", score),
+							message.ReplyWithMessage(c.Event.MessageID,
+								message.Text("回答完毕，所得分数如下:\n", text),
 							),
 						)
 						return
