@@ -17,7 +17,7 @@ import (
 func init() {
 	engine := control.Register("nihongo", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
-		Help:             "日语学习\n- 日语语法[xxx](使用tag随机)\n- 随机日语语法",
+		Help:             "日语学习\n- 日语语法[xxx](使用tag随机)",
 		PublicDataFolder: "Nihongo",
 	})
 
@@ -60,16 +60,4 @@ func init() {
 			}
 		})
 
-	engine.OnFullMatch("随机日语语法", getdb).SetBlock(true).
-		Handle(func(ctx *zero.Ctx) {
-			g := getRandomGrammar()
-			data, err := text.RenderToBase64(g.string(), text.FontFile, 400, 20)
-			if err != nil {
-				ctx.SendChain(message.Text("ERROR:", err))
-				return
-			}
-			if id := ctx.SendChain(message.Image("base64://" + binary.BytesToString(data))); id.ID() == 0 {
-				ctx.SendChain(message.Text("ERROR:可能被风控了"))
-			}
-		})
 }
