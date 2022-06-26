@@ -59,5 +59,4 @@ func init() {
 				ctx.SendChain(message.Text("ERROR:可能被风控了"))
 			}
 		})
-
 }

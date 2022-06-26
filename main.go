@@ -7,12 +7,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/FloatTech/zbputils/process"
+	"github.com/sirupsen/logrus"
+
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/bilibilipush"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/github/yydz"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/nihongo"
-	"github.com/FloatTech/zbputils/process"
-	"github.com/sirupsen/logrus"
 
 	// 程序主体
 	zero "github.com/wdvxdr1123/ZeroBot"
