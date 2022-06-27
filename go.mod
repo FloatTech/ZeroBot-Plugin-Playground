@@ -8,6 +8,7 @@ require (
 	github.com/FloatTech/zbputils v1.4.1-0.20220613042833-33e22060e8d9
 	github.com/antchfx/htmlquery v1.2.4
 	github.com/fumiama/sqlite3 v1.14.6
+	github.com/guohuiyuan/bilibili v0.0.0-20220627174844-78eba78c2915
 	github.com/jinzhu/gorm v1.9.16
 	github.com/sirupsen/logrus v1.8.1
 	github.com/tidwall/gjson v1.14.1

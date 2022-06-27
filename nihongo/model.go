@@ -28,8 +28,3 @@ func getRandomGrammarByTag(tag string) (g grammar) {
 	_ = db.Find("grammar", &g, "where tag LIKE '%"+tag+"%' ORDER BY RANDOM() limit 1")
 	return
 }
-
-func getRandomGrammar() (g grammar) {
-	_ = db.Pick("grammar", &g)
-	return
-}
