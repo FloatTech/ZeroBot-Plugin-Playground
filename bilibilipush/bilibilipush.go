@@ -5,9 +5,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"regexp"
 	"strconv"
 	"time"
 
+	"github.com/guohuiyuan/bilibili"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 	zero "github.com/wdvxdr1123/ZeroBot"
@@ -19,8 +22,6 @@ import (
 	"github.com/FloatTech/zbputils/ctxext"
 	"github.com/FloatTech/zbputils/img/text"
 	"github.com/FloatTech/zbputils/web"
-
-	"github.com/FloatTech/ZeroBot-Plugin-Playground/bilibilipush/dynamic"
 )
 
 const (
@@ -28,7 +29,6 @@ const (
 	referer     = "https://www.bilibili.com/"
 	infoURL     = "https://api.bilibili.com/x/space/acc/info?mid=%v"
 	liveListURL = "https://api.live.bilibili.com/room/v1/Room/get_status_info_by_uids"
-	tURL        = "https://t.bilibili.com/"
 	liveURL     = "https://live.bilibili.com/"
 	serviceName = "bilibilipush"
 )
@@ -45,8 +45,12 @@ var (
 		-402: "uid不存在，注意uid不是房间号",
 		-412: "操作过于频繁IP暂时被风控，请半小时后再尝试",
 	}
-	upMap = map[int64]string{}
-	limit = ctxext.NewLimiterManager(time.Second*10, 1)
+	upMap          = map[int64]string{}
+	limit          = ctxext.NewLimiterManager(time.Second*10, 1)
+	searchVideo    = `bilibili.com/video/(?:av(\d+)|(bv[\da-z]+))`
+	searchDynamic  = `[t.bilibili.com|m.bilibili.com/dynamic]/(\d+)`
+	searchArticle  = `bilibili.com/read/(?:cv|mobile/)(\d+)`
+	searchLiveRoom = `live.bilibili.com/(\d+)`
 )
 
 func init() {
@@ -59,7 +63,7 @@ func init() {
 			"- 取消b站动态订阅[uid]\n" +
 			"- 取消b站直播订阅[uid]\n" +
 			"- b站推送列表\n" +
-			"- https://t.bilibili.com/642277677329285174 (b站动态解析)",
+			"- t.bilibili.com/642277677329285174 | www.bilibili.com/read/cv17134450 | www.bilibili.com/video/BV13B4y1x7pS | live.bilibili.com/22603245 (b站动态、专栏、视频、直播解析)",
 		PrivateDataFolder: serviceName,
 	})
 
@@ -70,15 +74,37 @@ func init() {
 		bdb = initialize(dbfile)
 	}()
 
-	en.OnRegex(`https://t.bilibili.com/([0-9]+)`).SetBlock(true).Limit(limit.LimitByGroup).
+	en.OnRegex(`((b23|acg).tv|bili2233.cn)/[0-9a-zA-Z]+`).SetBlock(true).Limit(limit.LimitByGroup).
 		Handle(func(ctx *zero.Ctx) {
-			dynID := ctx.State["regex_matched"].([]string)[1]
-			msg, err := dynamic.Detail(dynID)
+			url := ctx.State["regex_matched"].([]string)[0]
+			realurl, err := getrealurl("https://" + url)
 			if err != nil {
-				ctx.SendChain(message.Text("ERROR:解析", dynID, err))
+				ctx.SendChain(message.Text("ERROR: ", err))
+				return
 			}
-			ctx.SendChain(msg...)
+			searchVideoRe := regexp.MustCompile(searchVideo)
+			searchDynamicRe := regexp.MustCompile(searchDynamic)
+			searchArticleRe := regexp.MustCompile(searchArticle)
+			searchLiveRoomRe := regexp.MustCompile(searchLiveRoom)
+			switch {
+			case searchVideoRe.MatchString(realurl):
+				ctx.State["regex_matched"] = searchVideoRe.FindStringSubmatch(realurl)
+				handleVideo(ctx)
+			case searchDynamicRe.MatchString(realurl):
+				ctx.State["regex_matched"] = searchDynamicRe.FindStringSubmatch(realurl)
+				handleDynamic(ctx)
+			case searchArticleRe.MatchString(realurl):
+				ctx.State["regex_matched"] = searchArticleRe.FindStringSubmatch(realurl)
+				handleArticle(ctx)
+			case searchLiveRoomRe.MatchString(realurl):
+				ctx.State["regex_matched"] = searchLiveRoomRe.FindStringSubmatch(realurl)
+				handleLive(ctx)
+			}
 		})
+	en.OnRegex(searchVideo).SetBlock(true).Limit(limit.LimitByGroup).Handle(handleVideo)
+	en.OnRegex(searchDynamic).SetBlock(true).Limit(limit.LimitByGroup).Handle(handleDynamic)
+	en.OnRegex(searchArticle).SetBlock(true).Limit(limit.LimitByGroup).Handle(handleArticle)
+	en.OnRegex(searchLiveRoom).SetBlock(true).Limit(limit.LimitByGroup).Handle(handleLive)
 
 	en.OnRegex(`^添加b站订阅\s?(\d+)$`, zero.UserOrGrpAdmin).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		buid, _ := strconv.ParseInt(ctx.State["regex_matched"].([]string)[1], 10, 64)
@@ -244,11 +270,17 @@ func bilibiliPushDaily() {
 	t := time.NewTicker(time.Second * 10)
 	defer t.Stop()
 	for range t.C {
-		if time.Now().Unix()%1800 == 0 {
+		if time.Now().Unix()%9 == 0 {
 			log.Debugln("-----bilibilipush拉取推送信息-----")
 		}
-		_ = sendDynamic()
-		_ = sendLive()
+		err := sendDynamic()
+		if err != nil {
+			log.Errorln(err)
+		}
+		err = sendLive()
+		if err != nil {
+			log.Errorln(err)
+		}
 	}
 }
 
@@ -311,7 +343,7 @@ func unsubscribeLive(buid, groupid int64) (err error) {
 }
 
 func getUserDynamicCard(buid int64) (cardList []gjson.Result, err error) {
-	data, err := web.RequestDataWith(web.NewDefaultClient(), fmt.Sprintf(dynamic.SpaceHistoryURL, buid, 0), "GET", referer, ua)
+	data, err := web.RequestDataWith(web.NewDefaultClient(), fmt.Sprintf(bilibili.SpaceHistoryURL, buid, 0), "GET", referer, ua)
 	if err != nil {
 		return
 	}
@@ -352,7 +384,7 @@ func sendDynamic() error {
 				m, ok := control.Lookup(serviceName)
 				if ok {
 					groupList := bdb.getAllGroupByBuidAndDynamic(buid)
-					msg, err := dynamic.Card2msg(cardList[i].Raw, 0)
+					msg, err := bilibili.DynamicCard2msg(cardList[i].Raw, 0)
 					if err != nil {
 						err = fmt.Errorf("动态%v的解析有问题,%v", cardList[i].Get("desc.dynamic_id_str"), err)
 						return err
@@ -434,4 +466,54 @@ func sendLive() error {
 		return true
 	})
 	return nil
+}
+
+// getrealurl 获取跳转后的链接
+func getrealurl(url string) (realurl string, err error) {
+	data, err := http.Head(url)
+	if err != nil {
+		return
+	}
+	realurl = data.Request.URL.String()
+	return
+}
+
+func handleVideo(ctx *zero.Ctx) {
+	id := ctx.State["regex_matched"].([]string)[1]
+	if id == "" {
+		id = ctx.State["regex_matched"].([]string)[2]
+	}
+	msg, err := bilibili.VideoInfo(id)
+	if err != nil {
+		ctx.SendChain(message.Text("ERROR:", err))
+		return
+	}
+	ctx.SendChain(msg...)
+}
+
+func handleDynamic(ctx *zero.Ctx) {
+	msg, err := bilibili.DynamicDetail(ctx.State["regex_matched"].([]string)[1])
+	if err != nil {
+		ctx.SendChain(message.Text("ERROR:", err))
+		return
+	}
+	ctx.SendChain(msg...)
+}
+
+func handleArticle(ctx *zero.Ctx) {
+	msg, err := bilibili.ArticleInfo(ctx.State["regex_matched"].([]string)[1])
+	if err != nil {
+		ctx.SendChain(message.Text("ERROR:", err))
+		return
+	}
+	ctx.SendChain(msg...)
+}
+
+func handleLive(ctx *zero.Ctx) {
+	msg, err := bilibili.LiveRoomInfo(ctx.State["regex_matched"].([]string)[1])
+	if err != nil {
+		ctx.SendChain(message.Text("ERROR:", err))
+		return
+	}
+	ctx.SendChain(msg...)
 }
