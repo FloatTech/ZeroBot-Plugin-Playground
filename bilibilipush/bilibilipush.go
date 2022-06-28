@@ -41,13 +41,13 @@ var (
 	liveStatus  = map[int64]int{}
 	uidErrorMsg = map[int]string{
 		0:    "输入的uid有效",
-		-400: "uid不存在，注意uid不是房间号",
-		-402: "uid不存在，注意uid不是房间号",
-		-412: "操作过于频繁IP暂时被风控，请半小时后再尝试",
+		-400: "uid不存在, 注意uid不是房间号",
+		-402: "uid不存在, 注意uid不是房间号",
+		-412: "操作过于频繁IP暂时被风控, 请半小时后再尝试",
 	}
 	upMap          = map[int64]string{}
 	limit          = ctxext.NewLimiterManager(time.Second*10, 1)
-	searchVideo    = `bilibili.com/video/(?:av(\d+)|(bv[\da-z]+))`
+	searchVideo    = `bilibili.com/video/(?:av(\d+)|([bv|BV][0-9a-zA-Z]+))`
 	searchDynamic  = `[t.bilibili.com|m.bilibili.com/dynamic]/(\d+)`
 	searchArticle  = `bilibili.com/read/(?:cv|mobile/)(\d+)`
 	searchLiveRoom = `live.bilibili.com/(\d+)`
@@ -121,7 +121,7 @@ func init() {
 			if status != 0 {
 				msg, ok := uidErrorMsg[status]
 				if !ok {
-					msg = "未知错误，请私聊反馈给" + zero.BotConfig.NickName[0]
+					msg = "未知错误, 请私聊反馈给" + zero.BotConfig.NickName[0]
 				}
 				ctx.SendChain(message.Text(msg))
 				return
@@ -152,7 +152,7 @@ func init() {
 			if status != 0 {
 				msg, ok := uidErrorMsg[status]
 				if !ok {
-					msg = "未知错误，请私聊反馈给" + zero.BotConfig.NickName[0]
+					msg = "未知错误, 请私聊反馈给" + zero.BotConfig.NickName[0]
 				}
 				ctx.SendChain(message.Text(msg))
 				return
@@ -183,7 +183,7 @@ func init() {
 			if status != 0 {
 				msg, ok := uidErrorMsg[status]
 				if !ok {
-					msg = "未知错误，请私聊反馈给" + zero.BotConfig.NickName[0]
+					msg = "未知错误, 请私聊反馈给" + zero.BotConfig.NickName[0]
 				}
 				ctx.SendChain(message.Text(msg))
 				return
@@ -214,7 +214,7 @@ func init() {
 			if status != 0 {
 				msg, ok := uidErrorMsg[status]
 				if !ok {
-					msg = "未知错误，请私聊反馈给" + zero.BotConfig.NickName[0]
+					msg = "未知错误, 请私聊反馈给" + zero.BotConfig.NickName[0]
 				}
 				ctx.SendChain(message.Text(msg))
 				return
@@ -365,6 +365,7 @@ func getLiveList(uids ...int64) (string, error) {
 func sendDynamic() error {
 	uids := bdb.getAllBuidByDynamic()
 	for _, buid := range uids {
+		time.Sleep(2 * time.Second)
 		cardList, err := getUserDynamicCard(buid)
 		if err != nil {
 			return err

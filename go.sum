@@ -46,8 +46,8 @@ github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e/go.mod h1:cIg4er
 github.com/google/go-cmp v0.5.3/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/guohuiyuan/bilibili v0.0.0-20220627174844-78eba78c2915 h1:kWwY/i5RD3FS++ijCwpIExP8IFj9leL5ef1QIhu9tQA=
-github.com/guohuiyuan/bilibili v0.0.0-20220627174844-78eba78c2915/go.mod h1:7BL1MBUB5YTct6ldtnFVp3sNtmpcBAkm5hCOFGql1mk=
+github.com/guohuiyuan/bilibili v0.0.0-20220628040241-b4be57e38fb8 h1:8Kv56qNOVM44yTQ4Vn2EaY1WEtwLhBQ+iBFdTa3eutg=
+github.com/guohuiyuan/bilibili v0.0.0-20220628040241-b4be57e38fb8/go.mod h1:7BL1MBUB5YTct6ldtnFVp3sNtmpcBAkm5hCOFGql1mk=
 github.com/jinzhu/gorm v1.9.16 h1:+IyIjPEABKRpsu/F8OvDPy9fyQlgsg2luMV2ZIH5i5o=
 github.com/jinzhu/gorm v1.9.16/go.mod h1:G3LB3wezTOWM2ITLzPxEXgSkOXAntiLHS7UdBefADcs=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
