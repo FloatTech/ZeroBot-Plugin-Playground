@@ -41,9 +41,9 @@ var (
 	liveStatus  = map[int64]int{}
 	uidErrorMsg = map[int]string{
 		0:    "输入的uid有效",
-		-400: "uid不存在，注意uid不是房间号",
-		-402: "uid不存在，注意uid不是房间号",
-		-412: "操作过于频繁IP暂时被风控，请半小时后再尝试",
+		-400: "uid不存在, 注意uid不是房间号",
+		-402: "uid不存在, 注意uid不是房间号",
+		-412: "操作过于频繁IP暂时被风控, 请半小时后再尝试",
 	}
 	upMap          = map[int64]string{}
 	limit          = ctxext.NewLimiterManager(time.Second*10, 1)
@@ -121,7 +121,7 @@ func init() {
 			if status != 0 {
 				msg, ok := uidErrorMsg[status]
 				if !ok {
-					msg = "未知错误，请私聊反馈给" + zero.BotConfig.NickName[0]
+					msg = "未知错误, 请私聊反馈给" + zero.BotConfig.NickName[0]
 				}
 				ctx.SendChain(message.Text(msg))
 				return
@@ -152,7 +152,7 @@ func init() {
 			if status != 0 {
 				msg, ok := uidErrorMsg[status]
 				if !ok {
-					msg = "未知错误，请私聊反馈给" + zero.BotConfig.NickName[0]
+					msg = "未知错误, 请私聊反馈给" + zero.BotConfig.NickName[0]
 				}
 				ctx.SendChain(message.Text(msg))
 				return
@@ -183,7 +183,7 @@ func init() {
 			if status != 0 {
 				msg, ok := uidErrorMsg[status]
 				if !ok {
-					msg = "未知错误，请私聊反馈给" + zero.BotConfig.NickName[0]
+					msg = "未知错误, 请私聊反馈给" + zero.BotConfig.NickName[0]
 				}
 				ctx.SendChain(message.Text(msg))
 				return
@@ -214,7 +214,7 @@ func init() {
 			if status != 0 {
 				msg, ok := uidErrorMsg[status]
 				if !ok {
-					msg = "未知错误，请私聊反馈给" + zero.BotConfig.NickName[0]
+					msg = "未知错误, 请私聊反馈给" + zero.BotConfig.NickName[0]
 				}
 				ctx.SendChain(message.Text(msg))
 				return
