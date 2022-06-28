@@ -47,7 +47,7 @@ var (
 	}
 	upMap          = map[int64]string{}
 	limit          = ctxext.NewLimiterManager(time.Second*10, 1)
-	searchVideo    = `bilibili.com/video/(?:av(\d+)|(bv[\da-z]+))`
+	searchVideo    = `bilibili.com/video/(?:av(\d+)|(bv[\da-zA-Z]+))`
 	searchDynamic  = `[t.bilibili.com|m.bilibili.com/dynamic]/(\d+)`
 	searchArticle  = `bilibili.com/read/(?:cv|mobile/)(\d+)`
 	searchLiveRoom = `live.bilibili.com/(\d+)`
