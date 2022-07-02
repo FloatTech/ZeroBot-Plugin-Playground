@@ -8,6 +8,7 @@ import (
 
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
+	"github.com/FloatTech/zbputils/ctxext"
 	"github.com/FloatTech/zbputils/file"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
@@ -59,7 +60,7 @@ func init() { // 插件主体
 		DisableOnDefault:  false,
 		Help:              "制图\n- " + strings.Join(cmd, "\n- "),
 		PrivateDataFolder: "petpet",
-	})
+	}).ApplySingle(ctxext.DefaultSingle)
 	datapath = file.BOTPATH + "/" + en.DataFolder()
 	en.OnRegex(`^(` + strings.Join(cmd, "|") + `)[\s\S]*?(\[CQ:(image\,file=([0-9a-zA-Z]{32}).*|at.+?(\d{5,11}))\].*|(\d+))$`).
 		SetBlock(true).Handle(func(ctx *zero.Ctx) {
