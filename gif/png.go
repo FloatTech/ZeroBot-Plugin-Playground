@@ -198,23 +198,17 @@ func (cc *context) Alike(args ...string) (string, error) {
 		return "", err
 	}
 	wg.Wait()
-	name := cc.usrdir + `Alike.png`
-	back, err := gg.LoadImage(c[0])
+	imgs, err := loadFirstFrames(c, 1)
 	if err != nil {
 		return "", err
 	}
-	canvas := gg.NewContextForImage(back)
-	canvas.SetColor(color.Black)
-	_, _ = file.GetLazyData(text.BoldFontFile, true)
-	fontSize := 26.0
-	_ = canvas.LoadFontFace(text.BoldFontFile, fontSize)
-	l, _ := canvas.MeasureString(args[0])
-	if l > fontSize*4 {
-		err = errors.New("输入字符太长")
+	name := cc.usrdir + `Anyasuki.png`
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 82, 69)
+	if err != nil {
 		return "", err
 	}
-	canvas.DrawString(args[0], 180-l/2, 65)
-	return "file:///" + name, canvas.SavePNG(name)
+	imgnrgba := imgs[0].InsertUp(im.Im, 0, 0, 136, 21).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
 }
 
 // Marriage
@@ -241,5 +235,123 @@ func (cc *context) Marriage(args ...string) (string, error) {
 		return "", err
 	}
 	imgnrgba := im.InsertUp(imgs[0].Im, 0, 0, 0, 0).InsertUp(imgs[1].Im, 0, 0, 520, 0).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
+// Anyasuki 阿尼亚喜欢
+func (cc *context) Anyasuki(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("anyasuki", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	name := cc.usrdir + `Anyasuki.png`
+	back, err := gg.LoadImage(c[0])
+	if err != nil {
+		return "", err
+	}
+	face, err := gg.LoadImage(cc.headimgsdir[0])
+	if err != nil {
+		return "", err
+	}
+	canvas := gg.NewContext(475, 540)
+	canvas.DrawImage(img.Size(face, 347, 267).Im, 82, 53)
+	canvas.DrawImage(back, 0, 0)
+	canvas.SetColor(color.Black)
+	_, err = file.GetLazyData(text.BoldFontFile, true)
+	if err != nil {
+		return "", err
+	}
+	if err = canvas.LoadFontFace(text.BoldFontFile, 30); err != nil {
+		return "", err
+	}
+	if args[0] == "" {
+		args[0] = "阿尼亚喜欢这个"
+	}
+	l, _ := canvas.MeasureString(args[0])
+	if l > 500 {
+		return "", errors.New("文字消息太长了")
+	}
+	canvas.DrawString(args[0], (500-l)/2.0, 535)
+	return "file:///" + name, canvas.SavePNG(name)
+}
+
+// AlwaysLike 我永远喜欢
+func (cc *context) AlwaysLike(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("always_like", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	name := cc.usrdir + `Anyasuki.png`
+	back, err := gg.LoadImage(c[0])
+	if err != nil {
+		return "", err
+	}
+	face, err := gg.LoadImage(cc.headimgsdir[0])
+	if err != nil {
+		return "", err
+	}
+	canvas := gg.NewContext(830, 599)
+	canvas.DrawImage(back, 0, 0)
+	canvas.DrawImage(img.Size(face, 341, 341).Im, 44, 74)
+	canvas.SetColor(color.Black)
+	_, err = file.GetLazyData(text.BoldFontFile, true)
+	if err != nil {
+		return "", err
+	}
+	if err = canvas.LoadFontFace(text.BoldFontFile, 56); err != nil {
+		return "", err
+	}
+	if args[0] == "" {
+		args[0] = "你们"
+	}
+	args[0] = "我永远喜欢" + args[0]
+	l, _ := canvas.MeasureString(args[0])
+	if l > 830 {
+		return "", errors.New("文字消息太长了")
+	}
+	canvas.DrawString(args[0], (830-l)/2.0, 559)
+	return "file:///" + name, canvas.SavePNG(name)
+}
+
+// DecentKiss 像样的亲亲
+func (cc *context) DecentKiss(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("decent_kiss", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 1)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + `Marriage.png`
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 589, 577)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := im.InsertUp(imgs[0].Im, 0, 0, 0, 0).Im
 	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
 }
