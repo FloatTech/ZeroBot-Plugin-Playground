@@ -7,9 +7,11 @@ require (
 	github.com/FloatTech/zbpctrl v1.4.1-0.20220610074608-425160596f27
 	github.com/FloatTech/zbputils v1.4.1-0.20220613042833-33e22060e8d9
 	github.com/antchfx/htmlquery v1.2.4
+	github.com/fogleman/gg v1.3.0
 	github.com/fumiama/sqlite3 v1.14.6
-	github.com/guohuiyuan/bilibili v0.0.0-20220628040241-b4be57e38fb8
+	github.com/guohuiyuan/bilibili v0.0.0-20220702115647-ef762dbbf5b9
 	github.com/jinzhu/gorm v1.9.16
+	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/tidwall/gjson v1.14.1
 	github.com/wdvxdr1123/ZeroBot v1.5.2-0.20220610070647-9eeffcb277ee
@@ -21,7 +23,6 @@ require (
 	github.com/antchfx/xpath v1.2.0 // indirect
 	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/ericpauley/go-quantize v0.0.0-20200331213906-ae555eb2afa4 // indirect
-	github.com/fogleman/gg v1.3.0 // indirect
 	github.com/fumiama/cron v1.3.0 // indirect
 	github.com/fumiama/go-base16384 v1.5.3 // indirect
 	github.com/fumiama/go-registry v0.1.6 // indirect

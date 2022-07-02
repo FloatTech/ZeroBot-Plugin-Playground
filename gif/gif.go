@@ -9,7 +9,7 @@ import (
 )
 
 // Mo 摸
-func (cc *context) Mo() (string, error) {
+func (cc *context) Mo(value ...string) (string, error) {
 	var wg sync.WaitGroup
 	var err error
 	var m sync.Mutex
@@ -45,7 +45,7 @@ func (cc *context) Mo() (string, error) {
 }
 
 // Cuo 搓
-func (cc *context) Cuo() (string, error) {
+func (cc *context) Cuo(value ...string) (string, error) {
 	var wg sync.WaitGroup
 	var err error
 	var m sync.Mutex
@@ -85,7 +85,7 @@ func (cc *context) Cuo() (string, error) {
 }
 
 // Qiao 敲
-func (cc *context) Qiao() (string, error) {
+func (cc *context) Qiao(value ...string) (string, error) {
 	var wg sync.WaitGroup
 	var err error
 	var m sync.Mutex
@@ -118,7 +118,7 @@ func (cc *context) Qiao() (string, error) {
 }
 
 // Chi 吃
-func (cc *context) Chi() (string, error) {
+func (cc *context) Chi(value ...string) (string, error) {
 	var wg sync.WaitGroup
 	var err error
 	var m sync.Mutex
@@ -152,7 +152,7 @@ func (cc *context) Chi() (string, error) {
 }
 
 // Ceng 蹭
-func (cc *context) Ceng() (string, error) {
+func (cc *context) Ceng(value ...string) (string, error) {
 	var wg sync.WaitGroup
 	var err error
 	var m sync.Mutex
@@ -193,7 +193,7 @@ func (cc *context) Ceng() (string, error) {
 }
 
 // Kiss 亲
-func (cc *context) Kiss() (string, error) {
+func (cc *context) Kiss(value ...string) (string, error) {
 	var wg sync.WaitGroup
 	var err error
 	var m sync.Mutex
@@ -230,7 +230,7 @@ func (cc *context) Kiss() (string, error) {
 }
 
 // Ken 啃
-func (cc *context) Ken() (string, error) {
+func (cc *context) Ken(value ...string) (string, error) {
 	var wg sync.WaitGroup
 	var err error
 	var m sync.Mutex
@@ -277,7 +277,7 @@ func (cc *context) Ken() (string, error) {
 }
 
 // Pai 拍
-func (cc *context) Pai() (string, error) {
+func (cc *context) Pai(value ...string) (string, error) {
 	var wg sync.WaitGroup
 	var err error
 	var m sync.Mutex
@@ -310,7 +310,7 @@ func (cc *context) Pai() (string, error) {
 }
 
 // Xqe 冲
-func (cc *context) Xqe() (string, error) {
+func (cc *context) Xqe(value ...string) (string, error) {
 	var wg sync.WaitGroup
 	var err error
 	var m sync.Mutex
@@ -343,7 +343,7 @@ func (cc *context) Xqe() (string, error) {
 }
 
 // Diu 丢
-func (cc *context) Diu() (string, error) {
+func (cc *context) Diu(value ...string) (string, error) {
 	var wg sync.WaitGroup
 	var err error
 	var m sync.Mutex

@@ -1,17 +1,22 @@
 package gif
 
 import (
+	"errors"
+	"image/color"
 	"math/rand"
 	"os"
 	"strconv"
+	"sync"
 
 	"github.com/FloatTech/zbputils/file"
 	"github.com/FloatTech/zbputils/img"
+	"github.com/FloatTech/zbputils/img/text"
 	"github.com/FloatTech/zbputils/img/writer"
+	"github.com/fogleman/gg"
 )
 
 // Pa 爬
-func (cc *context) Pa() (string, error) {
+func (cc *context) Pa(value ...string) (string, error) {
 	name := cc.usrdir + `爬.png`
 	tou, err := cc.getLogo(0, 0)
 	if err != nil {
@@ -37,7 +42,7 @@ func (cc *context) Pa() (string, error) {
 }
 
 // Si 撕
-func (cc *context) Si() (string, error) {
+func (cc *context) Si(value ...string) (string, error) {
 	name := cc.usrdir + `撕.png`
 	tou, err := cc.getLogo(0, 0)
 	if err != nil {
@@ -63,7 +68,7 @@ func (cc *context) Si() (string, error) {
 }
 
 // FlipV 上翻,下翻
-func (cc *context) FlipV() (string, error) {
+func (cc *context) FlipV(value ...string) (string, error) {
 	name := cc.usrdir + `FlipV.png`
 	// 加载图片
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 0, 0)
@@ -75,7 +80,7 @@ func (cc *context) FlipV() (string, error) {
 }
 
 // FlipH 左翻,右翻
-func (cc *context) FlipH() (string, error) {
+func (cc *context) FlipH(value ...string) (string, error) {
 	name := cc.usrdir + `FlipH.png`
 	// 加载图片
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 0, 0)
@@ -87,7 +92,7 @@ func (cc *context) FlipH() (string, error) {
 }
 
 // Invert 反色
-func (cc *context) Invert() (string, error) {
+func (cc *context) Invert(value ...string) (string, error) {
 	name := cc.usrdir + `Invert.png`
 	// 加载图片
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 0, 0)
@@ -98,8 +103,20 @@ func (cc *context) Invert() (string, error) {
 	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
 }
 
+// Blur 反色
+func (cc *context) Blur(value ...string) (string, error) {
+	name := cc.usrdir + `Blur.png`
+	// 加载图片
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 0, 0)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := im.Blur(10).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
 // Grayscale 灰度
-func (cc *context) Grayscale() (string, error) {
+func (cc *context) Grayscale(value ...string) (string, error) {
 	name := cc.usrdir + `Grayscale.png`
 	// 加载图片
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 0, 0)
@@ -110,9 +127,9 @@ func (cc *context) Grayscale() (string, error) {
 	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
 }
 
-// InsertAndGrayscale 负片
-func (cc *context) InsertAndGrayscale() (string, error) {
-	name := cc.usrdir + `InsertAndGrayscale.png`
+// InvertAndGrayscale 负片
+func (cc *context) InvertAndGrayscale(value ...string) (string, error) {
+	name := cc.usrdir + `InvertAndGrayscale.png`
 	// 加载图片
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 0, 0)
 	if err != nil {
@@ -123,7 +140,7 @@ func (cc *context) InsertAndGrayscale() (string, error) {
 }
 
 // Convolve3x3 浮雕
-func (cc *context) Convolve3x3() (string, error) {
+func (cc *context) Convolve3x3(value ...string) (string, error) {
 	name := cc.usrdir + ` Convolve3x3.png`
 	// 加载图片
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 0, 0)
@@ -164,5 +181,65 @@ func (cc *context) Deformation(value ...string) (string, error) {
 		return "", err
 	}
 	imgnrgba := img.Size(im.Im, w, h).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
+// Alike 你像个xxx一样
+func (cc *context) Alike(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("alike", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	name := cc.usrdir + `Alike.png`
+	back, err := gg.LoadImage(c[0])
+	if err != nil {
+		return "", err
+	}
+	canvas := gg.NewContextForImage(back)
+	canvas.SetColor(color.Black)
+	_, _ = file.GetLazyData(text.BoldFontFile, true)
+	fontSize := 26.0
+	_ = canvas.LoadFontFace(text.BoldFontFile, fontSize)
+	l, _ := canvas.MeasureString(args[0])
+	if l > fontSize*4 {
+		err = errors.New("输入字符太长")
+		return "", err
+	}
+	canvas.DrawString(args[0], 180-l/2, 65)
+	return "file:///" + name, canvas.SavePNG(name)
+}
+
+// Marriage
+func (cc *context) Marriage(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("marriage", 2, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 2)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + `Marriage.png`
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 800, 1080)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := im.InsertUp(imgs[0].Im, 0, 0, 0, 0).InsertUp(imgs[1].Im, 0, 0, 520, 0).Im
 	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
 }
