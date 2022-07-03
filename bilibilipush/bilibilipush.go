@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/guohuiyuan/bilibili"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 	zero "github.com/wdvxdr1123/ZeroBot"
@@ -48,7 +49,7 @@ var (
 	upMap          = map[int64]string{}
 	limit          = ctxext.NewLimiterManager(time.Second*10, 1)
 	searchVideo    = `bilibili.com/video/(?:av(\d+)|([bv|BV][0-9a-zA-Z]+))`
-	searchDynamic  = `[t.bilibili.com|m.bilibili.com/dynamic]/(\d+)`
+	searchDynamic  = `(t.bilibili.com|m.bilibili.com/dynamic)/(\d+)`
 	searchArticle  = `bilibili.com/read/(?:cv|mobile/)(\d+)`
 	searchLiveRoom = `live.bilibili.com/(\d+)`
 )
@@ -371,7 +372,7 @@ func sendDynamic() error {
 			return err
 		}
 		if len(cardList) == 0 {
-			return fmt.Errorf("%v的历史动态数为0", buid)
+			return errors.Errorf("%v的历史动态数为0", buid)
 		}
 		t, ok := lastTime[buid]
 		if !ok {
@@ -387,7 +388,7 @@ func sendDynamic() error {
 					groupList := bdb.getAllGroupByBuidAndDynamic(buid)
 					msg, err := bilibili.DynamicCard2msg(cardList[i].Raw, 0)
 					if err != nil {
-						err = fmt.Errorf("动态%v的解析有问题,%v", cardList[i].Get("desc.dynamic_id_str"), err)
+						err = errors.Errorf("动态%v的解析有问题,%v", cardList[i].Get("desc.dynamic_id_str"), err)
 						return err
 					}
 					zero.RangeBot(func(id int64, ctx *zero.Ctx) bool {
@@ -493,7 +494,7 @@ func handleVideo(ctx *zero.Ctx) {
 }
 
 func handleDynamic(ctx *zero.Ctx) {
-	msg, err := bilibili.DynamicDetail(ctx.State["regex_matched"].([]string)[1])
+	msg, err := bilibili.DynamicDetail(ctx.State["regex_matched"].([]string)[2])
 	if err != nil {
 		ctx.SendChain(message.Text("ERROR:", err))
 		return
