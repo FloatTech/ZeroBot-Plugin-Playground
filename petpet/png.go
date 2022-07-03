@@ -694,3 +694,233 @@ func (cc *context) Police1(args ...string) (string, error) {
 	imgnrgba := imgs[1].InsertBottom(img.Rotate(im.Im, 16, 0, 0).Im, 0, 0, 37, 291).Im
 	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
 }
+
+// Prpr 舔 舔屏 prpr
+func (cc *context) Prpr(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("prpr", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 1)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + "Prpr.png"
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 330, 330)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := imgs[0].InsertBottom(img.Rotate(im.Im, 8, 0, 0).Im, 0, 0, 46, 264).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
+// SafeSense 安全感
+func (cc *context) SafeSense(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("safe_sense", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	name := cc.usrdir + "SafeSense.png"
+	back, err := gg.LoadImage(c[0])
+	if err != nil {
+		return "", err
+	}
+	face, err := gg.LoadImage(cc.headimgsdir[0])
+	if err != nil {
+		return "", err
+	}
+	canvas := gg.NewContext(430, 478)
+	canvas.DrawImage(back, 0, 0)
+	canvas.DrawImage(img.Size(face, 215, 343).Im, 215, 135)
+	canvas.SetColor(color.Black)
+	_, err = file.GetLazyData(text.BoldFontFile, true)
+	if err != nil {
+		return "", err
+	}
+	if err = canvas.LoadFontFace(text.BoldFontFile, 30); err != nil {
+		return "", err
+	}
+	if args[0] == "" {
+		args[0] = "你给我的安全感远不如他的万分之一"
+	}
+
+	l, _ := canvas.MeasureString(args[0])
+	if l > 860 {
+		return "", errors.New("文字消息太长了")
+	}
+	canvas.DrawString(args[0][:len(args[0])/2], (430-l/2)/2.0, 40)
+	canvas.DrawString(args[0][len(args[0])/2:], (430-l/2)/2.0, 80)
+	return "file:///" + name, canvas.SavePNG(name)
+}
+
+// Support 精神支柱
+func (cc *context) Support(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("support", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 1)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + "Support.png"
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 815, 815)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := imgs[0].InsertBottom(img.Rotate(im.Im, 23, 0, 0).Im, 0, 0, -172, -17).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
+// Thinkwhat 想什么
+func (cc *context) Thinkwhat(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("thinkwhat", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 1)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + "Thinkwhat.png"
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 534, 493)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := imgs[0].InsertBottom(im.Im, 0, 0, 530, 0).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
+// Wallpaper 墙纸
+func (cc *context) Wallpaper(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("wallpaper", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 1)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + "Wallpaper.png"
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 775, 496)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := imgs[0].InsertBottom(im.Im, 0, 0, 260, 580).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
+// Whyatme 为什么at我
+func (cc *context) Whyatme(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("whyatme", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 1)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + "Whyatme.png"
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 265, 265)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := imgs[0].InsertBottom(im.Im, 0, 0, 42, 13).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
+// MakeFriend 交个朋友
+func (cc *context) MakeFriend(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("make_friend", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	name := cc.usrdir + "MakeFriend.png"
+	back, err := gg.LoadImage(c[0])
+	if err != nil {
+		return "", err
+	}
+	face, err := gg.LoadImage(cc.headimgsdir[0])
+	if err != nil {
+		return "", err
+	}
+	canvas := gg.NewContext(1000, 1000)
+	canvas.DrawImage(img.Size(face, 1000, 1000).Im, 0, 0)
+	canvas.DrawImage(img.Rotate(face, 9, 250, 250).Im, 743, 845)
+	canvas.DrawImage(img.Rotate(face, 9, 55, 55).Im, 836, 722)
+	canvas.DrawImage(back, 0, 0)
+	canvas.SetColor(color.White)
+	_, err = file.GetLazyData(text.BoldFontFile, true)
+	if err != nil {
+		return "", err
+	}
+	if err = canvas.LoadFontFace(text.BoldFontFile, 20); err != nil {
+		return "", err
+	}
+	if args[0] == "" {
+		args[0] = "我"
+	}
+	l, _ := canvas.MeasureString(args[0])
+	if l > 230 {
+		return "", errors.New("文字消息太长了")
+	}
+	canvas.Rotate(gg.Radians(-9))
+	canvas.DrawString(args[0], 595, 819)
+	return "file:///" + name, canvas.SavePNG(name)
+}
