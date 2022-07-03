@@ -17,7 +17,7 @@ import (
 
 // Pa 爬
 func (cc *context) Pa(value ...string) (string, error) {
-	name := cc.usrdir + `爬.png`
+	name := cc.usrdir + "爬.png"
 	tou, err := cc.getLogo(0, 0)
 	if err != nil {
 		return "", err
@@ -30,7 +30,7 @@ func (cc *context) Pa(value ...string) (string, error) {
 			return "", err
 		}
 	}
-	f, err := dlblock(`pa/` + strconv.Itoa(rand) + `.png`)
+	f, err := dlblock("pa/" + strconv.Itoa(rand) + ".png")
 	if err != nil {
 		return "", err
 	}
@@ -43,7 +43,7 @@ func (cc *context) Pa(value ...string) (string, error) {
 
 // Si 撕
 func (cc *context) Si(value ...string) (string, error) {
-	name := cc.usrdir + `撕.png`
+	name := cc.usrdir + "撕.png"
 	tou, err := cc.getLogo(0, 0)
 	if err != nil {
 		return "", err
@@ -56,7 +56,7 @@ func (cc *context) Si(value ...string) (string, error) {
 			return "", err
 		}
 	}
-	f, err := dlblock(`si/0.png`)
+	f, err := dlblock("si/0.png")
 	if err != nil {
 		return "", err
 	}
@@ -69,7 +69,7 @@ func (cc *context) Si(value ...string) (string, error) {
 
 // FlipV 上翻,下翻
 func (cc *context) FlipV(value ...string) (string, error) {
-	name := cc.usrdir + `FlipV.png`
+	name := cc.usrdir + "FlipV.png"
 	// 加载图片
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 0, 0)
 	if err != nil {
@@ -81,7 +81,7 @@ func (cc *context) FlipV(value ...string) (string, error) {
 
 // FlipH 左翻,右翻
 func (cc *context) FlipH(value ...string) (string, error) {
-	name := cc.usrdir + `FlipH.png`
+	name := cc.usrdir + "FlipH.png"
 	// 加载图片
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 0, 0)
 	if err != nil {
@@ -93,7 +93,7 @@ func (cc *context) FlipH(value ...string) (string, error) {
 
 // Invert 反色
 func (cc *context) Invert(value ...string) (string, error) {
-	name := cc.usrdir + `Invert.png`
+	name := cc.usrdir + "Invert.png"
 	// 加载图片
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 0, 0)
 	if err != nil {
@@ -105,7 +105,7 @@ func (cc *context) Invert(value ...string) (string, error) {
 
 // Blur 反色
 func (cc *context) Blur(value ...string) (string, error) {
-	name := cc.usrdir + `Blur.png`
+	name := cc.usrdir + "Blur.png"
 	// 加载图片
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 0, 0)
 	if err != nil {
@@ -117,7 +117,7 @@ func (cc *context) Blur(value ...string) (string, error) {
 
 // Grayscale 灰度
 func (cc *context) Grayscale(value ...string) (string, error) {
-	name := cc.usrdir + `Grayscale.png`
+	name := cc.usrdir + "Grayscale.png"
 	// 加载图片
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 0, 0)
 	if err != nil {
@@ -129,7 +129,7 @@ func (cc *context) Grayscale(value ...string) (string, error) {
 
 // InvertAndGrayscale 负片
 func (cc *context) InvertAndGrayscale(value ...string) (string, error) {
-	name := cc.usrdir + `InvertAndGrayscale.png`
+	name := cc.usrdir + "InvertAndGrayscale.png"
 	// 加载图片
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 0, 0)
 	if err != nil {
@@ -141,7 +141,7 @@ func (cc *context) InvertAndGrayscale(value ...string) (string, error) {
 
 // Convolve3x3 浮雕
 func (cc *context) Convolve3x3(value ...string) (string, error) {
-	name := cc.usrdir + ` Convolve3x3.png`
+	name := cc.usrdir + "Convolve3x3.png"
 	// 加载图片
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 0, 0)
 	if err != nil {
@@ -153,7 +153,7 @@ func (cc *context) Convolve3x3(value ...string) (string, error) {
 
 // Rotate 旋转,带参数暂时不用
 func (cc *context) Rotate(value ...string) (string, error) {
-	name := cc.usrdir + `Rotate.png`
+	name := cc.usrdir + "Rotate.png"
 	// 加载图片
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 0, 0)
 	if err != nil {
@@ -166,7 +166,7 @@ func (cc *context) Rotate(value ...string) (string, error) {
 
 // Deformation 变形,带参数暂时不用
 func (cc *context) Deformation(value ...string) (string, error) {
-	name := cc.usrdir + `Deformation.png`
+	name := cc.usrdir + "Deformation.png"
 	// 加载图片
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 0, 0)
 	if err != nil {
@@ -202,7 +202,7 @@ func (cc *context) Alike(args ...string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	name := cc.usrdir + `Anyasuki.png`
+	name := cc.usrdir + "Anyasuki.png"
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 82, 69)
 	if err != nil {
 		return "", err
@@ -229,12 +229,12 @@ func (cc *context) Marriage(args ...string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	name := cc.usrdir + `Marriage.png`
-	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 800, 1080)
+	name := cc.usrdir + "Marriage.png"
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 1080, 1080)
 	if err != nil {
 		return "", err
 	}
-	imgnrgba := im.InsertUp(imgs[0].Im, 0, 0, 0, 0).InsertUp(imgs[1].Im, 0, 0, 520, 0).Im
+	imgnrgba := im.InsertUp(imgs[0].Im, 0, 0, 0, 0).InsertUp(imgs[1].Im, 0, 0, 800, 0).Im
 	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
 }
 
@@ -252,7 +252,7 @@ func (cc *context) Anyasuki(args ...string) (string, error) {
 		return "", err
 	}
 	wg.Wait()
-	name := cc.usrdir + `Anyasuki.png`
+	name := cc.usrdir + "Anyasuki.png"
 	back, err := gg.LoadImage(c[0])
 	if err != nil {
 		return "", err
@@ -297,7 +297,7 @@ func (cc *context) AlwaysLike(args ...string) (string, error) {
 		return "", err
 	}
 	wg.Wait()
-	name := cc.usrdir + `Anyasuki.png`
+	name := cc.usrdir + "AlwaysLike.png"
 	back, err := gg.LoadImage(c[0])
 	if err != nil {
 		return "", err
@@ -347,11 +347,350 @@ func (cc *context) DecentKiss(args ...string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	name := cc.usrdir + `Marriage.png`
+	name := cc.usrdir + "DecentKiss.png"
 	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 589, 577)
 	if err != nil {
 		return "", err
 	}
 	imgnrgba := im.InsertUp(imgs[0].Im, 0, 0, 0, 0).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
+// ChinaFlag 国旗
+func (cc *context) ChinaFlag(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("china_flag", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 1)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + "ChinaFlag.png"
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 410, 410)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := im.InsertUp(imgs[0].Im, 0, 0, 0, 0).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
+// DontTouch 不要靠近
+func (cc *context) DontTouch(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("dont_touch", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 1)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + "DontTouch.png"
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 410, 410)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := imgs[0].InsertUp(im.Im, 148, 148, 46, 238).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
+// Universal 万能表情 空白表情
+func (cc *context) Universal(args ...string) (string, error) {
+	name := cc.usrdir + "Universal.png"
+	face, err := gg.LoadImage(cc.headimgsdir[0])
+	if err != nil {
+		return "", err
+	}
+	canvas := gg.NewContext(500, 550)
+	canvas.DrawImage(img.Size(face, 500, 500).Im, 0, 0)
+	canvas.SetColor(color.Black)
+	_, err = file.GetLazyData(text.BoldFontFile, true)
+	if err != nil {
+		return "", err
+	}
+	if err = canvas.LoadFontFace(text.BoldFontFile, 40); err != nil {
+		return "", err
+	}
+	if args[0] == "" {
+		args[0] = "在此处添加文字"
+	}
+	l, _ := canvas.MeasureString(args[0])
+	if l > 500 {
+		return "", errors.New("文字消息太长了")
+	}
+	canvas.DrawString(args[0], (500-l)/2.0, 545)
+	return "file:///" + name, canvas.SavePNG(name)
+}
+
+// Interview 采访
+func (cc *context) Interview(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("interview", 2, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	name := cc.usrdir + "Interview.png"
+	huaji, err := gg.LoadImage(c[0])
+	if err != nil {
+		return "", err
+	}
+	microphone, err := gg.LoadImage(c[1])
+	if err != nil {
+		return "", err
+	}
+	face, err := gg.LoadImage(cc.headimgsdir[0])
+	if err != nil {
+		return "", err
+	}
+	canvas := gg.NewContext(600, 300)
+	canvas.DrawImage(img.Size(face, 124, 124).Im, 100, 50)
+	canvas.DrawImage(huaji, 376, 50)
+	canvas.DrawImage(microphone, 300, 50)
+	canvas.SetColor(color.Black)
+	_, err = file.GetLazyData(text.BoldFontFile, true)
+	if err != nil {
+		return "", err
+	}
+	if err = canvas.LoadFontFace(text.BoldFontFile, 40); err != nil {
+		return "", err
+	}
+	if args[0] == "" {
+		args[0] = "采访大佬经验"
+	}
+	l, _ := canvas.MeasureString(args[0])
+	if l > 600 {
+		return "", errors.New("文字消息太长了")
+	}
+	canvas.DrawString(args[0], (600-l)/2.0, 270)
+	return "file:///" + name, canvas.SavePNG(name)
+}
+
+// Need 需要 你可能需要
+func (cc *context) Need(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("need", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 1)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + "Need.png"
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 114, 114)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := imgs[0].InsertBottom(im.Im, 0, 0, 327, 232).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
+// Paint 这像画吗
+func (cc *context) Paint(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("paint", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 1)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + "Paint.png"
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 117, 135)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := imgs[0].InsertBottom(img.Rotate(im.Im, 4, 0, 0).Im, 0, 0, 95, 107).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
+// Painter 小画家
+func (cc *context) Painter(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("painter", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 1)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + "Painter.png"
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 240, 345)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := imgs[0].InsertBottom(im.Im, 0, 0, 125, 91).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
+// Perfect 完美
+func (cc *context) Perfect(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("perfect", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 1)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + "Perfect.png"
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 310, 460)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := imgs[0].InsertUp(im.Im, 0, 0, 313, 64).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
+// PlayGame 玩游戏
+func (cc *context) PlayGame(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("play_game", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	name := cc.usrdir + "PlayGame.png"
+	back, err := gg.LoadImage(c[0])
+	if err != nil {
+		return "", err
+	}
+	face, err := gg.LoadImage(cc.headimgsdir[0])
+	if err != nil {
+		return "", err
+	}
+	canvas := gg.NewContext(526, 503)
+	canvas.DrawImage(img.Rotate(face, 10, 225, 160).Im, 161, 117)
+	canvas.DrawImage(back, 0, 0)
+	canvas.SetColor(color.Black)
+	_, err = file.GetLazyData(text.BoldFontFile, true)
+	if err != nil {
+		return "", err
+	}
+	if err = canvas.LoadFontFace(text.BoldFontFile, 40); err != nil {
+		return "", err
+	}
+	if args[0] == "" {
+		args[0] = "来玩休闲游戏啊"
+	}
+	l, _ := canvas.MeasureString(args[0])
+	if l > 526 {
+		return "", errors.New("文字消息太长了")
+	}
+	canvas.DrawString(args[0], (526-l)/2.0, 483)
+	return "file:///" + name, canvas.SavePNG(name)
+}
+
+// Police 出警
+func (cc *context) Police(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("police", 2, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 2)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + "Police.png"
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 245, 245)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := imgs[0].InsertBottom(im.Im, 0, 0, 224, 46).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
+// Police1 警察
+func (cc *context) Police1(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("police", 2, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 2)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + "Police1.png"
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 60, 75)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := imgs[1].InsertBottom(img.Rotate(im.Im, 16, 0, 0).Im, 0, 0, 37, 291).Im
 	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
 }
