@@ -15,6 +15,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/gif"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/github/yydz"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/nihongo"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/vote"
 
 	// 程序主体
 	zero "github.com/wdvxdr1123/ZeroBot"
