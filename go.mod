@@ -9,11 +9,13 @@ require (
 	github.com/antchfx/htmlquery v1.2.4
 	github.com/fogleman/gg v1.3.0
 	github.com/fumiama/sqlite3 v1.14.6
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/guohuiyuan/bilibili v0.0.0-20220702115647-ef762dbbf5b9
 	github.com/jinzhu/gorm v1.9.16
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/tidwall/gjson v1.14.1
+	github.com/wcharczuk/go-chart/v2 v2.1.0
 	github.com/wdvxdr1123/ZeroBot v1.5.2-0.20220610070647-9eeffcb277ee
 )
 
@@ -27,7 +29,6 @@ require (
 	github.com/fumiama/go-base16384 v1.5.3 // indirect
 	github.com/fumiama/go-registry v0.1.6 // indirect
 	github.com/fumiama/gofastTEA v0.0.10 // indirect
-	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect

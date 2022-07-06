@@ -924,3 +924,30 @@ func (cc *context) MakeFriend(args ...string) (string, error) {
 	canvas.DrawString(args[0], 595, 819)
 	return "file:///" + name, canvas.SavePNG(name)
 }
+
+// BackToWork 打工人, 继续干活
+func (cc *context) BackToWork(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("back_to_work", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 1)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + "BackToWork.png"
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 220, 310)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := imgs[0].InsertBottom(img.Rotate(im.Im, 25, 0, 0).Im, 0, 0, 56, 32).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
