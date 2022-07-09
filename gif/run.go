@@ -73,6 +73,27 @@ var (
 		"交个朋友":   "MakeFriend",
 		"打工人":    "BackToWork",
 		"继续干活":   "BackToWork",
+		"兑换券":    "Coupon",
+		"注意力涣散":  "Distracted",
+		"垃圾桶":    "Garbage",
+		"垃圾":     "Garbage",
+		"捶":      "Thump",
+		"啾啾":     "Jiujiu",
+		"2敲":     "Knock",
+		"听音乐":    "ListenMusic",
+		"永远爱你":   "LoveYou",
+		"2拍":     "Pat",
+		"顶":      "JackUp",
+		"捣":      "Pound",
+		"打拳":     "Punch",
+		"滚":      "Roll",
+		"吸":      "Suck",
+		"嗦":      "Suck",
+		"扔":      "Throw",
+		"锤":      "Hammer",
+		"紧贴":     "Tightly",
+		"紧紧贴着":   "Tightly",
+		"转":      "Turn",
 	}
 )
 
@@ -85,7 +106,9 @@ func init() { // 插件主体
 		Help: "制图\n- 搓\n- 冲\n- 摸\n- 拍\n- 丢\n- 吃\n- 敲\n- 啃\n- 蹭\n- 爬\n- 撕\n- 灰度\n- 上翻|下翻\n" +
 			"- 左翻|右翻\n- 反色\n- 浮雕\n- 打码\n- 负片\n- 旋转 45\n- 变形 100 100\n- 亲\n- 娶|结婚申请|结婚登记\n- 阿尼亚喜欢\n- 像只\n" +
 			"- 我永远喜欢|永远喜欢\n- 像样的亲亲\n- 国旗\n- 不要靠近\n- 万能表情|空白表情\n- 采访\n- 需要|你可能需要\n- 这像画吗\n- 小画家\n" +
-			"- 完美\n- 玩游戏\n- 出警\n- 警察\n- 舔|舔屏|prpr\n- 安全感\n- 精神支柱\n- 想什么\n- 墙纸\n- 为什么at我\n- 交个朋友\n- 打工人|继续干活",
+			"- 完美\n- 玩游戏\n- 出警\n- 警察\n- 舔|舔屏|prpr\n- 安全感\n- 精神支柱\n- 想什么\n- 墙纸\n- 为什么at我\n- 交个朋友\n- 打工人|继续干活\n" +
+			"- 兑换券\n- 注意力涣散\n- 垃圾桶|垃圾\n- 捶\n- 啾啾\n- 2敲\n- 听音乐\n- 永远爱你\n- 2拍\n- 顶\n- 捣\n- 打拳\n- 滚\n- 吸|嗦\n- 扔\n" +
+			"- 锤\n- 紧贴|紧紧贴着\n- 转\n",
 		PrivateDataFolder: "petpet",
 	}).ApplySingle(ctxext.DefaultSingle)
 	datapath = file.BOTPATH + "/" + en.DataFolder()

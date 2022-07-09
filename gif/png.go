@@ -951,3 +951,107 @@ func (cc *context) BackToWork(args ...string) (string, error) {
 	imgnrgba := imgs[0].InsertBottom(img.Rotate(im.Im, 25, 0, 0).Im, 0, 0, 56, 32).Im
 	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
 }
+
+// Coupon 兑换券
+func (cc *context) Coupon(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("coupon", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	name := cc.usrdir + "Coupon.png"
+	if args[0] == "" {
+		args[0] = "群主陪睡券"
+	}
+	back, err := gg.LoadImage(c[0])
+	if err != nil {
+		return "", err
+	}
+	face, err := cc.getLogo(0, 0)
+	if err != nil {
+		return "", err
+	}
+	canvas := gg.NewContext(500, 355)
+	canvas.DrawImage(back, 0, 0)
+	canvas.Rotate(gg.Radians(-22))
+	canvas.DrawImage(img.Size(face, 60, 60).Im, 100, 163)
+	canvas.SetColor(color.Black)
+	_, err = file.GetLazyData(text.BoldFontFile, true)
+	if err != nil {
+		return "", err
+	}
+	if err = canvas.LoadFontFace(text.BoldFontFile, 30); err != nil {
+		return "", err
+	}
+	if args[0] == "" {
+		args[0] = "陪睡券"
+	}
+	l, _ := canvas.MeasureString(args[0])
+	if l > 270 {
+		return "", errors.New("文字消息太长了")
+	}
+	canvas.DrawStringAnchored(args[0], 135, 255, 0.5, 0.5)
+	canvas.DrawStringAnchored("（永久有效）", 135, 295, 0.5, 0.5)
+	return "file:///" + name, canvas.SavePNG(name)
+}
+
+// Distracted 注意力涣散
+func (cc *context) Distracted(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("distracted", 2, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 2)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + "Distracted.png"
+	im, err := img.LoadFirstFrame(cc.headimgsdir[0], 500, 500)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := im.InsertUp(imgs[0].Im, 0, 0, 140, 320).InsertUp(imgs[1].Im, 0, 0, 0, 0).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
+
+// Throw 扔
+func (cc *context) Throw(args ...string) (string, error) {
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var err error
+	c := dlrange("throw", 1, &wg, func(e error) {
+		m.Lock()
+		err = e
+		m.Unlock()
+	})
+	if err != nil {
+		return "", err
+	}
+	wg.Wait()
+	imgs, err := loadFirstFrames(c, 1)
+	if err != nil {
+		return "", err
+	}
+	name := cc.usrdir + "Throw.png"
+	face, err := cc.getLogo(0, 0)
+	if err != nil {
+		return "", err
+	}
+	imgnrgba := imgs[0].InsertUpC(img.Rotate(face, float64(rand.Intn(360)), 143, 143).Im, 0, 0, 86, 249).Im
+	return "file:///" + name, writer.SavePNG2Path(name, imgnrgba)
+}
