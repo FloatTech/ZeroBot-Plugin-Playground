@@ -14,6 +14,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/github/yydz"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/nihongo"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/qqci"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/vote"
 
 	// 程序主体
