@@ -53,12 +53,14 @@ func init() {
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
+			ctx.SendChain(message.Text("成功,参数:", flagapp))
 		case "update":
 			err = adb.update(flagapp)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
+			ctx.SendChain(message.Text("成功,参数:", flagapp))
 		case "install", "start", "restart", "stop":
 			app, err = adb.getApp(flagapp)
 			if err != nil {
@@ -98,14 +100,7 @@ func init() {
 			}
 			workdir := cachePath + app.Gitrepo[index:]
 			makefileworkdir := filepath.Join(workdir, "Makefile")
-			loadfileworkdir := filepath.Join(workdir, "load.sh")
 			err = getConfigFile(makefileworkdir, engine.DataFolder()+"Makefile.tpl", app)
-			if err != nil {
-				_ = os.RemoveAll(cachePath)
-				ctx.SendChain(message.Text("ERROR:", err))
-				return
-			}
-			err = getConfigFile(loadfileworkdir, engine.DataFolder()+"load.tpl", app)
 			if err != nil {
 				_ = os.RemoveAll(cachePath)
 				ctx.SendChain(message.Text("ERROR:", err))
@@ -128,6 +123,13 @@ func init() {
 				return
 			}
 			_ = os.RemoveAll(cachePath)
+			loadfileworkdir := filepath.Join(app.Directory, app.Appname, "load.sh")
+			err = getConfigFile(loadfileworkdir, engine.DataFolder()+"load.tpl", app)
+			if err != nil {
+				_ = os.RemoveAll(cachePath)
+				ctx.SendChain(message.Text("ERROR:", err))
+				return
+			}
 			cmd = exec.Command("load.sh", "install")
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
@@ -148,11 +150,11 @@ func init() {
 
 func getConfigFile(executePath, templatePath string, app application) error {
 	path := filepath.Join(file.BOTPATH, app.MakefilePath)
+	f, err := os.Create(executePath)
+	if err != nil {
+		return err
+	}
 	if file.IsNotExist(path) {
-		f, err := os.Create(executePath)
-		if err != nil {
-			return err
-		}
 		tmpl, err := template.ParseFiles(templatePath)
 		if err != nil {
 			return err
@@ -163,11 +165,12 @@ func getConfigFile(executePath, templatePath string, app application) error {
 		}
 		return f.Close()
 	}
-	data, err := os.ReadFile(path)
+	data, err := os.Open(path)
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(executePath, data, 0666)
+	_, _ = io.Copy(f, data)
+	return f.Close()
 }
 
 func deCompress(tarFile, dest string) error {
