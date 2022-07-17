@@ -119,7 +119,8 @@ func init() {
 			}
 			logtext += fmt.Sprintf("执行命令 %v 成功\n", cmd.Args)
 			makefileworkdir := filepath.Join(workdir, "Makefile")
-			err = getConfigFile(makefileworkdir, engine.DataFolder()+"Makefile.tpl", app)
+			path := filepath.Join(file.BOTPATH, app.MakefilePath)
+			err = getConfigFile(path, makefileworkdir, engine.DataFolder()+"Makefile.tpl", app)
 			if err != nil {
 				_ = os.RemoveAll(workdir)
 				logtext += fmt.Sprintf("加载 %v 错误: %v\n", makefileworkdir, err)
@@ -155,7 +156,8 @@ func init() {
 			logtext += fmt.Sprintf("解压 %v 到 %v 成功\n", tarPath, app.Directory)
 			_ = os.RemoveAll(workdir)
 			loadfileworkdir := filepath.Join(app.Directory, app.Appname, "load.sh")
-			err = getConfigFile(loadfileworkdir, engine.DataFolder()+"load.tpl", app)
+			path = filepath.Join(file.BOTPATH, app.LoadfilePath)
+			err = getConfigFile(path, loadfileworkdir, engine.DataFolder()+"load.tpl", app)
 			if err != nil {
 				logtext += fmt.Sprintf("加载 %v 文件错误: %v\n", loadfileworkdir, err)
 				ctx.SendChain(message.Text(logtext))
@@ -188,8 +190,7 @@ func init() {
 	})
 }
 
-func getConfigFile(executePath, templatePath string, app application) error {
-	path := filepath.Join(file.BOTPATH, app.MakefilePath)
+func getConfigFile(path, executePath, templatePath string, app application) error {
 	_ = os.MkdirAll(filepath.Dir(path), 0755)
 	f, err := os.Create(executePath)
 	if err != nil {
