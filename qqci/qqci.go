@@ -13,9 +13,11 @@ import (
 	"text/template"
 
 	ctrl "github.com/FloatTech/zbpctrl"
+	"github.com/FloatTech/zbputils/binary"
 	"github.com/FloatTech/zbputils/control"
 	"github.com/FloatTech/zbputils/ctxext"
 	"github.com/FloatTech/zbputils/file"
+	"github.com/FloatTech/zbputils/img/text"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
@@ -23,7 +25,7 @@ import (
 func init() {
 	engine := control.Register("qqci", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
-		Help: "简易cicd\n- /qqci -a zbp -r git@github.com:FloatTech/ZeroBot-Plugin -dir /usr/local/service -cmd \"zpb\" -make data/Qqci/zbp/Makefile -load data/Qqci/zbp/load.sh -act insert\n" +
+		Help: "简易cicd\n- /qqci -a zbp -r git@github.com:FloatTech/ZeroBot-Plugin -dir /usr/local/service -cmd \"zpb\"  -act insert\n" +
 			"- /qqci -a zbp -dir D:/test -act update\n" +
 			"- /qqci -a zbp -act select\n" +
 			"- /qqci -a zbp -b master -act ci\n" +
@@ -92,14 +94,28 @@ func init() {
 			app, err = adb.getApp(flagapp)
 			if err != nil {
 				logtext += fmt.Sprintf("getApp 错误: %v\n\n", err)
-				ctx.SendChain(message.Text(logtext))
+				data, err := text.RenderToBase64(logtext, text.FontFile, 400, 20)
+				if err != nil {
+					ctx.SendChain(message.Text("ERROR:", err))
+					return
+				}
+				if id := ctx.SendChain(message.Image("base64://" + binary.BytesToString(data))); id.ID() == 0 {
+					ctx.SendChain(message.Text("ERROR:可能被风控了"))
+				}
 				return
 			}
 			logtext += fmt.Sprintf("数据库参数: %+v \n\n", app)
 			index := strings.LastIndex(app.Gitrepo, "/")
 			if index == -1 {
 				logtext += "git的地址错误\n\n"
-				ctx.SendChain(message.Text(logtext))
+				data, err := text.RenderToBase64(logtext, text.FontFile, 400, 20)
+				if err != nil {
+					ctx.SendChain(message.Text("ERROR:", err))
+					return
+				}
+				if id := ctx.SendChain(message.Image("base64://" + binary.BytesToString(data))); id.ID() == 0 {
+					ctx.SendChain(message.Text("ERROR:可能被风控了"))
+				}
 				return
 			}
 			workdir := cachePath + app.Gitrepo[index:]
@@ -114,17 +130,31 @@ func init() {
 			if err != nil {
 				_ = os.RemoveAll(workdir)
 				logtext += fmt.Sprintf("执行命令 %v 错误: %v,\n\n", cmd.Args, err)
-				ctx.SendChain(message.Text(logtext))
+				data, err := text.RenderToBase64(logtext, text.FontFile, 400, 20)
+				if err != nil {
+					ctx.SendChain(message.Text("ERROR:", err))
+					return
+				}
+				if id := ctx.SendChain(message.Image("base64://" + binary.BytesToString(data))); id.ID() == 0 {
+					ctx.SendChain(message.Text("ERROR:可能被风控了"))
+				}
 				return
 			}
 			logtext += fmt.Sprintf("执行命令 %v 成功\n\n", cmd.Args)
 			makefileworkdir := filepath.Join(workdir, "Makefile")
-			path := filepath.Join(file.BOTPATH, app.MakefilePath)
+			path := filepath.Join(file.BOTPATH, engine.DataFolder(), app.Appname, "Makefile")
 			err = getConfigFile(path, makefileworkdir, engine.DataFolder()+"Makefile.tpl", app)
 			if err != nil {
 				_ = os.RemoveAll(workdir)
 				logtext += fmt.Sprintf("加载 %v 错误: %v\n\n", makefileworkdir, err)
-				ctx.SendChain(message.Text(logtext))
+				data, err := text.RenderToBase64(logtext, text.FontFile, 400, 20)
+				if err != nil {
+					ctx.SendChain(message.Text("ERROR:", err))
+					return
+				}
+				if id := ctx.SendChain(message.Image("base64://" + binary.BytesToString(data))); id.ID() == 0 {
+					ctx.SendChain(message.Text("ERROR:可能被风控了"))
+				}
 				return
 			}
 			logtext += fmt.Sprintf("加载 %v 成功\n\n", makefileworkdir)
@@ -134,7 +164,14 @@ func init() {
 			if err != nil {
 				_ = os.RemoveAll(workdir)
 				logtext += fmt.Sprintf("执行命令 %v 错误: %v\n\n", cmd.Args, err)
-				ctx.SendChain(message.Text(logtext))
+				data, err := text.RenderToBase64(logtext, text.FontFile, 400, 20)
+				if err != nil {
+					ctx.SendChain(message.Text("ERROR:", err))
+					return
+				}
+				if id := ctx.SendChain(message.Image("base64://" + binary.BytesToString(data))); id.ID() == 0 {
+					ctx.SendChain(message.Text("ERROR:可能被风控了"))
+				}
 				return
 			}
 			logtext += fmt.Sprintf("执行命令 %v 成功\n\n", cmd.Args)
@@ -150,17 +187,31 @@ func init() {
 			if err != nil {
 				_ = os.RemoveAll(workdir)
 				logtext += fmt.Sprintf("解压 %v 到 %v 错误: %V\n\n", tarPath, app.Directory, err)
-				ctx.SendChain(message.Text(logtext))
+				data, err := text.RenderToBase64(logtext, text.FontFile, 400, 20)
+				if err != nil {
+					ctx.SendChain(message.Text("ERROR:", err))
+					return
+				}
+				if id := ctx.SendChain(message.Image("base64://" + binary.BytesToString(data))); id.ID() == 0 {
+					ctx.SendChain(message.Text("ERROR:可能被风控了"))
+				}
 				return
 			}
 			logtext += fmt.Sprintf("解压 %v 到 %v 成功\n\n", tarPath, app.Directory)
 			_ = os.RemoveAll(workdir)
 			loadfileworkdir := filepath.Join(app.Directory, app.Appname, "load.sh")
-			path = filepath.Join(file.BOTPATH, app.LoadfilePath)
+			path = filepath.Join(file.BOTPATH, engine.DataFolder(), app.Appname, "load.sh")
 			err = getConfigFile(path, loadfileworkdir, engine.DataFolder()+"load.tpl", app)
 			if err != nil {
 				logtext += fmt.Sprintf("加载 %v 文件错误: %v\n\n", loadfileworkdir, err)
-				ctx.SendChain(message.Text(logtext))
+				data, err := text.RenderToBase64(logtext, text.FontFile, 400, 20)
+				if err != nil {
+					ctx.SendChain(message.Text("ERROR:", err))
+					return
+				}
+				if id := ctx.SendChain(message.Image("base64://" + binary.BytesToString(data))); id.ID() == 0 {
+					ctx.SendChain(message.Text("ERROR:可能被风控了"))
+				}
 				return
 			}
 			logtext += fmt.Sprintf("加载 %v 文件成功\n\n", loadfileworkdir)
@@ -170,7 +221,14 @@ func init() {
 			err = cmd.Run()
 			if err != nil {
 				logtext += fmt.Sprintf("执行命令 %v 错误: %v \n\n", cmd.Args, err)
-				ctx.SendChain(message.Text(logtext))
+				data, err := text.RenderToBase64(logtext, text.FontFile, 400, 20)
+				if err != nil {
+					ctx.SendChain(message.Text("ERROR:", err))
+					return
+				}
+				if id := ctx.SendChain(message.Image("base64://" + binary.BytesToString(data))); id.ID() == 0 {
+					ctx.SendChain(message.Text("ERROR:可能被风控了"))
+				}
 				return
 			}
 			logtext += fmt.Sprintf("执行命令 %v 成功\n\n", cmd.Args)
@@ -179,11 +237,25 @@ func init() {
 			err = cmd.Run()
 			if err != nil {
 				logtext += fmt.Sprintf("执行命令 %v 错误: %v \n\n", cmd.Args, err)
-				ctx.SendChain(message.Text(logtext))
+				data, err := text.RenderToBase64(logtext, text.FontFile, 400, 20)
+				if err != nil {
+					ctx.SendChain(message.Text("ERROR:", err))
+					return
+				}
+				if id := ctx.SendChain(message.Image("base64://" + binary.BytesToString(data))); id.ID() == 0 {
+					ctx.SendChain(message.Text("ERROR:可能被风控了"))
+				}
 				return
 			}
 			logtext += fmt.Sprintf("执行命令 %v 成功\n\n", cmd.Args)
-			ctx.SendChain(message.Text(logtext))
+			data, err := text.RenderToBase64(logtext, text.FontFile, 400, 20)
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR:", err))
+				return
+			}
+			if id := ctx.SendChain(message.Image("base64://" + binary.BytesToString(data))); id.ID() == 0 {
+				ctx.SendChain(message.Text("ERROR:可能被风控了"))
+			}
 		default:
 			ctx.SendChain(message.Text("无效的动作:", flagapp.Action))
 		}

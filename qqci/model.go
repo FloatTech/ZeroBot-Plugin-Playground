@@ -12,18 +12,16 @@ var adb *appdb
 type appdb gorm.DB
 
 type application struct {
-	ID           int64  `gorm:"column:id;primary"`
-	Appname      string `gorm:"column:appname" flag:"a"`
-	Gitrepo      string `gorm:"column:gitrepo" flag:"r"`
-	Gitbranch    string `gorm:"-" flag:"b"`
-	Directory    string `gorm:"column:directory" flag:"dir"`
-	Command      string `gorm:"column:command" flag:"cmd"`
-	MakefilePath string `gorm:"column:makefile_path" flag:"make"`
-	LoadfilePath string `gorm:"column:loadfile_path" flag:"load"`
-	Action       string `gorm:"-" flag:"act"`
-	Upload       bool   `gorm:"-" flag:"u"`
-	Folder       string `gorm:"column:folder" flag:"f"`
-	GroupID      int    `gorm:"column:group_id" flag:"gid"`
+	ID        int64  `gorm:"column:id;primary"`
+	Appname   string `gorm:"column:appname" flag:"a"`
+	Gitrepo   string `gorm:"column:gitrepo" flag:"r"`
+	Gitbranch string `gorm:"-" flag:"b"`
+	Directory string `gorm:"column:directory" flag:"dir"`
+	Command   string `gorm:"column:command" flag:"cmd"`
+	Action    string `gorm:"-" flag:"act"`
+	Upload    bool   `gorm:"-" flag:"u"`
+	Folder    string `gorm:"column:folder" flag:"f"`
+	GroupID   int    `gorm:"column:group_id" flag:"gid"`
 }
 
 // TableName ...
