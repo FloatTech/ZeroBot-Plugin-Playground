@@ -5,12 +5,12 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"fmt"
-	"html/template"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
@@ -57,21 +57,21 @@ func init() {
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
-			ctx.SendChain(message.Text(fmt.Sprintf("执行成功,数据库参数: %+v \n", res)))
+			ctx.SendChain(message.Text(fmt.Sprintf("执行成功,数据库参数: %+v \n\n", res)))
 		case "insert":
 			err = adb.insert(flagapp)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
-			ctx.SendChain(message.Text(fmt.Sprintf("执行成功,命令参数: %+v \n", flagapp)))
+			ctx.SendChain(message.Text(fmt.Sprintf("执行成功,命令参数: %+v \n\n", flagapp)))
 		case "update":
 			err = adb.update(flagapp)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
-			ctx.SendChain(message.Text(fmt.Sprintf("执行成功,命令参数: %+v \n", flagapp)))
+			ctx.SendChain(message.Text(fmt.Sprintf("执行成功,命令参数: %+v \n\n", flagapp)))
 		case "install", "start", "restart", "stop":
 			app, err = adb.getApp(flagapp)
 			if err != nil {
@@ -87,18 +87,18 @@ func init() {
 			}
 		case "ci":
 			ctx.Send("少女祈祷中......")
-			logtext := "运行日志: \n"
-			logtext += fmt.Sprintf("命令参数: %+v \n", app)
+			logtext := "运行日志: \n\n"
+			logtext += fmt.Sprintf("命令参数: %+v \n\n", app)
 			app, err = adb.getApp(flagapp)
 			if err != nil {
-				logtext += fmt.Sprintf("getApp 错误: %v\n", err)
+				logtext += fmt.Sprintf("getApp 错误: %v\n\n", err)
 				ctx.SendChain(message.Text(logtext))
 				return
 			}
-			logtext += fmt.Sprintf("数据库参数: %+v \n", app)
+			logtext += fmt.Sprintf("数据库参数: %+v \n\n", app)
 			index := strings.LastIndex(app.Gitrepo, "/")
 			if index == -1 {
-				logtext += "git的地址错误\n"
+				logtext += "git的地址错误\n\n"
 				ctx.SendChain(message.Text(logtext))
 				return
 			}
@@ -113,31 +113,31 @@ func init() {
 			err = cmd.Run()
 			if err != nil {
 				_ = os.RemoveAll(workdir)
-				logtext += fmt.Sprintf("执行命令 %v 错误: %v,\n", cmd.Args, err)
+				logtext += fmt.Sprintf("执行命令 %v 错误: %v,\n\n", cmd.Args, err)
 				ctx.SendChain(message.Text(logtext))
 				return
 			}
-			logtext += fmt.Sprintf("执行命令 %v 成功\n", cmd.Args)
+			logtext += fmt.Sprintf("执行命令 %v 成功\n\n", cmd.Args)
 			makefileworkdir := filepath.Join(workdir, "Makefile")
 			path := filepath.Join(file.BOTPATH, app.MakefilePath)
 			err = getConfigFile(path, makefileworkdir, engine.DataFolder()+"Makefile.tpl", app)
 			if err != nil {
 				_ = os.RemoveAll(workdir)
-				logtext += fmt.Sprintf("加载 %v 错误: %v\n", makefileworkdir, err)
+				logtext += fmt.Sprintf("加载 %v 错误: %v\n\n", makefileworkdir, err)
 				ctx.SendChain(message.Text(logtext))
 				return
 			}
-			logtext += fmt.Sprintf("加载 %v 成功\n", makefileworkdir)
+			logtext += fmt.Sprintf("加载 %v 成功\n\n", makefileworkdir)
 			cmd = exec.Command("make")
 			cmd.Dir = workdir
 			err = cmd.Run()
 			if err != nil {
 				_ = os.RemoveAll(workdir)
-				logtext += fmt.Sprintf("执行命令 %v 错误: %v\n", cmd.Args, err)
+				logtext += fmt.Sprintf("执行命令 %v 错误: %v\n\n", cmd.Args, err)
 				ctx.SendChain(message.Text(logtext))
 				return
 			}
-			logtext += fmt.Sprintf("执行命令 %v 成功\n", cmd.Args)
+			logtext += fmt.Sprintf("执行命令 %v 成功\n\n", cmd.Args)
 			tarPath := filepath.Join(file.BOTPATH, workdir, "_output", app.Appname+".tar.gz")
 			if flagapp.Upload {
 				if app.GroupID > 0 {
@@ -149,40 +149,40 @@ func init() {
 			err = deCompress(tarPath, app.Directory)
 			if err != nil {
 				_ = os.RemoveAll(workdir)
-				logtext += fmt.Sprintf("解压 %v 到 %v 错误: %V\n", tarPath, app.Directory, err)
+				logtext += fmt.Sprintf("解压 %v 到 %v 错误: %V\n\n", tarPath, app.Directory, err)
 				ctx.SendChain(message.Text(logtext))
 				return
 			}
-			logtext += fmt.Sprintf("解压 %v 到 %v 成功\n", tarPath, app.Directory)
+			logtext += fmt.Sprintf("解压 %v 到 %v 成功\n\n", tarPath, app.Directory)
 			_ = os.RemoveAll(workdir)
 			loadfileworkdir := filepath.Join(app.Directory, app.Appname, "load.sh")
 			path = filepath.Join(file.BOTPATH, app.LoadfilePath)
 			err = getConfigFile(path, loadfileworkdir, engine.DataFolder()+"load.tpl", app)
 			if err != nil {
-				logtext += fmt.Sprintf("加载 %v 文件错误: %v\n", loadfileworkdir, err)
+				logtext += fmt.Sprintf("加载 %v 文件错误: %v\n\n", loadfileworkdir, err)
 				ctx.SendChain(message.Text(logtext))
 				return
 			}
-			logtext += fmt.Sprintf("加载 %v 文件成功\n", loadfileworkdir)
+			logtext += fmt.Sprintf("加载 %v 文件成功\n\n", loadfileworkdir)
 			_ = os.Chmod(loadfileworkdir, 0777)
 			cmd = exec.Command("./load.sh", "install")
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
 			if err != nil {
-				logtext += fmt.Sprintf("执行命令 %v 错误: %v \n", cmd.Args, err)
+				logtext += fmt.Sprintf("执行命令 %v 错误: %v \n\n", cmd.Args, err)
 				ctx.SendChain(message.Text(logtext))
 				return
 			}
-			logtext += fmt.Sprintf("执行命令 %v 成功\n", cmd.Args)
+			logtext += fmt.Sprintf("执行命令 %v 成功\n\n", cmd.Args)
 			cmd = exec.Command("./load.sh", "start")
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
 			if err != nil {
-				logtext += fmt.Sprintf("执行命令 %v 错误: %v \n", cmd.Args, err)
+				logtext += fmt.Sprintf("执行命令 %v 错误: %v \n\n", cmd.Args, err)
 				ctx.SendChain(message.Text(logtext))
 				return
 			}
-			logtext += fmt.Sprintf("执行命令 %v 成功\n", cmd.Args)
+			logtext += fmt.Sprintf("执行命令 %v 成功\n\n", cmd.Args)
 			ctx.SendChain(message.Text(logtext))
 		default:
 			ctx.SendChain(message.Text("无效的动作:", flagapp.Action))
