@@ -21,7 +21,8 @@ type application struct {
 	MakefilePath string `gorm:"column:makefile_path" flag:"make"`
 	LoadfilePath string `gorm:"column:loadfile_path" flag:"load"`
 	Action       string `gorm:"-" flag:"act"`
-	Namespace    string `gorm:"column:namespace" flag:"n"`
+	Folder       string `gorm:"column:folder" flag:"f"`
+	GroupID      int    `gorm:"column:group_id" flag:"gid"`
 }
 
 // TableName ...

@@ -5,6 +5,7 @@ import (
 	"flag"
 	"math/rand"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/FloatTech/zbputils/process"
@@ -34,6 +35,14 @@ func init() {
 	runcfg := flag.String("c", "", "Run from config file.")
 
 	flag.Parse()
+
+	for _, s := range flag.Args() {
+		i, err := strconv.ParseInt(s, 10, 64)
+		if err != nil {
+			continue
+		}
+		sus = append(sus, i)
+	}
 
 	if *runcfg != "" {
 		f, err := os.Open(*runcfg)

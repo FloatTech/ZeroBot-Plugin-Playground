@@ -45,6 +45,7 @@ func init() {
 			err error
 			cmd *exec.Cmd
 		)
+		_ = os.MkdirAll(app.Directory, 0755)
 		flagapp := ctx.State["flag"].(*application)
 		switch flagapp.Action {
 		case "insert":
@@ -80,64 +81,67 @@ func init() {
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
+			index := strings.LastIndex(app.Gitrepo, "/")
+			if index == -1 {
+				ctx.SendChain(message.Text("ERROR: git的地址错误"))
+				return
+			}
+			workdir := cachePath + app.Gitrepo[index:]
 			if flagapp.Gitbranch == "" {
 				cmd = exec.Command("git", "clone", app.Gitrepo)
+				app.Gitbranch = "latest"
 			} else {
 				cmd = exec.Command("git", "clone", "-b", flagapp.Gitbranch, app.Gitrepo)
 			}
 			cmd.Dir = cachePath
 			err = cmd.Run()
 			if err != nil {
-				_ = os.RemoveAll(cachePath)
+				_ = os.RemoveAll(workdir)
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
-			index := strings.LastIndex(app.Gitrepo, "/")
-			if index == -1 {
-				_ = os.RemoveAll(cachePath)
-				ctx.SendChain(message.Text("ERROR: git的地址错误"))
-				return
-			}
-			workdir := cachePath + app.Gitrepo[index:]
 			makefileworkdir := filepath.Join(workdir, "Makefile")
 			err = getConfigFile(makefileworkdir, engine.DataFolder()+"Makefile.tpl", app)
 			if err != nil {
-				_ = os.RemoveAll(cachePath)
+				_ = os.RemoveAll(workdir)
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
-			cmd = exec.Command("make", "tar")
+			cmd = exec.Command("make")
 			cmd.Dir = workdir
 			err = cmd.Run()
 			if err != nil {
-				_ = os.RemoveAll(cachePath)
+				_ = os.RemoveAll(workdir)
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
-			tarPath := filepath.Join(file.BOTPATH, "_output", app.Appname+".tar.gz")
-			ctx.UploadThisGroupFile(tarPath, app.Appname+"@"+app.Gitbranch, "")
+			tarPath := filepath.Join(file.BOTPATH, workdir, "_output", app.Appname+".tar.gz")
+			if app.GroupID > 0 {
+				ctx.UploadGroupFile(int64(app.GroupID), tarPath, app.Appname+"@"+app.Gitbranch, app.Folder)
+			} else {
+				ctx.UploadThisGroupFile(tarPath, app.Appname+"@"+app.Gitbranch, app.Folder)
+			}
 			err = deCompress(tarPath, app.Directory)
 			if err != nil {
-				_ = os.RemoveAll(cachePath)
+				_ = os.RemoveAll(workdir)
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
-			_ = os.RemoveAll(cachePath)
+			_ = os.RemoveAll(workdir)
 			loadfileworkdir := filepath.Join(app.Directory, app.Appname, "load.sh")
 			err = getConfigFile(loadfileworkdir, engine.DataFolder()+"load.tpl", app)
 			if err != nil {
-				_ = os.RemoveAll(cachePath)
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
-			cmd = exec.Command("load.sh", "install")
+			cmd = exec.Command("./load.sh", "install")
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
-			cmd = exec.Command("load.sh", "start")
+			cmd = exec.Command("./load.sh", "start")
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
 			if err != nil {
@@ -163,14 +167,17 @@ func getConfigFile(executePath, templatePath string, app application) error {
 		if err != nil {
 			return err
 		}
-		return f.Close()
+		_ = f.Close()
+		return nil
 	}
 	data, err := os.Open(path)
 	if err != nil {
 		return err
 	}
 	_, _ = io.Copy(f, data)
-	return f.Close()
+	_ = f.Close()
+	_ = data.Close()
+	return nil
 }
 
 func deCompress(tarFile, dest string) error {
@@ -194,10 +201,11 @@ func deCompress(tarFile, dest string) error {
 				return err
 			}
 		}
-		filename := dest + hdr.Name
-		err = os.MkdirAll(string([]rune(filename)[0:strings.LastIndex(filename, "/")]), 0755)
-		if err != nil {
-			return err
+		filename := filepath.Join(dest, hdr.Name)
+		_ = os.MkdirAll(filepath.Dir(filename), 0755)
+		if hdr.Size == 0 {
+			_ = os.MkdirAll(filename, 0755)
+			continue
 		}
 		file, err := os.Create(filename)
 		if err != nil {
