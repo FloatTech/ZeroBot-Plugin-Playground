@@ -25,7 +25,7 @@ func init() {
 		DisableOnDefault: false,
 		Help: "简易cicd\n- /qqci -act insert -a zbp -r git@github.com:FloatTech/ZeroBot-Plugin -dir /usr/local/service -cmd \"zpb\" -make data/Qqci/zbp/Makefile -load data/Qqci/zbp/load.sh -n FloatTech\n" +
 			"- /qqci -a zbp -dir D:/test -act update\n" +
-			"- /qqci -a zbp -b master\n" +
+			"- /qqci -a zbp -b master -act ci\n" +
 			"- /qqci -a zbp -act restart\n" +
 			"- /qqci -a zbp -act install\n" +
 			"- /qqci -a zbp -act start\n" +
@@ -56,14 +56,14 @@ func init() {
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
-			ctx.SendChain(message.Text("成功,命令参数:", flagapp))
+			ctx.SendChain(message.Text(fmt.Sprintf("成功,命令参数: %+v \n", flagapp)))
 		case "update":
 			err = adb.update(flagapp)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
-			ctx.SendChain(message.Text("成功,命令参数:", flagapp))
+			ctx.SendChain(message.Text(fmt.Sprintf("成功,命令参数: %+v \n", flagapp)))
 		case "install", "start", "restart", "stop":
 			app, err = adb.getApp(flagapp)
 			if err != nil {
@@ -77,22 +77,21 @@ func init() {
 				ctx.SendChain(message.Text("ERROR:", flagapp.Action, ",", err))
 				return
 			}
-		default:
+		case "ci":
 			ctx.Send("少女祈祷中......")
-			logmsg := make([]message.MessageSegment, 0, 16)
-			logmsg = append(logmsg, message.Text("运行日志: \n"))
-			logmsg = append(logmsg, message.Text(fmt.Sprintf("命令参数:%+v\n", app)))
+			logtext := "运行日志: \n"
+			logtext += fmt.Sprintf("命令参数: %+v \n", app)
 			app, err = adb.getApp(flagapp)
 			if err != nil {
-				logmsg = append(logmsg, message.Text("getApp 错误:", err, "\n"))
-				ctx.SendChain(logmsg...)
+				logtext += fmt.Sprintf("getApp 错误: %v\n", err)
+				ctx.SendChain(message.Text(logtext))
 				return
 			}
-			logmsg = append(logmsg, message.Text(fmt.Sprintf("数据库参数:%+v\n", app)))
+			logtext += fmt.Sprintf("数据库参数: %+v \n", app)
 			index := strings.LastIndex(app.Gitrepo, "/")
 			if index == -1 {
-				logmsg = append(logmsg, message.Text("git的地址错误\n"))
-				ctx.SendChain(logmsg...)
+				logtext += "git的地址错误\n"
+				ctx.SendChain(message.Text(logtext))
 				return
 			}
 			workdir := cachePath + app.Gitrepo[index:]
@@ -106,30 +105,30 @@ func init() {
 			err = cmd.Run()
 			if err != nil {
 				_ = os.RemoveAll(workdir)
-				logmsg = append(logmsg, message.Text("执行命令", cmd.Args, "错误:", err, "\n"))
-				ctx.SendChain(logmsg...)
+				logtext += fmt.Sprintf("执行命令 %v 错误: %v,\n", cmd.Args, err)
+				ctx.SendChain(message.Text(logtext))
 				return
 			}
-			logmsg = append(logmsg, message.Text("执行命令", cmd.Args, " 成功\n"))
+			logtext += fmt.Sprintf("执行命令 %v 成功\n", cmd.Args)
 			makefileworkdir := filepath.Join(workdir, "Makefile")
 			err = getConfigFile(makefileworkdir, engine.DataFolder()+"Makefile.tpl", app)
 			if err != nil {
 				_ = os.RemoveAll(workdir)
-				logmsg = append(logmsg, message.Text("加载makefile错误: ", err, "\n"))
-				ctx.SendChain(message.Text(logmsg))
+				logtext += fmt.Sprintf("加载 %v 错误: %v\n", makefileworkdir, err)
+				ctx.SendChain(message.Text(logtext))
 				return
 			}
-			logmsg = append(logmsg, message.Text("加载makefile成功\n"))
+			logtext += fmt.Sprintf("加载 %v 成功\n", makefileworkdir)
 			cmd = exec.Command("make")
 			cmd.Dir = workdir
 			err = cmd.Run()
 			if err != nil {
 				_ = os.RemoveAll(workdir)
-				logmsg = append(logmsg, message.Text("执行命令", cmd.Args, "错误:", err, "\n"))
-				ctx.SendChain(logmsg...)
+				logtext += fmt.Sprintf("执行命令 %v 错误: %v\n", cmd.Args, err)
+				ctx.SendChain(message.Text(logtext))
 				return
 			}
-			logmsg = append(logmsg, message.Text("执行命令", cmd.Args, "成功\n"))
+			logtext += fmt.Sprintf("执行命令 %v 成功\n", cmd.Args)
 			tarPath := filepath.Join(file.BOTPATH, workdir, "_output", app.Appname+".tar.gz")
 			if flagapp.Upload {
 				if app.GroupID > 0 {
@@ -141,39 +140,41 @@ func init() {
 			err = deCompress(tarPath, app.Directory)
 			if err != nil {
 				_ = os.RemoveAll(workdir)
-				logmsg = append(logmsg, message.Text("解压", tarPath, "到", app.Directory, " 错误: ", err, "\n"))
-				ctx.SendChain(logmsg...)
+				logtext += fmt.Sprintf("解压 %v 到 %v 错误: %V\n", tarPath, app.Directory, err)
+				ctx.SendChain(message.Text(logtext))
 				return
 			}
-			logmsg = append(logmsg, message.Text("解压", tarPath, "到", app.Directory, " 成功\n"))
+			logtext += fmt.Sprintf("解压 %v 到 %v 成功\n", tarPath, app.Directory)
 			_ = os.RemoveAll(workdir)
 			loadfileworkdir := filepath.Join(app.Directory, app.Appname, "load.sh")
 			err = getConfigFile(loadfileworkdir, engine.DataFolder()+"load.tpl", app)
 			if err != nil {
-				logmsg = append(logmsg, message.Text("加载load.sh文件错误: ", err, "\n"))
-				ctx.SendChain(logmsg...)
+				logtext += fmt.Sprintf("加载 %v 文件错误: %v\n", loadfileworkdir, err)
+				ctx.SendChain(message.Text(logtext))
 				return
 			}
-			logmsg = append(logmsg, message.Text("加载load.sh文件成功\n"))
+			logtext += fmt.Sprintf("加载 %v 文件成功\n", loadfileworkdir)
 			cmd = exec.Command("./load.sh", "install")
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
 			if err != nil {
-				logmsg = append(logmsg, message.Text("执行命令", cmd.Args, "错误:", err, "\n"))
-				ctx.SendChain(logmsg...)
+				logtext += fmt.Sprintf("执行命令 %v 错误: %v \n", cmd.Args, err)
+				ctx.SendChain(message.Text(logtext))
 				return
 			}
-			logmsg = append(logmsg, message.Text("执行命令", cmd.Args, "成功\n"))
+			logtext += fmt.Sprintf("执行命令 %v 成功\n", cmd.Args)
 			cmd = exec.Command("./load.sh", "start")
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
 			if err != nil {
-				logmsg = append(logmsg, message.Text("执行命令", cmd.Args, "错误:", err, "\n"))
-				ctx.SendChain(logmsg...)
+				logtext += fmt.Sprintf("执行命令 %v 错误: %v \n", cmd.Args, err)
+				ctx.SendChain(message.Text(logtext))
 				return
 			}
-			logmsg = append(logmsg, message.Text("执行命令", cmd.Args, "成功\n"))
-			ctx.SendChain(logmsg...)
+			logtext += fmt.Sprintf("执行命令 %v 成功\n", cmd.Args)
+			ctx.SendChain(message.Text(logtext))
+		default:
+			ctx.SendChain(message.Text("无效的动作:", app.Action))
 		}
 	})
 }
