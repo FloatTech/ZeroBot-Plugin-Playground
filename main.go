@@ -5,6 +5,7 @@ import (
 	"flag"
 	"math/rand"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/FloatTech/zbputils/process"
@@ -14,6 +15,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/github/yydz"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/nihongo"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/qqci"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/vote"
 
 	// 程序主体
@@ -33,6 +35,14 @@ func init() {
 	runcfg := flag.String("c", "", "Run from config file.")
 
 	flag.Parse()
+
+	for _, s := range flag.Args() {
+		i, err := strconv.ParseInt(s, 10, 64)
+		if err != nil {
+			continue
+		}
+		sus = append(sus, i)
+	}
 
 	if *runcfg != "" {
 		f, err := os.Open(*runcfg)
