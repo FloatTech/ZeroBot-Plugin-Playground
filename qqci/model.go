@@ -13,7 +13,7 @@ type appdb gorm.DB
 
 type application struct {
 	ID        int64  `gorm:"column:id;primary"`
-	Appname   string `gorm:"column:appname" flag:"a"`
+	Appname   string `gorm:"column:appname;unique_index" flag:"a"`
 	Gitrepo   string `gorm:"column:gitrepo" flag:"r"`
 	Gitbranch string `gorm:"-" flag:"b"`
 	Directory string `gorm:"column:directory" flag:"dir"`
