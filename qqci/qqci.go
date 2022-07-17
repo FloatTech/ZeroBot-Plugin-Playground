@@ -4,6 +4,7 @@ package qqci
 import (
 	"archive/tar"
 	"compress/gzip"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -28,6 +29,7 @@ func init() {
 		Help: "简易cicd\n- /qqci -a zbp -r git@github.com:FloatTech/ZeroBot-Plugin -dir /usr/local/service -cmd \"zpb\"  -act insert\n" +
 			"- /qqci -a zbp -dir D:/test -act update\n" +
 			"- /qqci -a zbp -act select\n" +
+			"- /qqci -a zbp -act folder -f /23bc19be-6b54-4542-b42e-d97a6bea81fd" +
 			"- /qqci -a zbp -b master -act ci\n" +
 			"- /qqci -a zbp -act restart\n" +
 			"- /qqci -a zbp -act install\n" +
@@ -87,6 +89,18 @@ func init() {
 				ctx.SendChain(message.Text("ERROR:", flagapp.Action, ",", err))
 				return
 			}
+		case "folder":
+			var folders []folder
+			text := "文件夹id: \n"
+			if flagapp.Folder == "" {
+				_ = json.Unmarshal(binary.StringToBytes(ctx.GetGroupRootFiles(ctx.Event.GroupID).Get("folders|@pretty").Raw), &folders)
+			} else {
+				_ = json.Unmarshal(binary.StringToBytes(ctx.GetGroupFilesByFolder(ctx.Event.GroupID, flagapp.Folder).Get("folders|@pretty").Raw), &folders)
+			}
+			for _, v := range folders {
+				text += v.FolderName + ": " + v.FolderID + "\n"
+			}
+			ctx.SendChain(message.Text(text))
 		case "ci":
 			ctx.Send("少女祈祷中......")
 			logtext := "运行日志: \n\n"

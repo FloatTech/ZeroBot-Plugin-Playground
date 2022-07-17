@@ -24,6 +24,11 @@ type application struct {
 	GroupID   int    `gorm:"column:group_id" flag:"gid"`
 }
 
+type folder struct {
+	FolderID   string `json:"folder_id"`
+	FolderName string `json:"folder_name"`
+}
+
 // TableName ...
 func (application) TableName() string {
 	return "application"
