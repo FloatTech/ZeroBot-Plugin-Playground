@@ -34,7 +34,8 @@ func init() {
 			"- /qqci -a zbp -act restart\n" +
 			"- /qqci -a zbp -act install\n" +
 			"- /qqci -a zbp -act start\n" +
-			"- /qqci -a zbp -act stop",
+			"- /qqci -a zbp -act stop\n" +
+			"- /qqci -a zbp -act upload",
 		PublicDataFolder: "Qqci",
 	})
 	cachePath := engine.DataFolder() + "cache/"
@@ -101,6 +102,31 @@ func init() {
 				text += v.FolderName + ": " + v.FolderID + "\n"
 			}
 			ctx.SendChain(message.Text(text))
+		case "upload":
+			app, err = adb.getApp(flagapp)
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR:", err))
+				return
+			}
+			var targets []string
+			_ = filepath.Walk(app.Directory, func(fPath string, fInfo os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+				if !fInfo.Mode().IsRegular() {
+					return nil
+				}
+				if filepath.Base(fPath) == flagapp.Upload {
+					if app.GroupID > 0 {
+						ctx.UploadGroupFile(int64(app.GroupID), fPath, filepath.Base(fPath), app.Folder)
+					} else {
+						ctx.UploadThisGroupFile(fPath, filepath.Base(fPath), app.Folder)
+					}
+				}
+				targets = append(targets, filepath.Base(fPath))
+				return nil
+			})
+			ctx.SendChain(message.Text("文件列表:\n- ", strings.Join(targets, "\n- ")))
 		case "ci":
 			ctx.Send("少女祈祷中......")
 			logtext := "运行日志: \n\n"
@@ -132,14 +158,16 @@ func init() {
 				}
 				return
 			}
-			workdir := cachePath + app.Gitrepo[index:]
+			workdir := filepath.Join(cachePath, app.Appname, app.Gitrepo[index:])
+			_ = os.MkdirAll(filepath.Dir(workdir), 0755)
 			if flagapp.Gitbranch == "" {
 				cmd = exec.Command("git", "clone", app.Gitrepo)
 				app.Gitbranch = "latest"
 			} else {
 				cmd = exec.Command("git", "clone", "-b", flagapp.Gitbranch, app.Gitrepo)
+				app.Gitbranch = flagapp.Gitbranch
 			}
-			cmd.Dir = cachePath
+			cmd.Dir = filepath.Join(cachePath, app.Appname)
 			err = cmd.Run()
 			if err != nil {
 				_ = os.RemoveAll(workdir)
@@ -190,17 +218,24 @@ func init() {
 			}
 			logtext += fmt.Sprintf("执行命令 %v 成功\n\n", cmd.Args)
 			tarPath := filepath.Join(file.BOTPATH, workdir, "_output", app.Appname+".tar.gz")
-			if flagapp.Upload {
+			newtarPath := filepath.Join(app.Directory, app.Appname, app.Appname+"@"+app.Gitbranch+".tar.gz")
+			tf, _ := os.Open(tarPath)
+			cf, _ := os.Create(newtarPath)
+			_, _ = io.Copy(cf, tf)
+			cf.Close()
+			tf.Close()
+			if flagapp.Upload != "" {
 				if app.GroupID > 0 {
-					ctx.UploadGroupFile(int64(app.GroupID), tarPath, app.Gitrepo+"@"+app.Gitbranch+".tar.gz", app.Folder)
+					ctx.UploadGroupFile(int64(app.GroupID), newtarPath, app.Appname+"@"+app.Gitbranch+".tar.gz", app.Folder)
 				} else {
-					ctx.UploadThisGroupFile(tarPath, app.Gitrepo+"@"+app.Gitbranch+".tar.gz", app.Folder)
+					ctx.UploadThisGroupFile(newtarPath, app.Appname+"@"+app.Gitbranch+".tar.gz", app.Folder)
 				}
 			}
-			err = deCompress(tarPath, app.Directory)
+			_ = os.RemoveAll(workdir)
+			err = deCompress(newtarPath, app.Directory)
 			if err != nil {
 				_ = os.RemoveAll(workdir)
-				logtext += fmt.Sprintf("解压 %v 到 %v 错误: %V\n\n", tarPath, app.Directory, err)
+				logtext += fmt.Sprintf("解压 %v 到 %v 错误: %v\n\n", newtarPath, app.Directory, err)
 				data, err := text.RenderToBase64(logtext, text.FontFile, 400, 20)
 				if err != nil {
 					ctx.SendChain(message.Text("ERROR:", err))
@@ -212,7 +247,6 @@ func init() {
 				return
 			}
 			logtext += fmt.Sprintf("解压 %v 到 %v 成功\n\n", tarPath, app.Directory)
-			_ = os.RemoveAll(workdir)
 			loadfileworkdir := filepath.Join(app.Directory, app.Appname, "load.sh")
 			path = filepath.Join(file.BOTPATH, engine.DataFolder(), app.Appname, "load.sh")
 			err = getConfigFile(path, loadfileworkdir, engine.DataFolder()+"load.tpl", app)

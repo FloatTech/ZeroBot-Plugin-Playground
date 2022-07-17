@@ -19,7 +19,7 @@ type application struct {
 	Directory string `gorm:"column:directory" flag:"dir"`
 	Command   string `gorm:"column:command" flag:"cmd"`
 	Action    string `gorm:"-" flag:"act"`
-	Upload    bool   `gorm:"-" flag:"u"`
+	Upload    string `gorm:"-" flag:"u"`
 	Folder    string `gorm:"column:folder" flag:"f"`
 	GroupID   int    `gorm:"column:group_id" flag:"gid"`
 }
