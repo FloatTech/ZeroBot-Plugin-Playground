@@ -4,6 +4,7 @@ package qqci
 import (
 	"archive/tar"
 	"compress/gzip"
+	"fmt"
 	"html/template"
 	"io"
 	"os"
@@ -54,14 +55,14 @@ func init() {
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
-			ctx.SendChain(message.Text("成功,参数:", flagapp))
+			ctx.SendChain(message.Text("成功,命令参数:", flagapp))
 		case "update":
 			err = adb.update(flagapp)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
-			ctx.SendChain(message.Text("成功,参数:", flagapp))
+			ctx.SendChain(message.Text("成功,命令参数:", flagapp))
 		case "install", "start", "restart", "stop":
 			app, err = adb.getApp(flagapp)
 			if err != nil {
@@ -72,18 +73,25 @@ func init() {
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
 			if err != nil {
-				ctx.SendChain(message.Text("ERROR:", err))
+				ctx.SendChain(message.Text("ERROR:", flagapp.Action, ",", err))
 				return
 			}
 		default:
+			ctx.Send("少女祈祷中......")
+			logmsg := make([]message.MessageSegment, 0, 16)
+			logmsg = append(logmsg, message.Text("运行日志: \n"))
+			logmsg = append(logmsg, message.Text(fmt.Sprintf("命令参数:%+v\n", app)))
 			app, err = adb.getApp(flagapp)
 			if err != nil {
-				ctx.SendChain(message.Text("ERROR:", err))
+				logmsg = append(logmsg, message.Text("getApp 错误:", err, "\n"))
+				ctx.SendChain(logmsg...)
 				return
 			}
+			logmsg = append(logmsg, message.Text(fmt.Sprintf("数据库参数:%+v\n", app)))
 			index := strings.LastIndex(app.Gitrepo, "/")
 			if index == -1 {
-				ctx.SendChain(message.Text("ERROR: git的地址错误"))
+				logmsg = append(logmsg, message.Text("git的地址错误\n"))
+				ctx.SendChain(logmsg...)
 				return
 			}
 			workdir := cachePath + app.Gitrepo[index:]
@@ -97,57 +105,70 @@ func init() {
 			err = cmd.Run()
 			if err != nil {
 				_ = os.RemoveAll(workdir)
-				ctx.SendChain(message.Text("ERROR:", err))
+				logmsg = append(logmsg, message.Text(cmd.Args, "错误:", err, "\n"))
+				ctx.SendChain(logmsg...)
 				return
 			}
+			logmsg = append(logmsg, message.Text(cmd.Args, " 成功\n"))
 			makefileworkdir := filepath.Join(workdir, "Makefile")
 			err = getConfigFile(makefileworkdir, engine.DataFolder()+"Makefile.tpl", app)
 			if err != nil {
 				_ = os.RemoveAll(workdir)
-				ctx.SendChain(message.Text("ERROR:", err))
+				logmsg = append(logmsg, message.Text("加载makefile错误: ", err, "\n"))
+				ctx.SendChain(message.Text(logmsg))
 				return
 			}
+			logmsg = append(logmsg, message.Text("加载makefile成功\n"))
 			cmd = exec.Command("make")
 			cmd.Dir = workdir
 			err = cmd.Run()
 			if err != nil {
 				_ = os.RemoveAll(workdir)
-				ctx.SendChain(message.Text("ERROR:", err))
+				logmsg = append(logmsg, message.Text(cmd.Args, "错误:", err, "\n"))
+				ctx.SendChain(logmsg...)
 				return
 			}
 			tarPath := filepath.Join(file.BOTPATH, workdir, "_output", app.Appname+".tar.gz")
 			if app.GroupID > 0 {
-				ctx.UploadGroupFile(int64(app.GroupID), tarPath, app.Appname+"@"+app.Gitbranch, app.Folder)
+				ctx.UploadGroupFile(int64(app.GroupID), tarPath, app.Appname+"@"+app.Gitbranch+".tar.gz", app.Folder)
 			} else {
-				ctx.UploadThisGroupFile(tarPath, app.Appname+"@"+app.Gitbranch, app.Folder)
+				ctx.UploadThisGroupFile(tarPath, app.Appname+"@"+app.Gitbranch+".tar.gz", app.Folder)
 			}
 			err = deCompress(tarPath, app.Directory)
 			if err != nil {
 				_ = os.RemoveAll(workdir)
-				ctx.SendChain(message.Text("ERROR:", err))
+				logmsg = append(logmsg, message.Text("解压", tarPath, "到", app.Directory, " 错误: ", err, "\n"))
+				ctx.SendChain(logmsg...)
 				return
 			}
+			logmsg = append(logmsg, message.Text("解压", tarPath, "到", app.Directory, " 成功\n"))
 			_ = os.RemoveAll(workdir)
 			loadfileworkdir := filepath.Join(app.Directory, app.Appname, "load.sh")
 			err = getConfigFile(loadfileworkdir, engine.DataFolder()+"load.tpl", app)
 			if err != nil {
-				ctx.SendChain(message.Text("ERROR:", err))
+				logmsg = append(logmsg, message.Text("加载load.sh文件错误: ", err, "\n"))
+				ctx.SendChain(logmsg...)
 				return
 			}
+			logmsg = append(logmsg, message.Text("加载load.sh文件成功\n"))
 			cmd = exec.Command("./load.sh", "install")
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
 			if err != nil {
-				ctx.SendChain(message.Text("ERROR:", err))
+				logmsg = append(logmsg, message.Text(cmd.Args, "错误:", err, "\n"))
+				ctx.SendChain(logmsg...)
 				return
 			}
+			logmsg = append(logmsg, message.Text(cmd.Args, "成功\n"))
 			cmd = exec.Command("./load.sh", "start")
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
 			if err != nil {
-				ctx.SendChain(message.Text("ERROR:", err))
+				logmsg = append(logmsg, message.Text(cmd.Args, "错误:", err, "\n"))
+				ctx.SendChain(logmsg...)
 				return
 			}
+			ctx.SendChain(logmsg...)
 		}
 	})
 }
