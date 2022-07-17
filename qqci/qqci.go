@@ -24,13 +24,14 @@ func init() {
 	engine := control.Register("qqci", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Help: "简易cicd\n- /qqci -act insert -a zbp -r git@github.com:FloatTech/ZeroBot-Plugin -dir /usr/local/service -cmd \"zpb\" -make data/Qqci/zbp/Makefile -load data/Qqci/zbp/load.sh -n FloatTech\n" +
+			"- /qqci -a zbp -dir D:/test -act update\n" +
 			"- /qqci -a zbp -b master\n" +
 			"- /qqci -a zbp -act restart\n" +
 			"- /qqci -a zbp -act install\n" +
 			"- /qqci -a zbp -act start\n" +
 			"- /qqci -a zbp -act stop",
 		PublicDataFolder: "Qqci",
-	})
+	}).ApplySingle(ctxext.DefaultSingle)
 	cachePath := engine.DataFolder() + "cache/"
 	_ = os.RemoveAll(cachePath)
 	_ = os.MkdirAll(cachePath, 0755)
@@ -105,11 +106,11 @@ func init() {
 			err = cmd.Run()
 			if err != nil {
 				_ = os.RemoveAll(workdir)
-				logmsg = append(logmsg, message.Text(cmd.Args, "错误:", err, "\n"))
+				logmsg = append(logmsg, message.Text("执行命令", cmd.Args, "错误:", err, "\n"))
 				ctx.SendChain(logmsg...)
 				return
 			}
-			logmsg = append(logmsg, message.Text(cmd.Args, " 成功\n"))
+			logmsg = append(logmsg, message.Text("执行命令", cmd.Args, " 成功\n"))
 			makefileworkdir := filepath.Join(workdir, "Makefile")
 			err = getConfigFile(makefileworkdir, engine.DataFolder()+"Makefile.tpl", app)
 			if err != nil {
@@ -124,15 +125,18 @@ func init() {
 			err = cmd.Run()
 			if err != nil {
 				_ = os.RemoveAll(workdir)
-				logmsg = append(logmsg, message.Text(cmd.Args, "错误:", err, "\n"))
+				logmsg = append(logmsg, message.Text("执行命令", cmd.Args, "错误:", err, "\n"))
 				ctx.SendChain(logmsg...)
 				return
 			}
+			logmsg = append(logmsg, message.Text("执行命令", cmd.Args, "成功\n"))
 			tarPath := filepath.Join(file.BOTPATH, workdir, "_output", app.Appname+".tar.gz")
-			if app.GroupID > 0 {
-				ctx.UploadGroupFile(int64(app.GroupID), tarPath, app.Appname+"@"+app.Gitbranch+".tar.gz", app.Folder)
-			} else {
-				ctx.UploadThisGroupFile(tarPath, app.Appname+"@"+app.Gitbranch+".tar.gz", app.Folder)
+			if flagapp.Upload {
+				if app.GroupID > 0 {
+					ctx.UploadGroupFile(int64(app.GroupID), tarPath, app.Gitrepo+"@"+app.Gitbranch+".tar.gz", app.Folder)
+				} else {
+					ctx.UploadThisGroupFile(tarPath, app.Gitrepo+"@"+app.Gitbranch+".tar.gz", app.Folder)
+				}
 			}
 			err = deCompress(tarPath, app.Directory)
 			if err != nil {
@@ -155,19 +159,20 @@ func init() {
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
 			if err != nil {
-				logmsg = append(logmsg, message.Text(cmd.Args, "错误:", err, "\n"))
+				logmsg = append(logmsg, message.Text("执行命令", cmd.Args, "错误:", err, "\n"))
 				ctx.SendChain(logmsg...)
 				return
 			}
-			logmsg = append(logmsg, message.Text(cmd.Args, "成功\n"))
+			logmsg = append(logmsg, message.Text("执行命令", cmd.Args, "成功\n"))
 			cmd = exec.Command("./load.sh", "start")
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
 			if err != nil {
-				logmsg = append(logmsg, message.Text(cmd.Args, "错误:", err, "\n"))
+				logmsg = append(logmsg, message.Text("执行命令", cmd.Args, "错误:", err, "\n"))
 				ctx.SendChain(logmsg...)
 				return
 			}
+			logmsg = append(logmsg, message.Text("执行命令", cmd.Args, "成功\n"))
 			ctx.SendChain(logmsg...)
 		}
 	})
@@ -180,24 +185,27 @@ func getConfigFile(executePath, templatePath string, app application) error {
 		return err
 	}
 	if file.IsNotExist(path) {
+		nf, err := os.Create(path)
+		if err != nil {
+			return err
+		}
 		tmpl, err := template.ParseFiles(templatePath)
 		if err != nil {
 			return err
 		}
-		err = tmpl.Execute(f, app)
+		err = tmpl.Execute(nf, app)
 		if err != nil {
 			return err
 		}
-		_ = f.Close()
-		return nil
+		_ = nf.Close()
 	}
-	data, err := os.Open(path)
+	pf, err := os.Open(path)
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(f, data)
+	_, _ = io.Copy(f, pf)
 	_ = f.Close()
-	_ = data.Close()
+	_ = pf.Close()
 	return nil
 }
 
