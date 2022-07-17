@@ -82,7 +82,7 @@ func init() {
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
-			cmd := exec.Command("load.sh", flagapp.Action)
+			cmd := exec.Command("./load.sh", flagapp.Action)
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
 			if err != nil {
