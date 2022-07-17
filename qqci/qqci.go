@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -109,21 +110,24 @@ func init() {
 				return
 			}
 			var targets []string
-			_ = filepath.Walk(app.Directory, func(fPath string, fInfo os.FileInfo, err error) error {
+			maxDepth := strings.Count(filepath.Join(app.Directory, app.Appname), string(os.PathSeparator))
+			_ = filepath.WalkDir(filepath.Join(app.Directory, app.Appname), func(fPath string, d fs.DirEntry, err error) error {
 				if err != nil {
 					return err
 				}
-				if !fInfo.Mode().IsRegular() {
-					return nil
+				if d.IsDir() && strings.Count(fPath, string(os.PathSeparator)) > maxDepth {
+					return fs.SkipDir
 				}
-				if filepath.Base(fPath) == flagapp.Upload {
+				if !d.IsDir() && filepath.Base(fPath) == flagapp.Upload {
 					if app.GroupID > 0 {
 						ctx.UploadGroupFile(int64(app.GroupID), fPath, filepath.Base(fPath), app.Folder)
 					} else {
 						ctx.UploadThisGroupFile(fPath, filepath.Base(fPath), app.Folder)
 					}
 				}
-				targets = append(targets, filepath.Base(fPath))
+				if !d.IsDir() {
+					targets = append(targets, filepath.Base(fPath))
+				}
 				return nil
 			})
 			ctx.SendChain(message.Text("文件列表:\n- ", strings.Join(targets, "\n- ")))
