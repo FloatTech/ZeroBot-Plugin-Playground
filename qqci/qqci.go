@@ -36,7 +36,7 @@ func init() {
 			"- /qqci -a zbp -act start\n" +
 			"- /qqci -a zbp -act stop",
 		PublicDataFolder: "Qqci",
-	}).ApplySingle(ctxext.DefaultSingle)
+	})
 	cachePath := engine.DataFolder() + "cache/"
 	_ = os.RemoveAll(cachePath)
 	_ = os.MkdirAll(cachePath, 0755)
