@@ -174,13 +174,14 @@ func init() {
 			logtext += fmt.Sprintf("执行命令 %v 成功\n", cmd.Args)
 			ctx.SendChain(message.Text(logtext))
 		default:
-			ctx.SendChain(message.Text("无效的动作:", app.Action))
+			ctx.SendChain(message.Text("无效的动作:", flagapp.Action))
 		}
 	})
 }
 
 func getConfigFile(executePath, templatePath string, app application) error {
 	path := filepath.Join(file.BOTPATH, app.MakefilePath)
+	_ = os.MkdirAll(filepath.Dir(path), 0755)
 	f, err := os.Create(executePath)
 	if err != nil {
 		return err
