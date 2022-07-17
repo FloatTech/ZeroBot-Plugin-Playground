@@ -339,6 +339,7 @@ func deCompress(tarFile, dest string) error {
 			return err
 		}
 		_, _ = io.Copy(file, tr)
+		_ = os.Chmod(filename, 0777)
 	}
 	return nil
 }
