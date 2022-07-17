@@ -59,6 +59,12 @@ func (adb *appdb) update(app *application) error {
 	return db.Model(&application{}).Where("appname = ?", app.Appname).Updates(*app).Error
 }
 
+func (adb *appdb) get(app *application) (res application, err error) {
+	db := (*gorm.DB)(adb)
+	err = db.Model(&application{}).First(&res, "appname = ?", app.Appname).Error
+	return
+}
+
 func (adb *appdb) getApp(app *application) (a application, err error) {
 	db := (*gorm.DB)(adb)
 	if app.Appname != "" {

@@ -23,8 +23,9 @@ import (
 func init() {
 	engine := control.Register("qqci", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
-		Help: "简易cicd\n- /qqci -act insert -a zbp -r git@github.com:FloatTech/ZeroBot-Plugin -dir /usr/local/service -cmd \"zpb\" -make data/Qqci/zbp/Makefile -load data/Qqci/zbp/load.sh -n FloatTech\n" +
+		Help: "简易cicd\n- /qqci -a zbp -r git@github.com:FloatTech/ZeroBot-Plugin -dir /usr/local/service -cmd \"zpb\" -make data/Qqci/zbp/Makefile -load data/Qqci/zbp/load.sh -act insert\n" +
 			"- /qqci -a zbp -dir D:/test -act update\n" +
+			"- /qqci -a zbp -act select\n" +
 			"- /qqci -a zbp -b master -act ci\n" +
 			"- /qqci -a zbp -act restart\n" +
 			"- /qqci -a zbp -act install\n" +
@@ -50,20 +51,27 @@ func init() {
 		_ = os.MkdirAll(app.Directory, 0755)
 		flagapp := ctx.State["flag"].(*application)
 		switch flagapp.Action {
+		case "select":
+			res, err := adb.get(flagapp)
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR:", err))
+				return
+			}
+			ctx.SendChain(message.Text(fmt.Sprintf("执行成功,数据库参数: %+v \n", res)))
 		case "insert":
 			err = adb.insert(flagapp)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
-			ctx.SendChain(message.Text(fmt.Sprintf("成功,命令参数: %+v \n", flagapp)))
+			ctx.SendChain(message.Text(fmt.Sprintf("执行成功,命令参数: %+v \n", flagapp)))
 		case "update":
 			err = adb.update(flagapp)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR:", err))
 				return
 			}
-			ctx.SendChain(message.Text(fmt.Sprintf("成功,命令参数: %+v \n", flagapp)))
+			ctx.SendChain(message.Text(fmt.Sprintf("执行成功,命令参数: %+v \n", flagapp)))
 		case "install", "start", "restart", "stop":
 			app, err = adb.getApp(flagapp)
 			if err != nil {
@@ -154,6 +162,7 @@ func init() {
 				return
 			}
 			logtext += fmt.Sprintf("加载 %v 文件成功\n", loadfileworkdir)
+			_ = os.Chmod(loadfileworkdir, 0777)
 			cmd = exec.Command("./load.sh", "install")
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
