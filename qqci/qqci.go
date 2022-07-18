@@ -88,9 +88,10 @@ func init() {
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
 			if err != nil {
-				ctx.SendChain(message.Text("ERROR:", flagapp.Action, ",", err))
+				ctx.SendChain(message.Text("执行命令 ", cmd.Args, " 错误: ", err, "\n\n"))
 				return
 			}
+			ctx.SendChain(message.Text("执行命令 ", cmd.Args, " 成功\n\n"))
 		case "folder":
 			var folders []folder
 			text := "文件夹id: \n"
@@ -223,6 +224,7 @@ func init() {
 			logtext += fmt.Sprintf("执行命令 %v 成功\n\n", cmd.Args)
 			tarPath := filepath.Join(file.BOTPATH, workdir, "_output", app.Appname+".tar.gz")
 			newtarPath := filepath.Join(app.Directory, app.Appname, app.Appname+"@"+app.Gitbranch+".tar.gz")
+			_ = os.MkdirAll(filepath.Dir(newtarPath), 0755)
 			tf, _ := os.Open(tarPath)
 			cf, _ := os.Create(newtarPath)
 			_, _ = io.Copy(cf, tf)
@@ -236,6 +238,25 @@ func init() {
 				}
 			}
 			_ = os.RemoveAll(workdir)
+			loadfileworkdir := filepath.Join(app.Directory, app.Appname, "load.sh")
+			if file.IsExist(loadfileworkdir) {
+				cmd = exec.Command("./load.sh", "stop")
+				cmd.Dir = filepath.Join(app.Directory, app.Appname)
+				err = cmd.Run()
+				if err != nil {
+					logtext += fmt.Sprintf("执行命令 %v 错误: %v \n\n", cmd.Args, err)
+					data, err := text.RenderToBase64(logtext, text.FontFile, 400, 20)
+					if err != nil {
+						ctx.SendChain(message.Text("ERROR:", err))
+						return
+					}
+					if id := ctx.SendChain(message.Image("base64://" + binary.BytesToString(data))); id.ID() == 0 {
+						ctx.SendChain(message.Text("ERROR:可能被风控了"))
+					}
+					return
+				}
+				logtext += fmt.Sprintf("执行命令 %v 成功\n\n", cmd.Args)
+			}
 			err = deCompress(newtarPath, app.Directory)
 			if err != nil {
 				_ = os.RemoveAll(workdir)
@@ -250,8 +271,7 @@ func init() {
 				}
 				return
 			}
-			logtext += fmt.Sprintf("解压 %v 到 %v 成功\n\n", tarPath, app.Directory)
-			loadfileworkdir := filepath.Join(app.Directory, app.Appname, "load.sh")
+			logtext += fmt.Sprintf("解压 %v 到 %v 成功\n\n", newtarPath, app.Directory)
 			path = filepath.Join(file.BOTPATH, engine.DataFolder(), app.Appname, "load.sh")
 			err = getConfigFile(path, loadfileworkdir, engine.DataFolder()+"load.tpl", app)
 			if err != nil {
