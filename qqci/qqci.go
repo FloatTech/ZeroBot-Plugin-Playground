@@ -242,7 +242,20 @@ func init() {
 			if file.IsExist(loadfileworkdir) {
 				cmd = exec.Command("./load.sh", "stop")
 				cmd.Dir = filepath.Join(app.Directory, app.Appname)
-				_ = cmd.Run()
+				err = cmd.Run()
+				if err != nil {
+					logtext += fmt.Sprintf("执行命令 %v 错误: %v \n\n", cmd.Args, err)
+					data, err := text.RenderToBase64(logtext, text.FontFile, 400, 20)
+					if err != nil {
+						ctx.SendChain(message.Text("ERROR:", err))
+						return
+					}
+					if id := ctx.SendChain(message.Image("base64://" + binary.BytesToString(data))); id.ID() == 0 {
+						ctx.SendChain(message.Text("ERROR:可能被风控了"))
+					}
+					return
+				}
+				logtext += fmt.Sprintf("执行命令 %v 成功\n\n", cmd.Args)
 			}
 			err = deCompress(newtarPath, app.Directory)
 			if err != nil {
