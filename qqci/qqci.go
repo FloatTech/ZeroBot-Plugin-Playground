@@ -88,9 +88,10 @@ func init() {
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
 			if err != nil {
-				ctx.SendChain(message.Text("ERROR:", flagapp.Action, ",", err))
+				ctx.SendChain(message.Text("执行命令 ", cmd.Args, " 错误: ", err, "\n\n"))
 				return
 			}
+			ctx.SendChain(message.Text("执行命令 ", cmd.Args, " 成功\n\n"))
 		case "folder":
 			var folders []folder
 			text := "文件夹id: \n"
