@@ -224,6 +224,7 @@ func init() {
 			logtext += fmt.Sprintf("执行命令 %v 成功\n\n", cmd.Args)
 			tarPath := filepath.Join(file.BOTPATH, workdir, "_output", app.Appname+".tar.gz")
 			newtarPath := filepath.Join(app.Directory, app.Appname, app.Appname+"@"+app.Gitbranch+".tar.gz")
+			_ = os.MkdirAll(filepath.Dir(newtarPath), 0755)
 			tf, _ := os.Open(tarPath)
 			cf, _ := os.Create(newtarPath)
 			_, _ = io.Copy(cf, tf)
