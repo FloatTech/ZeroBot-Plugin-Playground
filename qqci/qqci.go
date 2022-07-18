@@ -250,7 +250,7 @@ func init() {
 				}
 				return
 			}
-			logtext += fmt.Sprintf("解压 %v 到 %v 成功\n\n", tarPath, app.Directory)
+			logtext += fmt.Sprintf("解压 %v 到 %v 成功\n\n", newtarPath, app.Directory)
 			loadfileworkdir := filepath.Join(app.Directory, app.Appname, "load.sh")
 			path = filepath.Join(file.BOTPATH, engine.DataFolder(), app.Appname, "load.sh")
 			err = getConfigFile(path, loadfileworkdir, engine.DataFolder()+"load.tpl", app)
@@ -269,22 +269,6 @@ func init() {
 			logtext += fmt.Sprintf("加载 %v 文件成功\n\n", loadfileworkdir)
 			_ = os.Chmod(loadfileworkdir, 0777)
 			cmd = exec.Command("./load.sh", "install")
-			cmd.Dir = filepath.Join(app.Directory, app.Appname)
-			err = cmd.Run()
-			if err != nil {
-				logtext += fmt.Sprintf("执行命令 %v 错误: %v \n\n", cmd.Args, err)
-				data, err := text.RenderToBase64(logtext, text.FontFile, 400, 20)
-				if err != nil {
-					ctx.SendChain(message.Text("ERROR:", err))
-					return
-				}
-				if id := ctx.SendChain(message.Image("base64://" + binary.BytesToString(data))); id.ID() == 0 {
-					ctx.SendChain(message.Text("ERROR:可能被风控了"))
-				}
-				return
-			}
-			logtext += fmt.Sprintf("执行命令 %v 成功\n\n", cmd.Args)
-			cmd = exec.Command("./load.sh", "start")
 			cmd.Dir = filepath.Join(app.Directory, app.Appname)
 			err = cmd.Run()
 			if err != nil {
