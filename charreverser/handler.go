@@ -72,8 +72,7 @@ func init() {
 	compiledRegex = regexp.MustCompile(commandRegex)
 }
 
-// HandleReverse
-// 翻转命令Handler
+// HandleReverse 翻转命令Handler
 func HandleReverse(ctx *zero.Ctx) {
 	// 获取需要翻转的字符串
 	results := compiledRegex.FindAllString(ctx.MessageString(), -1)
