@@ -1,4 +1,4 @@
-package CharReverser
+package charreverser
 
 import (
 	"regexp"
@@ -6,8 +6,7 @@ import (
 	zero "github.com/wdvxdr1123/ZeroBot"
 )
 
-// 命令正则表达式
-const COMMAND_REGEX = `[A-z]+`
+const commandRegex = `[A-z]+` // 命令正则表达式
 
 var (
 	charMap = map[rune]rune{
@@ -70,9 +69,10 @@ var (
 
 func init() {
 	// 编译正则表达式
-	compiledRegex = regexp.MustCompile(COMMAND_REGEX)
+	compiledRegex = regexp.MustCompile(commandRegex)
 }
 
+// 翻转命令Handler
 func HandleReverse(ctx *zero.Ctx) {
 	// 获取需要翻转的字符串
 	results := compiledRegex.FindAllString(ctx.MessageString(), -1)
@@ -81,13 +81,13 @@ func HandleReverse(ctx *zero.Ctx) {
 	// 将字符顺序翻转
 	var tempStr string
 	for i := len(str) - 1; i >= 0; i-- {
-		tempStr = tempStr + string(str[i])
+		tempStr += string(str[i])
 	}
 
 	// 翻转字符字形
 	var reversedStr string
 	for _, char := range tempStr {
-		reversedStr = reversedStr + string(charMap[char])
+		reversedStr += string(charMap[char])
 	}
 
 	// 发送翻转后的字符串

@@ -17,6 +17,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/nihongo"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/qqci"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/vote"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/charreverser"
 
 	// 程序主体
 	zero "github.com/wdvxdr1123/ZeroBot"

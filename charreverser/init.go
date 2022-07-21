@@ -1,5 +1,5 @@
-// Package CharReverser 英文字符反转
-package CharReverser
+// Package charreverser 英文字符反转
+package charreverser
 
 import (
 	ctrl "github.com/FloatTech/zbpctrl"
