@@ -6,7 +6,7 @@ import (
 	zero "github.com/wdvxdr1123/ZeroBot"
 )
 
-const commandRegex = `[A-z]+` // 命令正则表达式
+const commandRegex = `[A-z]{1}([A-z]|\s)+[A-z]{1}` // 命令正则表达式
 
 var (
 	charMap = map[rune]rune{
@@ -72,6 +72,7 @@ func init() {
 	compiledRegex = regexp.MustCompile(commandRegex)
 }
 
+// HandleReverse
 // 翻转命令Handler
 func HandleReverse(ctx *zero.Ctx) {
 	// 获取需要翻转的字符串
@@ -87,7 +88,11 @@ func HandleReverse(ctx *zero.Ctx) {
 	// 翻转字符字形
 	var reversedStr string
 	for _, char := range tempStr {
-		reversedStr += string(charMap[char])
+		if char != ' ' {
+			reversedStr += string(charMap[char])
+		} else {
+			reversedStr += " "
+		}
 	}
 
 	// 发送翻转后的字符串

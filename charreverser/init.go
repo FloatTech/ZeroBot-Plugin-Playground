@@ -17,5 +17,5 @@ func init() {
 		},
 	)
 	// 处理字符翻转指令
-	engine.OnRegex(`翻转( )+[A-z]+`).SetBlock(true).Handle(HandleReverse)
+	engine.OnRegex(`翻转( )+[A-z]{1}([A-z]|\s)+[A-z]{1}`).SetBlock(true).Handle(HandleReverse)
 }
