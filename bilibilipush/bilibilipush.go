@@ -5,8 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"regexp"
 	"strconv"
 	"time"
 
@@ -46,12 +44,8 @@ var (
 		-402: "uid不存在, 注意uid不是房间号",
 		-412: "操作过于频繁IP暂时被风控, 请半小时后再尝试",
 	}
-	upMap          = map[int64]string{}
-	limit          = ctxext.NewLimiterManager(time.Second*10, 1)
-	searchVideo    = `bilibili.com/video/(?:av(\d+)|([bv|BV][0-9a-zA-Z]+))`
-	searchDynamic  = `(t.bilibili.com|m.bilibili.com/dynamic)/(\d+)`
-	searchArticle  = `bilibili.com/read/(?:cv|mobile/)(\d+)`
-	searchLiveRoom = `live.bilibili.com/(\d+)`
+	upMap = map[int64]string{}
+	limit = ctxext.NewLimiterManager(time.Second*10, 1)
 )
 
 func init() {
@@ -63,8 +57,7 @@ func init() {
 			"- 取消b站订阅[uid]\n" +
 			"- 取消b站动态订阅[uid]\n" +
 			"- 取消b站直播订阅[uid]\n" +
-			"- b站推送列表\n" +
-			"- t.bilibili.com/642277677329285174 | www.bilibili.com/read/cv17134450 | www.bilibili.com/video/BV13B4y1x7pS | live.bilibili.com/22603245 (b站动态、专栏、视频、直播解析)",
+			"- b站推送列表",
 		PrivateDataFolder: serviceName,
 	})
 
@@ -74,38 +67,6 @@ func init() {
 		dbfile := dbpath + "push.db"
 		bdb = initialize(dbfile)
 	}()
-
-	en.OnRegex(`((b23|acg).tv|bili2233.cn)/[0-9a-zA-Z]+`).SetBlock(true).Limit(limit.LimitByGroup).
-		Handle(func(ctx *zero.Ctx) {
-			url := ctx.State["regex_matched"].([]string)[0]
-			realurl, err := getrealurl("https://" + url)
-			if err != nil {
-				ctx.SendChain(message.Text("ERROR: ", err))
-				return
-			}
-			searchVideoRe := regexp.MustCompile(searchVideo)
-			searchDynamicRe := regexp.MustCompile(searchDynamic)
-			searchArticleRe := regexp.MustCompile(searchArticle)
-			searchLiveRoomRe := regexp.MustCompile(searchLiveRoom)
-			switch {
-			case searchVideoRe.MatchString(realurl):
-				ctx.State["regex_matched"] = searchVideoRe.FindStringSubmatch(realurl)
-				handleVideo(ctx)
-			case searchDynamicRe.MatchString(realurl):
-				ctx.State["regex_matched"] = searchDynamicRe.FindStringSubmatch(realurl)
-				handleDynamic(ctx)
-			case searchArticleRe.MatchString(realurl):
-				ctx.State["regex_matched"] = searchArticleRe.FindStringSubmatch(realurl)
-				handleArticle(ctx)
-			case searchLiveRoomRe.MatchString(realurl):
-				ctx.State["regex_matched"] = searchLiveRoomRe.FindStringSubmatch(realurl)
-				handleLive(ctx)
-			}
-		})
-	en.OnRegex(searchVideo).SetBlock(true).Limit(limit.LimitByGroup).Handle(handleVideo)
-	en.OnRegex(searchDynamic).SetBlock(true).Limit(limit.LimitByGroup).Handle(handleDynamic)
-	en.OnRegex(searchArticle).SetBlock(true).Limit(limit.LimitByGroup).Handle(handleArticle)
-	en.OnRegex(searchLiveRoom).SetBlock(true).Limit(limit.LimitByGroup).Handle(handleLive)
 
 	en.OnRegex(`^添加b站订阅\s?(\d+)$`, zero.UserOrGrpAdmin).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		buid, _ := strconv.ParseInt(ctx.State["regex_matched"].([]string)[1], 10, 64)
@@ -468,54 +429,4 @@ func sendLive() error {
 		return true
 	})
 	return nil
-}
-
-// getrealurl 获取跳转后的链接
-func getrealurl(url string) (realurl string, err error) {
-	data, err := http.Head(url)
-	if err != nil {
-		return
-	}
-	realurl = data.Request.URL.String()
-	return
-}
-
-func handleVideo(ctx *zero.Ctx) {
-	id := ctx.State["regex_matched"].([]string)[1]
-	if id == "" {
-		id = ctx.State["regex_matched"].([]string)[2]
-	}
-	msg, err := bilibili.VideoInfo(id)
-	if err != nil {
-		ctx.SendChain(message.Text("ERROR:", err))
-		return
-	}
-	ctx.SendChain(msg...)
-}
-
-func handleDynamic(ctx *zero.Ctx) {
-	msg, err := bilibili.DynamicDetail(ctx.State["regex_matched"].([]string)[2])
-	if err != nil {
-		ctx.SendChain(message.Text("ERROR:", err))
-		return
-	}
-	ctx.SendChain(msg...)
-}
-
-func handleArticle(ctx *zero.Ctx) {
-	msg, err := bilibili.ArticleInfo(ctx.State["regex_matched"].([]string)[1])
-	if err != nil {
-		ctx.SendChain(message.Text("ERROR:", err))
-		return
-	}
-	ctx.SendChain(msg...)
-}
-
-func handleLive(ctx *zero.Ctx) {
-	msg, err := bilibili.LiveRoomInfo(ctx.State["regex_matched"].([]string)[1])
-	if err != nil {
-		ctx.SendChain(message.Text("ERROR:", err))
-		return
-	}
-	ctx.SendChain(msg...)
 }
