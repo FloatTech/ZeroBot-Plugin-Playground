@@ -18,7 +18,6 @@ import (
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/binary"
 	"github.com/FloatTech/zbputils/control"
-	"github.com/FloatTech/zbputils/ctxext"
 	"github.com/FloatTech/zbputils/img/text"
 	"github.com/FloatTech/zbputils/web"
 )
@@ -45,7 +44,6 @@ var (
 		-412: "操作过于频繁IP暂时被风控, 请半小时后再尝试",
 	}
 	upMap = map[int64]string{}
-	limit = ctxext.NewLimiterManager(time.Second*10, 1)
 )
 
 func init() {
