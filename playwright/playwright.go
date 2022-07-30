@@ -14,6 +14,7 @@ import (
 	"github.com/playwright-community/playwright-go"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/extension/shell"
+	"github.com/wdvxdr1123/ZeroBot/extension/single"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
@@ -22,11 +23,20 @@ func init() {
 		DisableOnDefault:  false,
 		Help:              "网页截图\n- /网页截图 -p https://zhuanlan.zhihu.com/p/497349204 -w 600 -h 800\n",
 		PrivateDataFolder: "playwright",
-	})
+	}).ApplySingle(single.New(
+		single.WithKeyFn(func(ctx *zero.Ctx) int64 { return ctx.Event.GroupID }),
+		single.WithPostFn[int64](func(ctx *zero.Ctx) {
+			ctx.Send(
+				message.ReplyWithMessage(ctx.Event.MessageID,
+					message.Text("已经有正在进行的网页截图..."),
+				),
+			)
+		}),
+	))
 	cachePath := engine.DataFolder() + "cache/"
 	_ = os.RemoveAll(cachePath)
 	_ = os.MkdirAll(cachePath, 0755)
-	engine.OnCommand("网页截图", zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnCommand("网页截图").SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		fset := flag.FlagSet{}
 		var (
 			pageURL string
