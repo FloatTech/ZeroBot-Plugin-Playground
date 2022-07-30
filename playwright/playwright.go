@@ -3,7 +3,7 @@ package playwright
 
 import (
 	"flag"
-	"log"
+	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -47,13 +47,14 @@ func init() {
 		today := now.Format("20060102")
 		pwFile := cachePath + strconv.FormatInt(uid, 10) + today + "playwright.png"
 		fullpage := true
+		ctx.SendChain(message.Text("少女祈祷中..."))
 		pw, err := playwright.Run()
 		if err != nil {
-			log.Fatalf("could not start playwright: %v", err)
+			ctx.Send(fmt.Sprintf("could not start playwright: %v", err))
 		}
 		browser, err := pw.Chromium.Launch()
 		if err != nil {
-			log.Fatalf("could not launch browser: %v", err)
+			ctx.Send(fmt.Sprintf("could not launch browser: %v", err))
 		}
 		device := pw.Devices["Pixel 5"]
 		context, err := browser.NewContext(playwright.BrowserNewContextOptions{
@@ -69,29 +70,29 @@ func init() {
 			HasTouch:          playwright.Bool(device.HasTouch),
 		})
 		if err != nil {
-			log.Fatalf("could not create context: %v", err)
+			ctx.Send(fmt.Sprintf("could not create context: %v", err))
 		}
 		page, err := context.NewPage()
 		if err != nil {
-			log.Fatalf("could not create page: %v", err)
+			ctx.Send(fmt.Sprintf("could not create page: %v", err))
 		}
 		if _, err = page.Goto(pageURL, playwright.PageGotoOptions{
 			WaitUntil: playwright.WaitUntilStateNetworkidle,
 		}); err != nil {
-			log.Fatalf("could not goto: %v", err)
+			ctx.Send(fmt.Sprintf("could not goto: %v", err))
 		}
 		if _, err = page.Screenshot(playwright.PageScreenshotOptions{
 			Path:     playwright.String(pwFile),
 			FullPage: &fullpage,
 		}); err != nil {
-			log.Fatalf("could not create screenshot: %v", err)
+			ctx.Send(fmt.Sprintf("could not create screenshot: %v", err))
 		}
 		ctx.SendChain(message.Image("file:///" + file.BOTPATH + "/" + pwFile))
 		if err = browser.Close(); err != nil {
-			log.Fatalf("could not close browser: %v", err)
+			ctx.Send(fmt.Sprintf("could not close browser: %v", err))
 		}
 		if err = pw.Stop(); err != nil {
-			log.Fatalf("could not stop Playwright: %v", err)
+			ctx.Send(fmt.Sprintf("could not stop Playwright: %v", err))
 		}
 	})
 }
