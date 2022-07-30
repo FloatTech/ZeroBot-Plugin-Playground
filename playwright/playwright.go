@@ -40,12 +40,12 @@ func init() {
 		fset := flag.FlagSet{}
 		var (
 			pageURL string
-			width   int
-			height  int
+			width   float64
+			height  float64
 		)
 		fset.StringVar(&pageURL, "p", "https://zhuanlan.zhihu.com/p/497349204", "网页链接")
-		fset.IntVar(&width, "w", 540, "宽度")
-		fset.IntVar(&height, "h", 720, "长度")
+		fset.Float64Var(&width, "w", 0, "宽度")
+		fset.Float64Var(&height, "h", 0, "高度")
 		arguments := shell.Parse(ctx.State["args"].(string))
 		err := fset.Parse(arguments)
 		if err != nil {
@@ -56,15 +56,16 @@ func init() {
 		now := time.Now()
 		today := now.Format("20060102")
 		pwFile := cachePath + strconv.FormatInt(uid, 10) + today + "playwright.png"
-		fullpage := true
 		ctx.SendChain(message.Text("少女祈祷中..."))
 		pw, err := playwright.Run()
 		if err != nil {
 			ctx.Send(fmt.Sprintf("could not start playwright: %v", err))
+			return
 		}
 		browser, err := pw.Chromium.Launch()
 		if err != nil {
 			ctx.Send(fmt.Sprintf("could not launch browser: %v", err))
+			return
 		}
 		device := pw.Devices["Pixel 5"]
 		context, err := browser.NewContext(playwright.BrowserNewContextOptions{
@@ -81,28 +82,47 @@ func init() {
 		})
 		if err != nil {
 			ctx.Send(fmt.Sprintf("could not create context: %v", err))
+			return
 		}
 		page, err := context.NewPage()
 		if err != nil {
 			ctx.Send(fmt.Sprintf("could not create page: %v", err))
+			return
 		}
 		if _, err = page.Goto(pageURL, playwright.PageGotoOptions{
 			WaitUntil: playwright.WaitUntilStateNetworkidle,
 		}); err != nil {
 			ctx.Send(fmt.Sprintf("could not goto: %v", err))
+			return
+		}
+		x := float64(0)
+		y := float64(0)
+		fullpage := true
+		clip := (*playwright.PageScreenshotOptionsClip)(nil)
+		if width != 0 && height != 0 {
+			clip = &playwright.PageScreenshotOptionsClip{
+				X:      &x,
+				Y:      &y,
+				Width:  &width,
+				Height: &height,
+			}
 		}
 		if _, err = page.Screenshot(playwright.PageScreenshotOptions{
 			Path:     playwright.String(pwFile),
 			FullPage: &fullpage,
+			Clip:     clip,
 		}); err != nil {
 			ctx.Send(fmt.Sprintf("could not create screenshot: %v", err))
+			return
 		}
 		ctx.SendChain(message.Image("file:///" + file.BOTPATH + "/" + pwFile))
 		if err = browser.Close(); err != nil {
 			ctx.Send(fmt.Sprintf("could not close browser: %v", err))
+			return
 		}
 		if err = pw.Stop(); err != nil {
 			ctx.Send(fmt.Sprintf("could not stop Playwright: %v", err))
+			return
 		}
 	})
 }
