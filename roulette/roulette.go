@@ -2,13 +2,14 @@ package roulette
 
 import (
 	"fmt"
+	"math/rand"
+	"strconv"
+	"time"
+
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
-	"math/rand"
-	"strconv"
-	"time"
 )
 
 var dieMsg = []string{
@@ -56,7 +57,7 @@ func init() { // 插件主体
 			gid := ctx.Event.GroupID
 			uid := ctx.Event.UserID
 
-			//判断group是否已创建
+			// 判断group是否已创建
 			if checkSession(gid, dataPath) {
 				ctx.SendChain(message.Text("正在进行中，请稍后再试"))
 				return
@@ -182,7 +183,7 @@ func init() { // 插件主体
 
 			// 开抢
 			if ss.openFire() {
-				//从 die 中随机一条
+				// 从 die 中随机一条
 				ss.close()
 				ctx.SetGroupBan(gid, uid, int64(mute))
 				ctx.SendChain(message.Text(dieMsg[rand.Intn(len(dieMsg))]))
