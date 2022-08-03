@@ -1,4 +1,5 @@
-package daily_news
+// Package dailynews 每日新闻
+package dailynews
 
 import (
 	ctrl "github.com/FloatTech/zbpctrl"
