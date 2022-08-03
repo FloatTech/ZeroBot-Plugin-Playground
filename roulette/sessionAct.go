@@ -46,14 +46,14 @@ func saveItem(dataPath string, info Session) {
 	if err != nil {
 		panic(err)
 	}
-	//将数据data写入文件filePath中，并且修改文件权限为755
+	// 将数据data写入文件filePath中，并且修改文件权限为755
 	if err = ioutil.WriteFile(dataPath, bytes, 0644); err != nil {
 		panic(err)
 	}
 }
 
 func loadSessions(dataPath string) []Session {
-	//读取指定文件内容，返回的data是[]byte类型数据
+	// 读取指定文件内容，返回的data是[]byte类型数据
 	ss := make([]Session, 0)
 	data, err := ioutil.ReadFile(dataPath)
 	if err != nil {
@@ -127,7 +127,7 @@ func (cls Session) close() {
 	if err != nil {
 		panic(err)
 	}
-	//将数据data写入文件filePath中，并且修改文件权限为755
+	// 将数据data写入文件filePath中，并且修改文件权限为755
 	if err = ioutil.WriteFile(dataPath, bytes, 0644); err != nil {
 		panic(err)
 	}
