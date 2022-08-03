@@ -12,6 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/bilibilipush"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/breakrepeat"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/github/yydz"
