@@ -1,3 +1,4 @@
+// Package roulette 游戏轮盘赌
 package roulette
 
 import (
@@ -155,7 +156,7 @@ func init() { // 插件主体
 
 			ss := getSession(gid, dataPath)
 
-			if ss.IsValid == false {
+			if !ss.IsValid {
 				ctx.SendChain(message.Text("请先发送“开始”进行游戏"))
 				return
 			}

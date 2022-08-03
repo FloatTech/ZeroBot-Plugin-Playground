@@ -11,7 +11,7 @@ import (
 
 // Session 会话操作
 type Session struct {
-	GroupId    int64   // 群id
+	GroupID    int64   // 群id
 	Creator    int64   // 创建者
 	Users      []int64 // 参与者
 	Max        int64   // 最大人数
@@ -25,7 +25,10 @@ var dataPath string
 
 func checkFile(path string) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		os.Create(path)
+		_, err := os.Create(path)
+		if err != nil {
+			return
+		}
 	}
 	dataPath = path
 }
@@ -36,7 +39,7 @@ func saveItem(dataPath string, info Session) {
 		interact = append(interact, info)
 	} else {
 		for i, v := range interact {
-			if v.GroupId == info.GroupId {
+			if v.GroupID == info.GroupID {
 				interact[i] = info
 				break
 			}
@@ -69,7 +72,7 @@ func checkSession(gid int64, dataPath string) bool {
 	interact := loadSessions(dataPath)
 
 	for _, v := range interact {
-		if v.GroupId == gid {
+		if v.GroupID == gid {
 			return true
 		}
 	}
@@ -79,7 +82,7 @@ func checkSession(gid int64, dataPath string) bool {
 func getSession(gid int64, dataPath string) Session {
 	interact := loadSessions(dataPath)
 	for _, v := range interact {
-		if v.GroupId == gid {
+		if v.GroupID == gid {
 			return v
 		}
 	}
@@ -88,7 +91,7 @@ func getSession(gid int64, dataPath string) Session {
 
 // 添加会话
 func (cls Session) addSession(gid, uid int64, dataPath string) {
-	cls.GroupId = gid
+	cls.GroupID = gid
 	cls.Creator = uid
 	cls.Users = append(cls.Users, uid)
 	cls.IsValid = false
@@ -106,8 +109,8 @@ func (cls Session) countUser() int {
 }
 
 // 加入会话
-func (cls Session) addUser(userId int64) {
-	cls.Users = append(cls.Users, userId)
+func (cls Session) addUser(userID int64) {
+	cls.Users = append(cls.Users, userID)
 	saveItem(dataPath, cls)
 }
 
@@ -117,7 +120,7 @@ func (cls Session) close() {
 
 	run := make([]Session, 0)
 	for _, v := range interact {
-		if v.GroupId == cls.GroupId {
+		if v.GroupID == cls.GroupID {
 			continue
 		}
 		run = append(run, v)
@@ -154,10 +157,7 @@ func (cls Session) checkJoin(uid int64) bool {
 
 // 判断是否轮到用户
 func (cls Session) checkTurn(uid int64) bool {
-	if cls.Users[0] != uid {
-		return false
-	}
-	return true
+	return cls.Users[0] == uid
 }
 
 // 剩余子弹数
