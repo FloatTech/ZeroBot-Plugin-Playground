@@ -171,7 +171,7 @@ func init() { // 插件主体
 				return
 			}
 
-			mute := 1
+			mute := 60
 			// 获取剩余子弹数
 			if ss.cartridgesLeft() == 1 {
 				next := ss.Users[1]
