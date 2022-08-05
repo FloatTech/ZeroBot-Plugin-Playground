@@ -193,7 +193,6 @@ func init() { // 插件主体
 						return
 					}
 					ctx.SendChain(message.Text(aliveMsg[rand.Intn(len(aliveMsg))]), message.Text(",轮到"), message.At(s.Users[1]), message.Text("开火"))
-
 				}
 			}
 		})
