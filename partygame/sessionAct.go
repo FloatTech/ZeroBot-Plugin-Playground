@@ -1,11 +1,11 @@
-package roulette
+package partygame
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -23,7 +23,11 @@ type Session struct {
 
 var dataPath string
 
+var rlmu sync.RWMutex
+
 func checkFile(path string) {
+	rlmu.Lock()
+	defer rlmu.Unlock()
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		_, err := os.Create(path)
 		if err != nil {
@@ -35,6 +39,8 @@ func checkFile(path string) {
 
 func saveItem(dataPath string, info Session) {
 	interact := loadSessions(dataPath)
+	rlmu.Lock()
+	defer rlmu.Unlock()
 	if len(interact) == 0 {
 		interact = append(interact, info)
 	} else {
@@ -57,6 +63,8 @@ func saveItem(dataPath string, info Session) {
 
 func loadSessions(dataPath string) []Session {
 	// 读取指定文件内容，返回的data是[]byte类型数据
+	rlmu.RLock()
+	defer rlmu.RUnlock()
 	ss := make([]Session, 0)
 	data, err := ioutil.ReadFile(dataPath)
 	if err != nil {
@@ -66,17 +74,6 @@ func loadSessions(dataPath string) []Session {
 		return ss
 	}
 	return ss
-}
-
-func checkSession(gid int64, dataPath string) bool {
-	interact := loadSessions(dataPath)
-
-	for _, v := range interact {
-		if v.GroupID == gid {
-			return true
-		}
-	}
-	return false
 }
 
 func getSession(gid int64, dataPath string) Session {
@@ -90,7 +87,8 @@ func getSession(gid int64, dataPath string) Session {
 }
 
 // 添加会话
-func (cls Session) addSession(gid, uid int64, dataPath string) {
+func addSession(gid, uid int64, dataPath string) {
+	cls := Session{}
 	cls.GroupID = gid
 	cls.Creator = uid
 	cls.Users = append(cls.Users, uid)
@@ -173,13 +171,11 @@ func (cls Session) openFire() bool {
 	if bullet == 1 {
 		return true
 	}
-	fmt.Println(cls.Users)
 	// 获取开枪人
 	user := cls.Users[0]
 	// 人员轮转
 	cls.Users = cls.Users[1:]
 	cls.Users = append(cls.Users, user)
-	fmt.Println(cls.Users)
 
 	saveItem(dataPath, cls)
 	return false

@@ -34,19 +34,14 @@ func init() {
 			}
 			limit[gid]++
 			if limit[gid] >= maxLimit {
-				if len([]rune(rawMsg[gid])) > 2 {
-					ctx.Send(shuffle(rawMsg[gid]))
+				r := []rune(rawMsg[gid])
+				if len(r) > 2 {
+					rand.Shuffle(len(r), func(i, j int) {
+						r[i], r[j] = r[j], r[i]
+					})
+					ctx.Send(string(r))
 				}
 				limit[gid] = 0
 			}
 		})
-}
-
-func shuffle(s string) string {
-	r := []rune(s)
-	for i := len(r) - 1; i > 0; i-- {
-		num := rand.Intn(i + 1)
-		r[i], r[num] = r[num], r[i]
-	}
-	return string(r)
 }

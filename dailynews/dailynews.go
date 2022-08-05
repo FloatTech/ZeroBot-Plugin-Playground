@@ -11,7 +11,7 @@ import (
 )
 
 func init() { // 插件主体
-	engine := control.Register("daily_news", &ctrl.Options[*zero.Ctx]{
+	engine := control.Register("dailynews", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Help: "每日早报\n" +
 			"- [1] 启用后会在每天早上发送一份早报",
