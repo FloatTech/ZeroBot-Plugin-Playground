@@ -17,9 +17,9 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/github/yydz"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/partygame"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/playwright"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/qqci"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/roulette"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/vote"
 
 	// 程序主体
