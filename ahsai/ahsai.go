@@ -85,8 +85,8 @@ func selectName(ctx *zero.Ctx) bool {
 	for {
 		select {
 		case <-time.After(time.Second * 10):
-			ctx.SendChain(message.Text("时间太久啦！", zero.BotConfig.NickName[0], "帮你选择"))
 			ctx.State["ahsainame"] = namelist[rand.Intn(len(namelist))]
+			ctx.SendChain(message.Text("时间太久啦！", zero.BotConfig.NickName[0], "帮你选择", ctx.State["ahsainame"]))
 			return true
 		case c := <-next:
 			msg := c.Event.Message.ExtractPlainText()
