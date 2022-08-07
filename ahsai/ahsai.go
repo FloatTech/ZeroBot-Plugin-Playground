@@ -25,7 +25,7 @@ var (
 func init() {
 	engine := control.Register("ahsai", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault:  false,
-		Help:              "ahsai tts\n- /ahsai -n 琴葉葵 -t にーはぉすーじぇ",
+		Help:              "ahsai tts (linux需要安装音频驱动: yum install *alsa*) \n- /ahsai -n 琴葉葵 -t にーはぉすーじぇ",
 		PrivateDataFolder: "ahsai",
 	})
 	cachePath := engine.DataFolder() + "cache/"
