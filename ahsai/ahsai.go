@@ -65,13 +65,13 @@ func selectName(ctx *zero.Ctx) bool {
 	)
 	fset.StringVar(&name, "n", "", "speaker name")
 	fset.StringVar(&text, "t", "にーはぉすーじぇ", "转换文本")
-	ctx.State["ahsaitext"] = text
 	arguments := shell.Parse(ctx.State["args"].(string))
 	err := fset.Parse(arguments)
 	if err != nil {
 		ctx.SendChain(message.Text("Error:", err))
 		return false
 	}
+	ctx.State["ahsaitext"] = text
 	if name != "" {
 		return true
 	}
@@ -85,8 +85,8 @@ func selectName(ctx *zero.Ctx) bool {
 	for {
 		select {
 		case <-time.After(time.Second * 10):
-			ctx.SendChain(message.Text("时间太久啦！", zero.BotConfig.NickName[0], "帮你选择"))
 			ctx.State["ahsainame"] = namelist[rand.Intn(len(namelist))]
+			ctx.SendChain(message.Text("时间太久啦！", zero.BotConfig.NickName[0], "帮你选择", ctx.State["ahsainame"]))
 			return true
 		case c := <-next:
 			msg := c.Event.Message.ExtractPlainText()
