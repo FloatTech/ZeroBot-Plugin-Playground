@@ -11,11 +11,13 @@ import (
 	"github.com/FloatTech/zbputils/process"
 	"github.com/sirupsen/logrus"
 
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/ahsai"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/bilibilipush"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/breakrepeat"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/dailynews"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/fyzhq"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/github/yydz"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/partygame"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/playwright"
