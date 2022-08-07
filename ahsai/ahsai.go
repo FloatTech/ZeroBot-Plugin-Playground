@@ -65,13 +65,13 @@ func selectName(ctx *zero.Ctx) bool {
 	)
 	fset.StringVar(&name, "n", "", "speaker name")
 	fset.StringVar(&text, "t", "にーはぉすーじぇ", "转换文本")
-	ctx.State["ahsaitext"] = text
 	arguments := shell.Parse(ctx.State["args"].(string))
 	err := fset.Parse(arguments)
 	if err != nil {
 		ctx.SendChain(message.Text("Error:", err))
 		return false
 	}
+	ctx.State["ahsaitext"] = text
 	if name != "" {
 		return true
 	}
