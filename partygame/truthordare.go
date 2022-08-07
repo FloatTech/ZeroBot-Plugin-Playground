@@ -123,12 +123,13 @@ func getActionOrQuestion() string {
 }
 
 func getTruthOrDare(ctx *zero.Ctx) bool {
-	next := zero.NewFutureEvent("message", 999, false, ctx.CheckSession(), zero.FullMatchRule("真心话", "大冒险")).Next()
+	next, cancel := zero.NewFutureEvent("message", 999, false, ctx.CheckSession(), zero.FullMatchRule("真心话", "大冒险")).Repeat()
+	defer cancel()
 	key := fmt.Sprintf("%v-%v", ctx.Event.GroupID, ctx.Event.UserID)
 	ctx.SendChain(message.At(ctx.Event.UserID), message.Text("你将受到严峻的惩罚, 请选择惩罚, 真心话还是大冒险?"))
 	for {
 		select {
-		case <-time.After(time.Second * 10):
+		case <-time.After(time.Second * 20):
 			ctx.SendChain(message.Text("时间太久啦！", zero.BotConfig.NickName[0], "帮你选择"))
 			p := getActionOrQuestion()
 			punishmap.Store(key, p)
