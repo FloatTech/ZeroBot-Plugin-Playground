@@ -6,7 +6,7 @@ require (
 	github.com/FloatTech/zbpctrl v1.4.1-0.20220610074608-425160596f27
 	github.com/FloatTech/zbputils v1.4.1-0.20220613042833-33e22060e8d9
 	github.com/antchfx/htmlquery v1.2.4
-	github.com/fumiama/ahsai v0.0.0-20220807145618-d4edb0a2f2b6
+	github.com/fumiama/ahsai v0.0.0-20220808032821-3f3bf325537f
 	github.com/fumiama/sqlite3 v1.14.6
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/guohuiyuan/bilibili v0.0.0-20220710055502-056b60dc29a7
