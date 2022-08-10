@@ -163,7 +163,6 @@ func init() {
 	})
 	engine.OnFullMatch("我是什么职位", customrule2).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 	})
-
 }
 
 // randText 随机文本
