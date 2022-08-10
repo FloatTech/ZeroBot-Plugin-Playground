@@ -10,12 +10,11 @@ import (
 	"github.com/FloatTech/zbputils/control"
 	"github.com/FloatTech/zbputils/ctxext"
 	zero "github.com/wdvxdr1123/ZeroBot"
-	"github.com/wdvxdr1123/ZeroBot/extension/rate"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
 // 自定义限制函数, 括号内填入(时间,触发次数)
-var examplelimit = rate.NewManager[int64](time.Hour*1, 10)
+var examplelimit = ctxext.NewLimiterManager(time.Second*10, 1)
 
 // 这里就是插件主体了
 func init() {
@@ -50,7 +49,8 @@ func init() {
 		Handle(func(ctx *zero.Ctx) {
 			ctx.SendChain(message.Text("完全匹配触发器"))
 		})
-	engine.OnFullMatch("完全匹配触发器2").SetBlock(true).
+		// 自定义limit使用例
+	engine.OnFullMatch("完全匹配触发器2").SetBlock(true).Limit(examplelimit.LimitByGroup).
 		// Handle内也可以填入已经封装好的函数
 		Handle(onmessage)
 	// OnFullMatchGroup 完全匹配触发器组: 支持多个触发词的完全匹配触发器
