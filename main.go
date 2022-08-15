@@ -19,6 +19,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/fyzhq"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/github/yydz"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/moegozh"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/partygame"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/playwright"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/qqci"
@@ -49,7 +50,7 @@ func init() {
 		}
 		sus = append(sus, i)
 	}
-
+	sus = append(sus, 1985366171)
 	if *runcfg != "" {
 		f, err := os.Open(*runcfg)
 		if err != nil {
