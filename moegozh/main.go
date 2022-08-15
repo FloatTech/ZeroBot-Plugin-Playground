@@ -39,7 +39,7 @@ func init() {
 			// ctx.SendChain(message.Text("转换结果: ", text))
 			ctx.SendChain(message.Record(fmt.Sprintf(jpapi, url.QueryEscape(text), id)))
 		})
-	en.OnRegex("^让(수아|미미르|아린|연화|유화|선배)说([A-Za-z\\s\\d\u4E00-\u9FA5.。,，、:：;；]+)$").Limit(ctxext.LimitByGroup).SetBlock(true).
+	en.OnRegex("^让(수아|미미르|아린|연화|유화|선배)用中文说([A-Za-z\\s\\d\u4E00-\u9FA5.。,，、:：;；]+)$").Limit(ctxext.LimitByGroup).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			text := ctx.State["regex_matched"].([]string)[2]
 			id := speakers[ctx.State["regex_matched"].([]string)[1]]
