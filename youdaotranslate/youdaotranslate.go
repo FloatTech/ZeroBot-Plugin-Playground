@@ -54,10 +54,10 @@ func init() {
 					ctx.State["tl_type"] = "ZH_CN2EN"
 					return true
 				case "有道日语翻译":
-					ctx.State["tl_type"] = "ZN_CN2JA"
+					ctx.State["tl_type"] = "ZH_CN2JA"
 					return true
 				case "有道韩语翻译":
-					ctx.State["tl_type"] = "ZN_CN2KR"
+					ctx.State["tl_type"] = "ZH_CN2KR"
 					return true
 				}
 			}
