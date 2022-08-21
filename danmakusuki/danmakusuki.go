@@ -85,7 +85,7 @@ var (
 const (
 	searchUserURL = "http://api.bilibili.com/x/web-interface/search/type?search_type=bili_user&keyword=%v"
 	danmakuAPI    = "https://danmaku.suki.club/api/search/user/detail?uid=%v&pagenum=%v&pagesize=5"
-	danmakuURL    = "https://danmaku.suki.club/%v"
+	danmakuURL    = "https://danmaku.suki.club/user/%v"
 	memberCardURL = "https://account.bilibili.com/api/member/getCardByMid?mid=%v"
 )
 
@@ -163,7 +163,10 @@ func init() {
 		for i := 0; i < len(danmaku.Data.Data); i++ {
 			totalDanmuku += len(danmaku.Data.Data[i].Danmakus) + 1
 		}
-		canvas = gg.NewContext(2000, 550+len(danmaku.Data.Data)*int(faceH)+totalDanmuku*int(danmuH))
+		cw := 10000
+		mcw := float64(2000)
+		ch := 550 + len(danmaku.Data.Data)*int(faceH) + totalDanmuku*int(danmuH)
+		canvas = gg.NewContext(cw, ch)
 		canvas.SetColor(color.White)
 		canvas.Clear()
 		canvas.SetColor(color.Black)
@@ -262,7 +265,9 @@ func init() {
 				switch danItem.Type {
 				case 0:
 					t = danItem.Message
+					l, _ = canvas.MeasureString(t)
 					canvas.DrawString(t, moveW, danmuNow)
+					moveW += l + dz
 				case 1:
 					t = danmakuTypeMap[danItem.Type]
 					l, _ = canvas.MeasureString(t)
@@ -271,8 +276,10 @@ func init() {
 					moveW += l + dz
 
 					t = danItem.Message
+					l, _ = canvas.MeasureString(t)
 					canvas.DrawString(t, moveW, danmuNow)
 					canvas.SetColor(color.Black)
+					moveW += l + dz
 				case 2, 3:
 					t = danmakuTypeMap[danItem.Type]
 					l, _ = canvas.MeasureString(t)
@@ -307,26 +314,35 @@ func init() {
 					moveW += l
 
 					t = "]"
+					l, _ = canvas.MeasureString(t)
 					canvas.DrawString(t, moveW, danmuNow)
 					canvas.SetColor(color.Black)
+					moveW += l + dz
 				case 4, 5:
 					t = danmakuTypeMap[danItem.Type]
 					canvas.SetRGB255(0, 128, 0)
+					l, _ = canvas.MeasureString(t)
 					canvas.DrawString(t, moveW, danmuNow)
 					canvas.SetColor(color.Black)
+					moveW += l + dz
+				}
+				if moveW > mcw {
+					mcw = moveW
 				}
 			}
 			channelStart = DanmakuStart + float64(len(item.Danmakus)+1)*danmuH
 		}
+		im := canvas.Image().(*image.RGBA)
+		nim := im.SubImage(image.Rect(0, 0, int(mcw), ch))
 		f, err := os.Create(drawedFile)
 		if err != nil {
 			log.Errorln("[danmakusuki]", err)
-			data, cl := writer.ToBytes(canvas.Image())
+			data, cl := writer.ToBytes(nim)
 			ctx.SendChain(message.ImageBytes(data))
 			cl()
 			return
 		}
-		_, err = writer.WriteTo(canvas.Image(), f)
+		_, err = writer.WriteTo(nim, f)
 		_ = f.Close()
 		if err != nil {
 			ctx.SendChain(message.Text("ERROR:", err))
