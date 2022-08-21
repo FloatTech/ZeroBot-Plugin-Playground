@@ -14,6 +14,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/ahsai"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/breakrepeat"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/dailynews"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/danmakusuki"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/fyzhq"
@@ -23,6 +24,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/playwright"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/qqci"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/vote"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/youdaotranslate"
 
 	// 程序主体
 	zero "github.com/wdvxdr1123/ZeroBot"

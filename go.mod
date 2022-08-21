@@ -6,13 +6,12 @@ require (
 	github.com/FloatTech/zbpctrl v1.4.1-0.20220610074608-425160596f27
 	github.com/FloatTech/zbputils v1.4.1-0.20220613042833-33e22060e8d9
 	github.com/antchfx/htmlquery v1.2.4
+	github.com/fogleman/gg v1.3.0
 	github.com/fumiama/ahsai v0.0.0-20220808032821-3f3bf325537f
 	github.com/fumiama/sqlite3 v1.14.6
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
-	github.com/guohuiyuan/bilibili v0.0.0-20220710055502-056b60dc29a7
 	github.com/guohuiyuan/go-fyzhq v0.0.0-20220807135412-25c16c843e5a
 	github.com/jinzhu/gorm v1.9.16
-	github.com/pkg/errors v0.9.1
 	github.com/playwright-community/playwright-go v0.2000.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/tidwall/gjson v1.14.2
@@ -26,8 +25,9 @@ require (
 	github.com/RomiChan/websocket v1.4.3-0.20220123145318-307a86b127bc // indirect
 	github.com/antchfx/xpath v1.2.0 // indirect
 	github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964 // indirect
+	github.com/disintegration/imaging v1.6.2 // indirect
+	github.com/ericpauley/go-quantize v0.0.0-20200331213906-ae555eb2afa4 // indirect
 	github.com/faiface/beep v1.1.0 // indirect
-	github.com/fogleman/gg v1.3.0 // indirect
 	github.com/fumiama/cron v1.3.0 // indirect
 	github.com/fumiama/go-base16384 v1.5.3 // indirect
 	github.com/fumiama/go-registry v0.1.6 // indirect
@@ -41,6 +41,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mozillazg/go-pinyin v0.19.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
