@@ -2,11 +2,13 @@
 package danmakusuki
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"image"
 	"image/color"
+	"net/http"
 	"os"
 	"path"
 	"regexp"
@@ -108,7 +110,13 @@ func init() {
 			return
 		}
 		var danmaku danmakusuki
-		data, err := web.GetData(fmt.Sprintf(danmakuAPI, id, pagenum))
+		tr := &http.Transport{
+			DisableKeepAlives: true,
+			TLSClientConfig:   &tls.Config{InsecureSkipVerify: true},
+		}
+
+		client := &http.Client{Transport: tr}
+		data, err := web.RequestDataWith(client, fmt.Sprintf(danmakuAPI, id, pagenum), "GET", "", web.RandUA())
 		if err != nil {
 			ctx.SendChain(message.Text("Error:", err))
 			return
