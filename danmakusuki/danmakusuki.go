@@ -92,7 +92,7 @@ const (
 func init() {
 	engine := control.Register("danmakusuki", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault:  false,
-		Help:              "https://danmaku.suki.club/\n查弹幕 [uid|name]",
+		Help:              "https://danmaku.suki.club/\n查弹幕 嘉然 0 | 查弹幕 2 0 (第一个参数是name或uid, 第二个参数是页面)",
 		PrivateDataFolder: "danmakusuki",
 	})
 	cachePath := engine.DataFolder() + "cache/"
@@ -221,17 +221,19 @@ func init() {
 			canvas.DrawString("开始时间: "+time.UnixMilli(item.Live.StartDate).Format("2006-01-02 15:04:05"), startWidth, channelStart+fontH*3)
 			if item.Live.IsFinish {
 				canvas.DrawString("结束时间: "+time.UnixMilli(item.Live.StopDate).Format("2006-01-02 15:04:05"), startWidth, channelStart+fontH*4)
+				canvas.DrawString("直播时长: "+strconv.FormatFloat(float64(item.Live.StopDate-item.Live.StartDate)/3600000.0, 'f', 1, 64)+"小时", startWidth, channelStart+fontH*5)
 			} else {
 				t := "结束时间:"
 				l, _ := canvas.MeasureString(t)
 				canvas.DrawString(t, startWidth, channelStart+fontH*4)
 
-				canvas.SetRGB255(24, 144, 255)
-				t = "正在直播:"
+				canvas.SetRGB255(0, 128, 0)
+				t = "正在直播"
 				canvas.DrawString(t, startWidth+l*1.1, channelStart+fontH*4)
 				canvas.SetColor(color.Black)
+
+				canvas.DrawString("直播时长: "+strconv.FormatFloat(float64(time.Now().UnixMilli()-item.Live.StartDate)/3600000.0, 'f', 1, 64)+"小时", startWidth, channelStart+fontH*5)
 			}
-			canvas.DrawString("直播时长: "+strconv.FormatFloat(float64(item.Live.StopDate-item.Live.StartDate)/3600000.0, 'f', 1, 64)+"小时", startWidth, channelStart+fontH*5)
 			canvas.DrawString("弹幕数量: "+strconv.Itoa(int(item.Live.DanmakusCount)), startWidth, channelStart+fontH*6)
 			canvas.DrawString("观看次数: "+strconv.Itoa(int(item.Live.WatchCount)), startWidth, channelStart+fontH*7)
 
