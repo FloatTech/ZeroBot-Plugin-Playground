@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/FloatTech/zbputils/process"
+	"github.com/FloatTech/floatbox/process"
 	"github.com/sirupsen/logrus"
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/ahsai"
@@ -18,7 +18,6 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/fyzhq"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/github/yydz"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/moegozh"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/partygame"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/playwright"

@@ -14,11 +14,11 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/FloatTech/floatbox/binary"
+	fcext "github.com/FloatTech/floatbox/ctxext"
+	"github.com/FloatTech/floatbox/file"
 	ctrl "github.com/FloatTech/zbpctrl"
-	"github.com/FloatTech/zbputils/binary"
 	"github.com/FloatTech/zbputils/control"
-	"github.com/FloatTech/zbputils/ctxext"
-	"github.com/FloatTech/zbputils/file"
 	"github.com/FloatTech/zbputils/img/text"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
@@ -43,7 +43,7 @@ func init() {
 	_ = os.RemoveAll(cachePath)
 	_ = os.MkdirAll(cachePath, 0755)
 	adb = initialize(engine.DataFolder() + "qqci.db")
-	getdb := ctxext.DoOnceOnSuccess(func(ctx *zero.Ctx) bool {
+	getdb := fcext.DoOnceOnSuccess(func(ctx *zero.Ctx) bool {
 		_, _ = engine.GetLazyData("makefile.tpl", true)
 		_, _ = engine.GetLazyData("load.tpl", true)
 		return true
