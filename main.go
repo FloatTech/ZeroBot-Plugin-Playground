@@ -11,8 +11,6 @@ import (
 	"github.com/FloatTech/floatbox/process"
 	"github.com/sirupsen/logrus"
 
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/ahsai"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/breakrepeat"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/dailynews"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/danmakusuki"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
