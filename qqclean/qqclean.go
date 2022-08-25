@@ -25,6 +25,6 @@ func init() {
 			ctx.SetGroupLeave(value.Get("group_id").Int(), false)
 			return true
 		})
-		ctx.SendChain(message.Text("已清理bot群聊: (", strings.Join(cleanGroupnameList, ", "), ")"))
+		ctx.SendPrivateMessage(ctx.Event.UserID, message.Text("已清理bot群聊: (", strings.Join(cleanGroupnameList, ", "), ")"))
 	})
 }
