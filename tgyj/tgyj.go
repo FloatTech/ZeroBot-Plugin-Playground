@@ -12,7 +12,7 @@ import (
 
 	"github.com/FloatTech/zbputils/control"
 	"github.com/FloatTech/zbputils/ctxext"
-	"github.com/FloatTech/zbputils/math"
+	"github.com/FloatTech/floatbox/math"
 )
 
 func init() {
