@@ -24,6 +24,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/qqclean"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/vote"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/youdaotranslate"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/tgyj"
 
 	// 程序主体
 	zero "github.com/wdvxdr1123/ZeroBot"
