@@ -27,7 +27,7 @@ func init() {
 		})
 		ctx.SendPrivateMessage(ctx.Event.UserID, message.Text("已清理bot群聊: (", strings.Join(cleanGroupnameList, ", "), ")"))
 	})
-	engine.OnRequest().SetBlock(false).Handle(func(ctx *zero.Ctx) {
+	engine.On("request/group/invite", zero.OnlyToMe).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		freecnt := 0
 		ctx.GetGroupList().ForEach(func(_, value gjson.Result) bool {
 			if ctx.GetGroupMemberInfo(value.Get("group_id").Int(), ctx.Event.SelfID, true).Get("role").String() == "member" {
