@@ -4,7 +4,6 @@ package tgyj
 import (
 	"math/rand"
 	"strconv"
-	"time"
 
 	ctrl "github.com/FloatTech/zbpctrl"
 	zero "github.com/wdvxdr1123/ZeroBot"
