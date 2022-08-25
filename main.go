@@ -20,6 +20,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/partygame"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/playwright"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/qqci"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/qqclean"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/vote"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/youdaotranslate"
 
