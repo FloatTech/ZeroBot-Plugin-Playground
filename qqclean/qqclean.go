@@ -14,7 +14,7 @@ import (
 func init() {
 	engine := control.Register("qqclean", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
-		Help:             "qq号清理\n清理群聊@bot\n",
+		Help:             "qq号清理\n清理群聊@bot (清理bot不是管理员的群)\n",
 	})
 	engine.OnFullMatch("清理群聊", zero.SuperUserPermission, zero.OnlyToMe).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		cleanGroupnameList := make([]string, 0, 64)
