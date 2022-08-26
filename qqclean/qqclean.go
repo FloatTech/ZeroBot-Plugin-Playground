@@ -14,7 +14,7 @@ import (
 func init() {
 	engine := control.Register("qqclean", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
-		Help:             "qq号清理\n清理群聊@bot (清理bot不是管理员的群)\n(当群聊数小于20时自动同意加群)\n",
+		Help:             "qq号清理\n清理群聊@bot (清理bot不是管理员的群)\n(当群聊数小于20时自动同意加群)\n清理好友@bot (清理bot 5级以下的好友)\n(自动同意好友邀请)",
 	})
 	engine.OnFullMatch("清理群聊", zero.SuperUserPermission, zero.OnlyToMe).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		cleanGroupnameList := make([]string, 0, 64)
@@ -40,5 +40,21 @@ func init() {
 		} else {
 			ctx.SetGroupAddRequest(ctx.Event.Flag, "invite", false, "游离群聊大于20")
 		}
+	})
+	engine.On("request/friend").SetBlock(true).Handle(func(ctx *zero.Ctx) {
+		ctx.SetFriendAddRequest(ctx.Event.Flag, true, "")
+	})
+	engine.OnFullMatch("清理好友", zero.SuperUserPermission, zero.OnlyToMe).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+		cleanFriendnameList := make([]string, 0, 64)
+		ctx.GetFriendList().ForEach(func(_, value gjson.Result) bool {
+			if ctx.GetStrangerInfo(value.Get("user_id").Int(), true).Get("level").Int() <= 5 {
+				ctx.CallAction("delete_friend", zero.Params{
+					"friend_id": value.Get("user_id").Int(),
+				})
+				cleanFriendnameList = append(cleanFriendnameList, value.Get("nickname").String())
+			}
+			return true
+		})
+		ctx.SendPrivateMessage(ctx.Event.UserID, message.Text("已清理bot好友: (", strings.Join(cleanFriendnameList, ", "), ")"))
 	})
 }

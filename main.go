@@ -13,7 +13,6 @@ import (
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/alipayvoice"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/dailynews"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/danmakusuki"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/fyzhq"
