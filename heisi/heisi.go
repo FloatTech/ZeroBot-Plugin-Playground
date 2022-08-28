@@ -28,7 +28,7 @@ func init() { // 插件主体
 	engine := control.Register("heisi", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Help: "黑丝\n" +
-			"- 来点黑丝",
+			"- 来点黑丝\n- 来点白丝\n- 来点jk\n- 来点巨乳\n- 来点足控\n- 来点网红",
 		PublicDataFolder: "Heisi",
 	})
 
