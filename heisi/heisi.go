@@ -7,9 +7,10 @@ import (
 	"strings"
 
 	"github.com/FloatTech/floatbox/binary"
-	"github.com/FloatTech/floatbox/ctxext"
+	fbctxext "github.com/FloatTech/floatbox/ctxext"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
+	"github.com/FloatTech/zbputils/ctxext"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
@@ -33,7 +34,7 @@ func init() { // 插件主体
 	})
 
 	// 开启
-	engine.OnFullMatchGroup([]string{"来点黑丝", "来点白丝", "来点jk", "来点巨乳", "来点足控", "来点网红"}, ctxext.DoOnceOnSuccess(func(ctx *zero.Ctx) bool {
+	engine.OnFullMatchGroup([]string{"来点黑丝", "来点白丝", "来点jk", "来点巨乳", "来点足控", "来点网红"}, zero.OnlyGroup, fbctxext.DoOnceOnSuccess(func(ctx *zero.Ctx) bool {
 		for i, filePath := range fileList {
 			_, err := engine.GetLazyData(filePath, false)
 			if err != nil {
@@ -79,6 +80,11 @@ func init() { // 插件主体
 			case "来点网红":
 				pic = mcnPic[rand.Intn(len(mcnPic))]
 			}
-			ctx.SendChain(message.Image(pic))
+			m := message.Message{ctxext.FakeSenderForwardNode(ctx, message.Image(pic))}
+			if id := ctx.SendGroupForwardMessage(
+				ctx.Event.GroupID,
+				m).Get("message_id").Int(); id == 0 {
+				ctx.SendChain(message.Text("ERROR: 可能被风控或下载图片用时过长，请耐心等待"))
+			}
 		})
 }
