@@ -1,4 +1,4 @@
-// Package heisi 每日新闻
+// Package heisi 黑丝
 package heisi
 
 import (

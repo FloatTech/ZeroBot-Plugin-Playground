@@ -15,6 +15,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/dailynews"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/fadian"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/fyzhq"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/heisi"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/kfccrazythursday"
