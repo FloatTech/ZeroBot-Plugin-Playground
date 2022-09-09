@@ -67,7 +67,8 @@ func init() { // 插件主体
 				return
 			}
 			ctx.SendChain(message.Record(t.AudioURL))
-			data, err := text.RenderToBase64(t.Content, text.FontFile, 400, 20)
+			content := t.Title + "\n\n" + t.Content
+			data, err := text.RenderToBase64(content, text.FontFile, 400, 20)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
@@ -91,8 +92,8 @@ func init() { // 插件主体
 				ctx.SendChain(message.Text("未能找到相关材料"))
 				return
 			}
-			ctx.SendChain(message.Record(t.AudioURL))
-			data, err := text.RenderToBase64(t.Content, text.FontFile, 400, 20)
+			content := t.Title + "\n\n" + t.Content
+			data, err := text.RenderToBase64(content, text.FontFile, 400, 20)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
