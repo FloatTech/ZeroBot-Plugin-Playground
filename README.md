@@ -1,5 +1,8 @@
 # ZeroBot-Plugin-Playground
+If you dont understand Chinese,you can refer here~ [Link](https://github.com/FloatTech/ZeroBot-Plugin-Playground/blob/main/README-en.md)
+
 快来这里上传你的奇思妙想吧！好的想法将会被合并入主仓库哦~
+
 ## 简介
 本仓库是[ZeroBot-Plugin](https://github.com/FloatTech/ZeroBot-Plugin)的插件试验场，无需任何pr即可上传并调试自己的插件。你可以在这里验证你的想法，与其他人进行交流，不会遇到任何阻碍。
 ## 我该怎么做？
@@ -12,6 +15,16 @@
 3. 礼貌交谈。
 ## 完善教程
 目前开发教程还不是很全面，欢迎大家编辑此README完善它，让更多人轻松加入zbp大家庭！
+
+目前提供的样板有 example中的
+
+- [江林版本](https://github.com/FloatTech/ZeroBot-Plugin-Playground/blob/main/example/JiangRed/message.go)
+- [小锅饭版本](https://github.com/FloatTech/ZeroBot-Plugin-Playground/blob/main/example/xiaoguofan/example.go)
+- [小锅饭的ZerobotCourse](https://github.com/guohuiyuan/ZerobotCourse)
+- [夹子的版本(半成品)](https://github.com/FloatTech/ZeroBot-Plugin-Playground/tree/main/tutorial)
+
+貌似试着写出来了一点 可以通过[tutorial](https://github.com/FloatTech/ZeroBot-Plugin-Playground/tree/main/tutorial)查看
+
 ## 联系方式
 你可以通过此二维码添加该QQ群以方便交流。
 
