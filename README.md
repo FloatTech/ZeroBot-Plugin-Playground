@@ -23,8 +23,6 @@ If you dont understand Chinese,you can refer here~ [Link](https://github.com/Flo
 - [小锅饭的ZerobotCourse](https://github.com/guohuiyuan/ZerobotCourse)
 - [夹子的版本(半成品)](https://github.com/FloatTech/ZeroBot-Plugin-Playground/tree/main/tutorial)
 
-貌似试着写出来了一点 可以通过[tutorial](https://github.com/FloatTech/ZeroBot-Plugin-Playground/tree/main/tutorial)查看
-
 ## 联系方式
 你可以通过此二维码添加该QQ群以方便交流。
 
