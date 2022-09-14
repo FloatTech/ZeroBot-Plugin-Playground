@@ -1,5 +1,5 @@
 # ZeroBot-Plugin-Playground
-If you dont understand Chinese,you can refer here~ [Link](https://github.com/FloatTech/ZeroBot-Plugin-Playground/blob/main/README-en.md)
+If you dont understand Chinese,you can refer to here~ [Link](https://github.com/FloatTech/ZeroBot-Plugin-Playground/blob/main/README-en.md)
 
 快来这里上传你的奇思妙想吧！好的想法将会被合并入主仓库哦~
 
