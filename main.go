@@ -22,6 +22,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/jptingroom"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/kfccrazythursday"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/moegozh"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/ottoshout"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/partygame"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/playwright"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/qqci"
