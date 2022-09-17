@@ -17,7 +17,7 @@ This repository is a palyground of [ZeroBot-Plugin](https://github.com/FloatTech
 
 1. Each plugin will be stored in an independent folders.
 2. Do not try to modify others' plugins without their permission, changes will be rollbacked and you will be kicked off if you really did that.
-3. Be a clever man.
+3. Be polite.
 
 ## Full Tutorial
 
