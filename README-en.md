@@ -10,7 +10,7 @@ This repository is a palyground of [ZeroBot-Plugin](https://github.com/FloatTech
 ## How to enter the organization, What Should I do?
 
 1. First of all, you need to be the member of [FloatTech](https://github.com/FloatTech), apply for it by issuing in this repository.
-2. Then, we will invite you to the organization and be the maintainer. Please check your email to accept the invitation.
+2. Then, we will invite you to the organization as maintainer. Please check your email to accept the invitation.
 3. Now you have the write permission. Push your own plugin now!
 
 ## Rules
