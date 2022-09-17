@@ -1,4 +1,5 @@
 # ZeroBot-Plugin-Playground
+English | [简体中文]((https://github.com/FloatTech/ZeroBot-Plugin-Playground/blob/main/README.md))
 
 Welcome~Let's play with fire~Here are our playground to test and modify our plugin for Framework Zerobot.
 
