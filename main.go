@@ -1,3 +1,4 @@
+// Package main ZeroBot-Plugin-Plugin main file
 package main
 
 import (
@@ -37,6 +38,13 @@ import (
 	"github.com/wdvxdr1123/ZeroBot/driver"
 )
 
+type zbpcfg struct {
+	Z zero.Config        `json:"zero"`
+	W []*driver.WSClient `json:"ws"`
+}
+
+var config zbpcfg
+
 func init() {
 	sus := make([]int64, 0, 16)
 	// 直接写死 AccessToken 时，请更改下面第二个参数
@@ -57,7 +65,7 @@ func init() {
 		}
 		sus = append(sus, i)
 	}
-	sus = append(sus, 1985366171)
+	// sus = append(sus, 123456)
 	if *runcfg != "" {
 		f, err := os.Open(*runcfg)
 		if err != nil {

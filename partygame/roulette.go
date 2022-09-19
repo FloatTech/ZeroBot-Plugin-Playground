@@ -183,13 +183,13 @@ func init() { // 插件主体
 						s.close()
 						ctx.SendChain(message.Text("你长舒了一口气, 并反手击毙了"), message.At(s.Users[1]))
 						c.Event.UserID = s.Users[1]
-						_ = getTruthOrDare(c)
+						getTruthOrDare(c)
 						return
 					}
 					if s.openFire() {
 						s.close()
 						ctx.SendChain(message.Text(dieMsg[rand.Intn(len(dieMsg))]))
-						_ = getTruthOrDare(c)
+						getTruthOrDare(c)
 						return
 					}
 					ctx.SendChain(message.Text(aliveMsg[rand.Intn(len(aliveMsg))]), message.Text(",轮到"), message.At(s.Users[1]), message.Text("开火"))
