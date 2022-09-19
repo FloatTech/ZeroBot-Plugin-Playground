@@ -1,5 +1,5 @@
-// Package anotherFortune 简单的测人品 仿照的是鱼子酱的www
-package anotherFortune
+// Package anotherfortune 简单的测人品 仿照的是鱼子酱的www
+package anotherfortune
 
 import (
 	"encoding/json"
@@ -92,7 +92,7 @@ func init() {
 			userS := strconv.FormatInt(user, 10)
 			now := time.Now().Format("20060102")
 			randEveryone := fcext.RandSenderPerDayN(ctx.Event.UserID, 100)
-			var si string = now + userS // 合成
+			si := now + userS // 合成
 			dyn := time.Now().Hour()
 			weeks := time.Now().Weekday()
 			switch {
