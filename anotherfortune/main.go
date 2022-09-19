@@ -1,5 +1,5 @@
 // Package anotherFortune 简单的测人品 仿照的是鱼子酱的www
-package AnotherFortune
+package anotherFortune
 
 import (
 	"encoding/json"
