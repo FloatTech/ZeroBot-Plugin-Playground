@@ -5,7 +5,7 @@ Welcome~ Here are our playground to test and modify plugins written on Zerobot F
 
 ## Info
 
-This repository is a palyground of [ZeroBot-Plugin](https://github.com/FloatTech/ZeroBot-Plugin). Everybody can upload any ideas and debug them here. You can try whatever you want in your own plugin and discuss with other developers freely.
+This repository is a playground of [ZeroBot-Plugin](https://github.com/FloatTech/ZeroBot-Plugin). Everybody can upload any ideas and debug them here. You can try whatever you want in your own plugin and discuss with other developers freely.
 
 ## How to enter the organization, What Should I do?
 
