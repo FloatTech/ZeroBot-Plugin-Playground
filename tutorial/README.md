@@ -1,12 +1,12 @@
 ## 引言~
 
-欢迎各位使用[Zerobot-Plugin](https://github.com/FloatTech/ZeroBot-Plugin)作为你的机器人~
+欢迎各位使用[Zerobot-Plugin](https://github.com/FloatTech/ZeroBot-Plugin)作为你的qq机器人~
 
-这边是我们的试验场~~~  w欢迎各位来这边开发新鲜好玩的插件~
+这边是我们的试验场~~  欢迎各位来这边开发新鲜好玩的插件w~
 
 当然我们也很欢迎各位学习并编写相关的**Zerobot**插件~
 
-什么?你不会**golang**?没关系的哦
+什么?你不会**golang**? 没关系的哦
 
 这边咱就教你如何使用并且编写自己想要的插件呢~
 

@@ -16,7 +16,7 @@
 ## 完善教程
 目前开发教程还不是很全面，欢迎大家编辑此README完善它，让更多人轻松加入zbp大家庭！
 
-目前提供的样板有 example中的
+目前提供的样板有 example 中的
 
 - [江林版本](https://github.com/FloatTech/ZeroBot-Plugin-Playground/blob/main/example/JiangRed/message.go)
 - [小锅饭版本](https://github.com/FloatTech/ZeroBot-Plugin-Playground/blob/main/example/xiaoguofan/example.go)
