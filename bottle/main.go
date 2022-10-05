@@ -1,4 +1,5 @@
-package bottle // zbp driftbottle 魔改 更干净更适用于多个群的bot使用
+// Package bottle zbp driftbottle 魔改 更干净更适用于多个群的bot使用
+package bottle
 
 import (
 	"fmt"
@@ -42,7 +43,7 @@ func init() {
 		panic(err)
 	}
 
-	_ = CreateChannel(seaSide)
+	_ = createChannel(seaSide)
 	engine.OnFullMatch("pick", zero.OnlyToMe, zero.OnlyGroup).Limit(ctxext.LimitByGroup).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		be, err := fetchBottle(seaSide)
 		if err != nil {
@@ -88,12 +89,6 @@ func (be *sea) throw(db *sql.Sqlite) error {
 	return db.Insert("global", be)
 }
 
-func (be *sea) destory(db *sql.Sqlite) error {
-	seaLocker.Lock()
-	defer seaLocker.Unlock()
-	return db.Del("global", "WHERE id="+strconv.FormatInt(be.ID, 10))
-}
-
 func fetchBottle(db *sql.Sqlite) (*sea, error) {
 	seaLocker.Lock()
 	defer seaLocker.Unlock()
@@ -101,7 +96,7 @@ func fetchBottle(db *sql.Sqlite) (*sea, error) {
 	return be, db.Pick("global", be)
 }
 
-func CreateChannel(db *sql.Sqlite) error {
+func createChannel(db *sql.Sqlite) error {
 	seaLocker.Lock()
 	defer seaLocker.Unlock()
 	return db.Create("global", &sea{})

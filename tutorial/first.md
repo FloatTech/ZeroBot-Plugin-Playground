@@ -1,7 +1,6 @@
 ## 浅尝辄止~尝试做一个好看的拼盘吧w
 
-~经过了上一次的尝试之后~ 我们已经踏入了第一步 > 让机器人跑自己需要的插件w
-
+经过了上一次的尝试之后~ 我们已经踏入了第一步 > 让机器人跑自己需要的插件w
  
 
 啊咧~我总不能只想让我的机器人发送 hello world 吧 我还想整点别的w
@@ -12,7 +11,7 @@
 
 ### emmm...我想让我的机器人可以发送图片w
 
-好哦~w 记得咱之前提的嘛~在总部**engine**中
+好哦~w 记得咱之前提的嘛 在**engine**中
 
 我们可以通过调用**ctx**工具箱的方式 为我们的机器人使用专业对口的小东西
 
@@ -70,7 +69,7 @@ engine.OnFullMatch("", zero.OnlyToMe).SetBlock(true).
 
 同时 你也可以~
 
-```
+```go
 // 戳一戳
 	engine.On("notice/notify/poke", zero.OnlyToMe).SetBlock(false).
 		Handle(func(ctx *zero.Ctx) {

@@ -3,8 +3,8 @@ module github.com/FloatTech/ZeroBot-Plugin-Playground
 go 1.19
 
 require (
-	github.com/Coloured-glaze/gg v1.3.4
 	github.com/FloatTech/floatbox v0.0.0-20220822040527-f059031fec44
+	github.com/FloatTech/sqlite v0.3.3
 	github.com/FloatTech/zbpctrl v1.4.1-0.20220715042842-93f081cb0133
 	github.com/FloatTech/zbputils v1.5.1-0.20220822052757-5539ad8af4a0
 	github.com/fumiama/sqlite3 v1.14.6
@@ -19,7 +19,7 @@ require (
 )
 
 require (
-	github.com/FloatTech/sqlite v0.3.3 // indirect
+	github.com/Coloured-glaze/gg v1.3.4 // indirect
 	github.com/FloatTech/ttl v0.0.0-20220715042055-15612be72f5b // indirect
 	github.com/RomiChan/syncx v0.0.0-20220404072119-d7ea0ae15a4c // indirect
 	github.com/RomiChan/websocket v1.4.3-0.20220123145318-307a86b127bc // indirect

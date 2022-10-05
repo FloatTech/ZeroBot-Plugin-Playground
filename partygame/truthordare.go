@@ -67,7 +67,7 @@ func init() { // 插件主体
 			puid, _ = strconv.ParseInt(ctx.Event.Message[1].Data["qq"], 10, 64)
 		}
 		ctx.Event.UserID = puid
-		_ = getTruthOrDare(ctx)
+		getTruthOrDare(ctx)
 	})
 	engine.OnRegex(`^(饶恕|阿门|释放|原谅|赦免)`, zero.AdminPermission, zero.OnlyGroup).Handle(func(ctx *zero.Ctx) {
 		puid := ctx.Event.UserID
@@ -84,7 +84,7 @@ func init() { // 插件主体
 			puid, _ = strconv.ParseInt(ctx.Event.Message[1].Data["qq"], 10, 64)
 		}
 		ctx.Event.UserID = puid
-		_ = getTruthOrDare(ctx)
+		getTruthOrDare(ctx)
 	})
 	engine.OnRegex(`^(反省|检查罪行)`, zero.OnlyGroup).Handle(func(ctx *zero.Ctx) {
 		puid := ctx.Event.UserID
@@ -122,7 +122,7 @@ func getActionOrQuestion() string {
 	return getQuestion()
 }
 
-func getTruthOrDare(ctx *zero.Ctx) bool {
+func getTruthOrDare(ctx *zero.Ctx) {
 	next, cancel := zero.NewFutureEvent("message", 999, false, ctx.CheckSession(), zero.FullMatchRule("真心话", "大冒险")).Repeat()
 	defer cancel()
 	key := fmt.Sprintf("%v-%v", ctx.Event.GroupID, ctx.Event.UserID)
@@ -134,7 +134,7 @@ func getTruthOrDare(ctx *zero.Ctx) bool {
 			p := getActionOrQuestion()
 			punishmap.Store(key, p)
 			ctx.SendChain(message.At(ctx.Event.UserID), message.Text("恭喜你获得\"", p, "\"的惩罚"))
-			return true
+			return
 		case c := <-next:
 			msg := c.Event.Message.ExtractPlainText()
 			var p string
@@ -145,7 +145,7 @@ func getTruthOrDare(ctx *zero.Ctx) bool {
 			}
 			punishmap.Store(key, p)
 			ctx.SendChain(message.At(ctx.Event.UserID), message.Text("恭喜你获得\"", p, "\"的惩罚"))
-			return true
+			return
 		}
 	}
 }
