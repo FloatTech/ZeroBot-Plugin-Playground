@@ -12,7 +12,7 @@ import (
 	"github.com/FloatTech/floatbox/process"
 	"github.com/sirupsen/logrus"
 
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/alipayvoice"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/aipaint"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/bottle"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/dailynews"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
