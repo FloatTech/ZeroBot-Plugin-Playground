@@ -8,6 +8,7 @@ import (
 
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
+	"github.com/FloatTech/zbputils/ctxext"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
@@ -37,7 +38,7 @@ func init() { // 插件主体
 	engine.OnPrefix(`ai画图`).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			args := ctx.State["args"].(string)
-			m := message.Message{message.Image(fmt.Sprintf(aipaintURL, mytoken, url.QueryEscape(strings.TrimSpace(strings.ReplaceAll(args, " ", "%20"))))).Add("cache", 0)}
+			m := message.Message{ctxext.FakeSenderForwardNode(ctx, message.Image(fmt.Sprintf(aipaintURL, mytoken, url.QueryEscape(strings.TrimSpace(strings.ReplaceAll(args, " ", "%20"))))).Add("cache", 0))}
 			if id := ctx.Send(m).ID(); id == 0 {
 				ctx.SendChain(message.Text("ERROR: 可能被风控或下载图片用时过长，请耐心等待"))
 			}
