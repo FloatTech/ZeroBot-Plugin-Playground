@@ -58,20 +58,12 @@ func init() { // 插件主体
 		Handle(func(ctx *zero.Ctx) {
 			ctx.SendChain(message.Text("少女祈祷中..."))
 			args := ctx.State["args"].(string)
-			data, err := web.GetData(aipaintTxt2ImgURL)
+			data, err := web.GetData(fmt.Sprintf(aipaintTxt2ImgURL, mytoken, url.QueryEscape(strings.TrimSpace(strings.ReplaceAll(args, " ", "%20")))))
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
-			var loadData string
-			if predictRe.MatchString(binary.BytesToString(data)) {
-				loadData = predictRe.FindStringSubmatch(binary.BytesToString(data))[0]
-			}
-			m := message.Message{ctxext.FakeSenderForwardNode(ctx, message.Image(fmt.Sprintf(aipaintTxt2ImgURL, mytoken, url.QueryEscape(strings.TrimSpace(strings.ReplaceAll(args, " ", "%20"))))).Add("cache", 0))}
-			m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Text("seed: ", gjson.Get(loadData, "seed").Int(), "\n", "scale: ", gjson.Get(loadData, "scale").Float())))
-			if id := ctx.Send(m).ID(); id == 0 {
-				ctx.SendChain(message.Text("ERROR: 可能被风控或下载图片用时过长，请耐心等待"))
-			}
+			sendAiImg(ctx, data)
 		})
 	engine.OnRegex(`^(以图绘图|以图生图|以图画图)[\s\S]*?(\[CQ:(image\,file=([0-9a-zA-Z]{32}).*|at.+?(\d{5,11}))\].*|(\d+))$`).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
@@ -123,16 +115,7 @@ func init() { // 插件主体
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
-			var loadData string
-			if predictRe.MatchString(binary.BytesToString(data)) {
-				loadData = predictRe.FindStringSubmatch(binary.BytesToString(data))[0]
-			}
-			encodeStr := base64.StdEncoding.EncodeToString(data)
-			m := message.Message{ctxext.FakeSenderForwardNode(ctx, message.Image("base64://"+encodeStr))}
-			m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Text("seed: ", gjson.Get(loadData, "seed").Int(), "\n", "scale: ", gjson.Get(loadData, "scale").Float())))
-			if id := ctx.Send(m).ID(); id == 0 {
-				ctx.SendChain(message.Text("ERROR: 可能被风控或下载图片用时过长，请耐心等待"))
-			}
+			sendAiImg(ctx, data)
 		})
 
 	// engine.OnRegex(`^画(\d{0,3})张([\s\S]*)$`).SetBlock(true).
@@ -172,4 +155,17 @@ func init() { // 插件主体
 	// 			ctx.SendChain(message.Text("ERROR: 可能被风控或下载图片用时过长，请耐心等待"))
 	// 		}
 	// 	})
+}
+
+func sendAiImg(ctx *zero.Ctx, data []byte) {
+	var loadData string
+	if predictRe.MatchString(binary.BytesToString(data)) {
+		loadData = predictRe.FindStringSubmatch(binary.BytesToString(data))[0]
+	}
+	encodeStr := base64.StdEncoding.EncodeToString(data)
+	m := message.Message{ctxext.FakeSenderForwardNode(ctx, message.Image("base64://"+encodeStr))}
+	m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Text("seed: ", gjson.Get(loadData, "seed").Int(), "\n", "scale: ", gjson.Get(loadData, "scale").Float())))
+	if id := ctx.Send(m).ID(); id == 0 {
+		ctx.SendChain(message.Text("ERROR: 可能被风控或下载图片用时过长，请耐心等待"))
+	}
 }
