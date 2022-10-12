@@ -48,8 +48,8 @@ func init() { // 插件主体
 	engine := control.Register("aipaint", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Help: "ai绘图\n" +
-			"ai绘图 xxx" +
-			"以图绘图 xxx [图片]",
+			"[ai绘图|生成色图|生成涩图|ai画图] xxx\n" +
+			"[以图绘图|以图生图|以图画图] xxx [图片]|@xxx|[qq号]",
 		// "- 画1张a photo of sks toy riding a bicycle",
 		PrivateDataFolder: "aipaint",
 	})
