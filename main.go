@@ -15,6 +15,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/aipaint"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/bottle"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/dailynews"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/deepdanbooru"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/fadian"

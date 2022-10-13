@@ -4,6 +4,7 @@ package aipaint
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"image"
 	"net/url"
@@ -19,13 +20,13 @@ import (
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
 	"github.com/FloatTech/zbputils/ctxext"
-	"github.com/tidwall/gjson"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
 const (
-	mytoken           = "06LhgOew9PJDFQKnfdcSI3BtXz84AGoM"
+	mytoken = "06LhgOew9PJDFQKnfdcSI3BtXz84AGoM"
+	// 备用host http://91.217.139.190:5010
 	aipaintHost       = "http://91.216.169.75:5010"
 	aipaintTxt2ImgURL = aipaintHost + "/got_image?token=%v&tags=%v"
 	aipaintImg2ImgURL = aipaintHost + "/got_image2image?token=%v&tags=%v"
@@ -43,6 +44,20 @@ var (
 // 	Data        []interface{} `json:"data"`
 // 	SessionHash string        `json:"session_hash"`
 // }
+
+type result struct {
+	Steps    int     `json:"steps"`
+	Sampler  string  `json:"sampler"`
+	Seed     int     `json:"seed"`
+	Strength float64 `json:"strength"`
+	Noise    float64 `json:"noise"`
+	Scale    float64 `json:"scale"`
+	Uc       string  `json:"uc"`
+}
+
+func (r *result) String() string {
+	return fmt.Sprintf("steps: %v\nsampler: %v\nseed: %v\nstrength: %v\nnoise: %v\nscale: %v\nuc: %v\n", r.Steps, r.Sampler, r.Seed, r.Strength, r.Noise, r.Scale, r.Uc)
+}
 
 func init() { // 插件主体
 	engine := control.Register("aipaint", &ctrl.Options[*zero.Ctx]{
@@ -162,9 +177,15 @@ func sendAiImg(ctx *zero.Ctx, data []byte) {
 	if predictRe.MatchString(binary.BytesToString(data)) {
 		loadData = predictRe.FindStringSubmatch(binary.BytesToString(data))[0]
 	}
+	var r result
+	err := json.Unmarshal(binary.StringToBytes(loadData), &r)
+	if err != nil {
+		ctx.SendChain(message.Text("ERROR: ", err))
+		return
+	}
 	encodeStr := base64.StdEncoding.EncodeToString(data)
 	m := message.Message{ctxext.FakeSenderForwardNode(ctx, message.Image("base64://"+encodeStr))}
-	m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Text("seed: ", gjson.Get(loadData, "seed").Int(), "\n", "scale: ", gjson.Get(loadData, "scale").Float())))
+	m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Text(r.String())))
 	if id := ctx.Send(m).ID(); id == 0 {
 		ctx.SendChain(message.Text("ERROR: 可能被风控或下载图片用时过长，请耐心等待"))
 	}
