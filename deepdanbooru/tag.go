@@ -9,6 +9,7 @@ import (
 	"image"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/Coloured-glaze/gg"
 	"github.com/FloatTech/floatbox/file"
@@ -146,6 +147,7 @@ func pushData(data []byte) (hash string, err error) {
 	if err != nil {
 		return
 	}
+	time.Sleep(1 * time.Second)
 	hash = gjson.ParseBytes(data).Get("hash").String()
 	return
 }
