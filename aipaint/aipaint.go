@@ -1,4 +1,4 @@
-// Package aipaint ai画图
+// Package aipaint ai绘图
 package aipaint
 
 import (
@@ -24,26 +24,14 @@ import (
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
-const (
-	mytoken = "06LhgOew9PJDFQKnfdcSI3BtXz84AGoM"
-	// 备用host http://91.217.139.190:5010
-	aipaintHost       = "http://91.216.169.75:5010"
-	aipaintTxt2ImgURL = aipaintHost + "/got_image?token=%v&tags=%v"
-	aipaintImg2ImgURL = aipaintHost + "/got_image2image?token=%v&tags=%v"
-	// aipaintURL  = "https://22229.gradio.app/api/predict/"
-	// sessionHash = "zerobot"
-)
-
 var (
 	datapath  string
 	predictRe = regexp.MustCompile(`{"steps".+?}`)
+	// 参考host http://91.217.139.190:5010 http://91.216.169.75:5010
+	aipaintTxt2ImgURL = "/got_image?token=%v&tags=%v"
+	aipaintImg2ImgURL = "/got_image2image?token=%v&tags=%v"
+	cfg               = newServerConfig("data/aipaint/config.json")
 )
-
-// type request struct {
-// 	FnIndex     int           `json:"fn_index"`
-// 	Data        []interface{} `json:"data"`
-// 	SessionHash string        `json:"session_hash"`
-// }
 
 type result struct {
 	Steps    int     `json:"steps"`
@@ -63,17 +51,25 @@ func init() { // 插件主体
 	engine := control.Register("aipaint", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Help: "ai绘图\n" +
-			"[ai绘图|生成色图|生成涩图|ai画图] xxx\n" +
-			"[以图绘图|以图生图|以图画图] xxx [图片]|@xxx|[qq号]",
-		// "- 画1张a photo of sks toy riding a bicycle",
+			"- [ ai绘图 | 生成色图 | 生成涩图 | ai画图 ] xxx\n" +
+			"- [ 以图绘图 | 以图生图 | 以图画图 ] xxx [图片]|@xxx|[qq号]\n" +
+			"- 设置ai绘图配置 [server] [token]\n" +
+			"例1: 设置ai绘图配置 http://91.216.169.75:5010 abc\n" +
+			"例2: 设置ai绘图配置 http://91.217.139.190:5010 abc\n" +
+			"通过 http://91.217.139.190:5010/token 获取token",
 		PrivateDataFolder: "aipaint",
 	})
 	datapath = file.BOTPATH + "/" + engine.DataFolder()
 	engine.OnPrefixGroup([]string{`ai绘图`, `生成色图`, `生成涩图`, `ai画图`}).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
+			server, token, err := cfg.load()
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR: ", err))
+				return
+			}
 			ctx.SendChain(message.Text("少女祈祷中..."))
 			args := ctx.State["args"].(string)
-			data, err := web.GetData(fmt.Sprintf(aipaintTxt2ImgURL, mytoken, url.QueryEscape(strings.TrimSpace(strings.ReplaceAll(args, " ", "%20")))))
+			data, err := web.GetData(server + fmt.Sprintf(aipaintTxt2ImgURL, token, url.QueryEscape(strings.TrimSpace(strings.ReplaceAll(args, " ", "%20")))))
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
@@ -82,9 +78,14 @@ func init() { // 插件主体
 		})
 	engine.OnRegex(`^(以图绘图|以图生图|以图画图)[\s\S]*?(\[CQ:(image\,file=([0-9a-zA-Z]{32}).*|at.+?(\d{5,11}))\].*|(\d+))$`).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
+			server, token, err := cfg.load()
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR: ", err))
+				return
+			}
 			c := newContext(ctx.Event.UserID)
 			list := ctx.State["regex_matched"].([]string)
-			err := c.prepareLogos(list[4]+list[5]+list[6], strconv.FormatInt(ctx.Event.UserID, 10))
+			err = c.prepareLogos(list[4]+list[5]+list[6], strconv.FormatInt(ctx.Event.UserID, 10))
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
@@ -95,7 +96,7 @@ func init() { // 插件主体
 				return
 			}
 			ctx.SendChain(message.Text("少女祈祷中..."))
-			postURL := fmt.Sprintf(aipaintImg2ImgURL, mytoken, url.QueryEscape(strings.TrimSpace(strings.ReplaceAll(args, " ", "%20"))))
+			postURL := server + fmt.Sprintf(aipaintImg2ImgURL, token, url.QueryEscape(strings.TrimSpace(strings.ReplaceAll(args, " ", "%20"))))
 
 			f, err := os.Open(c.headimgsdir[0])
 			if err != nil {
@@ -132,44 +133,16 @@ func init() { // 插件主体
 			}
 			sendAiImg(ctx, data)
 		})
-
-	// engine.OnRegex(`^画(\d{0,3})张([\s\S]*)$`).SetBlock(true).
-	// 	Handle(func(ctx *zero.Ctx) {
-	// 		regexMatched := ctx.State["regex_matched"].([]string)
-	// 		count, err := strconv.Atoi(regexMatched[1])
-	// 		if err != nil {
-	// 			ctx.SendChain(message.Text("Error:", err))
-	// 			return
-	// 		}
-	// 		if count > 100 {
-	// 			count = 100
-	// 		}
-	// 		ctx.SendChain(message.Text("少女祈祷中..."))
-	// 		r := request{
-	// 			FnIndex:     0,
-	// 			Data:        []interface{}{regexMatched[2], count},
-	// 			SessionHash: sessionHash,
-	// 		}
-	// 		b, err := json.Marshal(r)
-	// 		if err != nil {
-	// 			ctx.SendChain(message.Text("Error:", err))
-	// 			return
-	// 		}
-	// 		data, err := web.PostData(aipaintURL, "application/json", bytes.NewReader(b))
-	// 		if err != nil {
-	// 			ctx.SendChain(message.Text("Error:", err))
-	// 			return
-	// 		}
-	// 		fmt.Println(string(data))
-	// 		m := message.Message{}
-	// 		gjson.ParseBytes(data).Get("data.0").ForEach(func(_, value gjson.Result) bool {
-	// 			m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Image(strings.ReplaceAll(value.String(), "data:image/png;base64,", "base64://"))))
-	// 			return true
-	// 		})
-	// 		if id := ctx.Send(m).ID(); id == 0 {
-	// 			ctx.SendChain(message.Text("ERROR: 可能被风控或下载图片用时过长，请耐心等待"))
-	// 		}
-	// 	})
+	engine.OnRegex(`^设置ai绘图配置\s(.*[^\s$])\s(.+)$`, zero.SuperUserPermission).SetBlock(true).
+		Handle(func(ctx *zero.Ctx) {
+			regexMatched := ctx.State["regex_matched"].([]string)
+			err := cfg.save(regexMatched[1], regexMatched[2])
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR: ", err))
+				return
+			}
+			ctx.SendChain(message.Text("成功设置server为", regexMatched[1], ", token为", regexMatched[2]))
+		})
 }
 
 func sendAiImg(ctx *zero.Ctx, data []byte) {
@@ -178,10 +151,12 @@ func sendAiImg(ctx *zero.Ctx, data []byte) {
 		loadData = predictRe.FindStringSubmatch(binary.BytesToString(data))[0]
 	}
 	var r result
-	err := json.Unmarshal(binary.StringToBytes(loadData), &r)
-	if err != nil {
-		ctx.SendChain(message.Text("ERROR: ", err))
-		return
+	if loadData != "" {
+		err := json.Unmarshal(binary.StringToBytes(loadData), &r)
+		if err != nil {
+			ctx.SendChain(message.Text("ERROR: ", err))
+			return
+		}
 	}
 	encodeStr := base64.StdEncoding.EncodeToString(data)
 	m := message.Message{ctxext.FakeSenderForwardNode(ctx, message.Image("base64://"+encodeStr))}
