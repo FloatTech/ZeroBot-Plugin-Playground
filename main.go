@@ -13,6 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/aipaint"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/animegan"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/bottle"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/dailynews"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/deepdanbooru"
