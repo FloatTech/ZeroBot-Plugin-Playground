@@ -12,7 +12,6 @@ import (
 	"github.com/FloatTech/floatbox/process"
 	"github.com/sirupsen/logrus"
 
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/aipaint"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/animegan"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/bottle"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/dailynews"
@@ -21,7 +20,6 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/fadian"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/fyzhq"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/jptingroom"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/kfccrazythursday"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/magicprompt"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/moegozh"
