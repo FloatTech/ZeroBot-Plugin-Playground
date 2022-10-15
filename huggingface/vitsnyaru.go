@@ -3,7 +3,6 @@ package huggingface
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 
@@ -29,6 +28,10 @@ func init() { // 插件主体
 	// 开启
 	engine.OnPrefix(`让猫雷说`).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
+			_ctx, _cancel := context.WithTimeout(context.Background(), timeoutMax*time.Second)
+			defer _cancel()
+			ch := make(chan []byte, 1)
+
 			args := ctx.State["args"].(string)
 			pushURL := embed + vitsnyaruRepo + pushPath
 			statusURL := embed + vitsnyaruRepo + statusPath
@@ -40,9 +43,7 @@ func init() { // 插件主体
 				statusRes statusResponse
 				data      []byte
 			)
-			ch := make(chan []byte, 1)
-			_ctx, _cancel := context.WithTimeout(context.Background(), timeoutMax*time.Second)
-			defer _cancel()
+
 			// 获取clean后的文本
 			pushReq = pushRequest{
 				Action:      defaultAction,
@@ -67,14 +68,15 @@ func init() { // 插件主体
 					case <-t.C:
 						data, err = status(statusURL, statusReq)
 						if err != nil {
-							ctx.SendChain(message.Text("Error:", err))
-							return
+							ch <- data
+							break LOOP
 						}
 						if gjson.ParseBytes(data).Get("status").String() == completeStatus {
 							ch <- data
 							break LOOP
 						}
 					case <-c.Done():
+						ch <- data
 						break LOOP
 					}
 				}
@@ -85,6 +87,7 @@ func init() { // 插件主体
 				ctx.SendChain(message.Text("Error:", err))
 				return
 			}
+
 			// 用clean的文本预测语音
 			pushReq = pushRequest{
 				Action:      defaultAction,
@@ -109,14 +112,15 @@ func init() { // 插件主体
 					case <-t.C:
 						data, err = status(statusURL, statusReq)
 						if err != nil {
-							ctx.SendChain(message.Text("Error:", err))
-							return
+							ch <- data
+							break LOOP
 						}
 						if gjson.ParseBytes(data).Get("status").String() == completeStatus {
 							ch <- data
 							break LOOP
 						}
 					case <-c.Done():
+						ch <- data
 						break LOOP
 					}
 				}
@@ -127,7 +131,7 @@ func init() { // 插件主体
 				ctx.SendChain(message.Text("Error:", err))
 				return
 			}
-			fmt.Printf("%#v\n", statusRes)
+
 			// 发送语音
 			if len(statusRes.Data.Data) < 2 {
 				ctx.SendChain(message.Text("Error: 未能获取语音"))
