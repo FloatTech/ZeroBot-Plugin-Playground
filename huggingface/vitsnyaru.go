@@ -68,7 +68,7 @@ func init() { // 插件主体
 						data, err = status(statusURL, statusReq)
 						if err != nil {
 							ctx.SendChain(message.Text("Error:", err))
-							break LOOP
+							return
 						}
 						if gjson.ParseBytes(data).Get("status").String() == completeStatus {
 							ch <- data
