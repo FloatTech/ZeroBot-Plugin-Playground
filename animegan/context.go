@@ -1,4 +1,4 @@
-package aipaint
+package animegan
 
 import (
 	"os"

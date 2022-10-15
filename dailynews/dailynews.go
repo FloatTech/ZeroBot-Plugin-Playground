@@ -1,4 +1,4 @@
-// Package dailynews 每日新闻
+// Package dailynews 今日早报
 package dailynews
 
 import (
@@ -13,9 +13,9 @@ import (
 func init() { // 插件主体
 	engine := control.Register("dailynews", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
-		Help: "每日早报\n" +
-			"- [1] 启用后会在每天早上发送一份早报",
-		PrivateDataFolder: "daily_news",
+		Help: "今日早报\n" +
+			"- 今日早报",
+		PrivateDataFolder: "dailynews",
 	})
 
 	// 开启
