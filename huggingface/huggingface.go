@@ -4,7 +4,6 @@ package huggingface
 import (
 	"bytes"
 	"encoding/json"
-	"time"
 
 	"github.com/FloatTech/floatbox/web"
 )
@@ -16,6 +15,8 @@ const (
 	statusPath         = "/api/queue/status/"
 	defaultAction      = "predict"
 	defaultSessionHash = "zerobot"
+	completeStatus     = "COMPLETE"
+	timeoutMax         = 300
 )
 
 type pushRequest struct {
@@ -40,7 +41,7 @@ type statusResponse struct {
 		Data            []interface{} `json:"data"`
 		Duration        float64       `json:"duration"`
 		AverageDuration float64       `json:"average_duration"`
-	} `json:"data"`
+	}
 }
 
 func push(pushURL string, pushReq pushRequest) (pushRes pushResponse, err error) {
@@ -54,19 +55,14 @@ func push(pushURL string, pushReq pushRequest) (pushRes pushResponse, err error)
 	}
 	err = json.Unmarshal(data, &pushRes)
 	// 上传数据休息
-	time.Sleep(2 * time.Second)
 	return
 }
 
-func status(statusURL string, statusReq statusRequest) (statusRes statusResponse, err error) {
+func status(statusURL string, statusReq statusRequest) (data []byte, err error) {
 	b, err := json.Marshal(statusReq)
 	if err != nil {
 		return
 	}
-	data, err := web.PostData(statusURL, "application/json", bytes.NewReader(b))
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(data, &statusRes)
+	data, err = web.PostData(statusURL, "application/json", bytes.NewReader(b))
 	return
 }
