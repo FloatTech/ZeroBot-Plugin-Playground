@@ -23,6 +23,7 @@ func init() {
 		data, err := web.GetData(crazyURL)
 		if err != nil {
 			ctx.SendChain(message.Text("Error:", err))
+			return
 		}
 		ctx.SendChain(message.Text(gjson.ParseBytes(data).Get("@this.0.content").String()))
 	})
