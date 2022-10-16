@@ -29,10 +29,10 @@ func init() { // 插件主体
 	engine.OnPrefix(`电棍说`).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			args := ctx.State["args"].(string)
-			data, err := web.PostData(makeURL, "application/x-www-form-urlencoded", strings.NewReader("text="+url.QueryEscape(args)))
+			data, err := web.PostData(makeURL, "application/x-www-form-urlencoded", strings.NewReader("text="+url.QueryEscape(args)+"&inYsddMode=true&norm=true&reverse=false&speedMult=1&pitchMult=1"))
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR:", err))
 			}
-			ctx.SendChain(message.Record(websiteURL + "/" + gjson.ParseBytes(data).Get("id").String() + ".mp3"))
+			ctx.SendChain(message.Record(websiteURL + "/get/" + gjson.ParseBytes(data).Get("id").String() + ".mp3"))
 		})
 }
