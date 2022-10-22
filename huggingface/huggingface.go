@@ -9,14 +9,19 @@ import (
 )
 
 const (
-	huggingfaceHost    = "https://hf.space"
-	embed              = huggingfaceHost + "/embed"
-	pushPath           = "/api/queue/push/"
-	statusPath         = "/api/queue/status/"
-	defaultAction      = "predict"
-	defaultSessionHash = "zerobot"
-	completeStatus     = "COMPLETE"
-	timeoutMax         = 300
+	huggingfaceSpaceHTTPS = "https://hf.space"
+	embed                 = huggingfaceSpaceHTTPS + "/embed"
+	pushPath              = "/api/queue/push/"
+	statusPath            = "/api/queue/status/"
+	defaultAction         = "predict"
+	defaultSessionHash    = "zerobot"
+	completeStatus        = "COMPLETE"
+	timeoutMax            = 300
+
+	huggingfaceSpaceWss = "wss://spaces.huggingface.tech"
+	joinPath            = "/queue/join"
+
+	predictPath = "/api/predict/"
 )
 
 type pushRequest struct {
