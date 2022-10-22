@@ -25,7 +25,7 @@ func init() { // 插件主体
 	engine := control.Register("realcugan", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Help: "清晰术\n" +
-			"- 清晰术(双重吟唱|三重吟唱|四重吟唱)(强力术式|中等术式|弱术式|不变式|原式)",
+			"- 清晰术(双重吟唱|三重吟唱|四重吟唱)(强力术式|中等术式|弱术式|不变式|原式)[图片]",
 		PrivateDataFolder: "realcugan",
 	})
 	engine.OnPrefixGroup([]string{"清晰术"}, zero.MustProvidePicture).SetBlock(true).
