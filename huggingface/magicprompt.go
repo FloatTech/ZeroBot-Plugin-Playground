@@ -1,5 +1,4 @@
-// Package magicprompt 魔力提词
-package magicprompt
+package huggingface
 
 import (
 	"encoding/json"
@@ -16,14 +15,9 @@ import (
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
-const magicpromptURL = "wss://spaces.huggingface.tech/Gustavosta/MagicPrompt-Stable-Diffusion/queue/join"
-
-type hfRequest struct {
-	Action      string        `json:"action,omitempty"`
-	FnIndex     int           `json:"fn_index"`
-	Data        []interface{} `json:"data"`
-	SessionHash string        `json:"session_hash"`
-}
+const (
+	magicpromptRepo = "/Gustavosta/MagicPrompt-Stable-Diffusion"
+)
 
 func init() { // 插件主体
 	engine := control.Register("magicprompt", &ctrl.Options[*zero.Ctx]{
@@ -36,10 +30,12 @@ func init() { // 插件主体
 	// 开启
 	engine.OnPrefix(`魔力提词`).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
+			ctx.SendChain(message.Text("少女祈祷中..."))
+			magicpromptURL := huggingfaceSpaceWss + magicpromptRepo + joinPath
 			args := ctx.State["args"].(string)
 			c, _, err := websocket.DefaultDialer.Dial(magicpromptURL, nil)
 			if err != nil {
-				ctx.SendChain(message.Text("Error:", err))
+				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
 			defer c.Close()
@@ -49,33 +45,42 @@ func init() { // 插件主体
 			go func() {
 				defer close(done)
 				for {
-					_, m, err := c.ReadMessage()
+					_, data, err := c.ReadMessage()
 					if err != nil {
 						logrus.Println("read:", err)
 						return
 					}
-					text := gjson.ParseBytes(m).Get("output.data.0").String()
-					if text != "" {
+					if gjson.ParseBytes(data).Get("status").String() == completeStatus {
+						var sr statusResponse
+						err := json.Unmarshal(data, &sr)
+						if err != nil {
+							ctx.SendChain(message.Text("ERROR: ", err))
+							return
+						}
+						if len(sr.Data.Data) == 0 {
+							ctx.SendChain(message.Text("ERROR:  未能获取提词"))
+							return
+						}
 						m := message.Message{}
-						for _, v := range strings.Split(text, "\n\n") {
+						for _, v := range strings.Split(sr.Data.Data[0].(string), "\n\n") {
 							m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Text(v)))
 						}
 						if id := ctx.Send(m).ID(); id == 0 {
-							ctx.SendChain(message.Text("ERROR: 可能被风控或下载图片用时过长，请耐心等待"))
+							ctx.SendChain(message.Text("ERROR:  可能被风控或下载图片用时过长，请耐心等待"))
 						}
 					}
-					logrus.Printf("recv: %s", m)
+					logrus.Printf("recv: %s", data)
 				}
 			}()
 
-			r := hfRequest{
+			r := pushRequest{
 				FnIndex:     0,
 				Data:        []interface{}{args},
-				SessionHash: "zerobot",
+				SessionHash: defaultSessionHash,
 			}
 			b, err := json.Marshal(r)
 			if err != nil {
-				ctx.SendChain(message.Text("Error:", err))
+				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
 
@@ -89,7 +94,7 @@ func init() { // 插件主体
 				case <-ticker.C:
 					err := c.WriteMessage(websocket.TextMessage, b)
 					if err != nil {
-						ctx.SendChain(message.Text("Error:", err))
+						ctx.SendChain(message.Text("ERROR: ", err))
 						return
 					}
 				}

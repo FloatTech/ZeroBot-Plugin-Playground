@@ -53,7 +53,7 @@ func init() { // 插件主体
 			}
 			pushRes, err := push(pushURL, pushReq)
 			if err != nil {
-				ctx.SendChain(message.Text("Error:", err))
+				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
 			statusReq = statusRequest{
@@ -84,7 +84,7 @@ func init() { // 插件主体
 			data = <-ch
 			err = json.Unmarshal(data, &statusRes)
 			if err != nil {
-				ctx.SendChain(message.Text("Error:", err))
+				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
 
@@ -97,7 +97,7 @@ func init() { // 插件主体
 			}
 			pushRes, err = push(pushURL, pushReq)
 			if err != nil {
-				ctx.SendChain(message.Text("Error:", err))
+				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
 			statusReq = statusRequest{
@@ -128,13 +128,13 @@ func init() { // 插件主体
 			data = <-ch
 			err = json.Unmarshal(data, &statusRes)
 			if err != nil {
-				ctx.SendChain(message.Text("Error:", err))
+				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
 
 			// 发送语音
 			if len(statusRes.Data.Data) < 2 {
-				ctx.SendChain(message.Text("Error: 未能获取语音"))
+				ctx.SendChain(message.Text("ERROR: 未能获取语音"))
 				return
 			}
 			ctx.SendChain(message.Record("base64://" + strings.TrimPrefix(statusRes.Data.Data[1].(string), "data:audio/wav;base64,")))
