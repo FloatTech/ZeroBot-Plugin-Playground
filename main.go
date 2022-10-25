@@ -28,6 +28,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/playwright"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/qqci"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/qqclean"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/qzone"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/recall" // SGK2401
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/tgyj"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/vote"
