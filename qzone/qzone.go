@@ -7,22 +7,15 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/FloatTech/floatbox/binary"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
-	"github.com/mcoo/OPQBot"
-	"github.com/mcoo/OPQBot/qzone"
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
-)
-
-var (
-	m qzone.Manager
 )
 
 func init() { // 插件主体
@@ -35,6 +28,12 @@ func init() { // 插件主体
 	})
 	engine.OnFullMatch("登录qq空间", zero.SuperUserPermission, zero.OnlyPrivate).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
+			var (
+				uin     string
+				skey    string
+				pskey   string
+				cookies string
+			)
 			for i := 0; i < attempts; i++ {
 				gCurCookieJar, _ := cookiejar.New(nil)
 				client := &http.Client{
@@ -85,6 +84,9 @@ func init() { // 插件主体
 						continue
 					}
 					defer checkResp.Body.Close()
+					for _, v := range checkResp.Cookies() {
+						cookies += v.Name + "=" + v.Value + ";"
+					}
 					checkData, err := io.ReadAll(checkResp.Body)
 					if err != nil {
 						logrus.Errorln("ERROR: ", err)
@@ -109,7 +111,7 @@ func init() { // 插件主体
 							break LOOP
 						}
 						ptsigx := values["ptsigx"][0]
-						uin := values["uin"][0]
+						uin = values["uin"][0]
 						redirectReq, err := http.NewRequest("GET", fmt.Sprintf(checkSigURL, uin, ptsigx), nil)
 						if err != nil {
 							logrus.Errorln("ERROR: ", err)
@@ -121,30 +123,16 @@ func init() { // 插件主体
 							break LOOP
 						}
 						defer redirectResp.Body.Close()
-						oc := OPQBot.Cookie{}
-						finalCookie := redirectResp.Header.Values("Set-Cookie")
-						oc.Cookies = strings.Join(finalCookie, ";")
-						for _, v := range finalCookie {
-							for _, c := range strings.Split(v, ";") {
-								l, b, f := strings.Cut(c, "=")
-								if !f {
-									logrus.Errorln("ERROR: cut ", c)
-									continue
-								}
-								if l == "skey" && oc.Skey == "" {
-									oc.Skey = b
-								}
-								if l == "p_skey" && oc.PSkey.Qzone == "" {
-									oc.PSkey.Qzone = b
-								}
+						for _, v := range redirectResp.Cookies() {
+							if v.Name == "skey" && skey == "" {
+								skey = v.Value
 							}
+							if v.Name == "p_skey" && pskey == "" {
+								pskey = v.Value
+							}
+							cookies += v.Name + "=" + v.Value + ";"
 						}
-						qq, err := strconv.Atoi(uin)
-						if err != nil {
-							logrus.Errorln("ERROR: ", err)
-							break LOOP
-						}
-						m = qzone.NewQzoneManager(int64(qq), oc)
+						m = newManager(uin, skey, pskey, cookies)
 						fmt.Printf("m:%#v\n", m)
 						ctx.SendChain(message.Text("登录成功"))
 						return

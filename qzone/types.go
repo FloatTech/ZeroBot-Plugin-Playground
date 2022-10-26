@@ -3,6 +3,13 @@ package qzone
 import (
 	"fmt"
 	"strconv"
+
+	"github.com/mcoo/OPQBot"
+	"github.com/mcoo/OPQBot/qzone"
+)
+
+var (
+	m qzone.Manager
 )
 
 const (
@@ -22,4 +29,13 @@ func getPtqrtoken(sKey string) string {
 		hash += (hash << 5) + us
 	}
 	return fmt.Sprintf("%d", hash&0x7fffffff)
+}
+
+func newManager(uin, skey, pskey, cookies string) qzone.Manager {
+	var oc OPQBot.Cookie
+	qq, _ := strconv.Atoi(uin)
+	oc.Skey = skey
+	oc.PSkey.Qzone = pskey
+	oc.Cookies = cookies
+	return qzone.NewQzoneManager(int64(qq), oc)
 }
