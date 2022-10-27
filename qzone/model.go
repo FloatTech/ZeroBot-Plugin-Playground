@@ -28,14 +28,14 @@ func initialize(dbpath string) *qzonedb {
 	if err != nil {
 		panic(err)
 	}
-	qdb.AutoMigrate(&qzoneConfig{})
+	qdb.AutoMigrate(&qzoneConfig{}).AutoMigrate(&emotion{})
 	return (*qzonedb)(qdb)
 }
 
 // qzoneConfig qq空间初始化信息
 type qzoneConfig struct {
 	ID      uint   `gorm:"primary_key;AUTO_INCREMENT"`
-	Uin     int64  `gorm:"column:uin;unique;not null"`
+	QQ      int64  `gorm:"column:qq;unique;not null"`
 	Skey    string `gorm:"column:skey"`
 	Pskey   string `gorm:"column:pskey"`
 	Cookies string `gorm:"column:cookies;type:varchar(1024)"`
@@ -46,17 +46,16 @@ func (qzoneConfig) TableName() string {
 	return "qzone_config"
 }
 
-// sleep 更新睡眠时间
-func (qdb *qzonedb) insertOrUpdate(uin int64, skey, pskey, cookies string) (err error) {
+func (qdb *qzonedb) insertOrUpdate(qq int64, skey, pskey, cookies string) (err error) {
 	db := (*gorm.DB)(qdb)
 	qc := qzoneConfig{
-		Uin:     uin,
+		QQ:      qq,
 		Skey:    skey,
 		Pskey:   pskey,
 		Cookies: cookies,
 	}
 	var oqc qzoneConfig
-	err = db.Take(&oqc, "uin = ?", qc.Uin).Error
+	err = db.Take(&oqc, "qq = ?", qc.QQ).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			err = db.Create(&qc).Error
@@ -67,9 +66,51 @@ func (qdb *qzonedb) insertOrUpdate(uin int64, skey, pskey, cookies string) (err 
 	return
 }
 
-// getUp 更新起床时间
-func (qdb *qzonedb) getByUin(uin int64) (qc qzoneConfig, err error) {
+func (qdb *qzonedb) getByUin(qq int64) (qc qzoneConfig, err error) {
 	db := (*gorm.DB)(qdb)
-	err = db.Take(&qc, "uin = ?", uin).Error
+	err = db.Take(&qc, "qq = ?", qq).Error
+	return
+}
+
+// emotion 说说信息
+type emotion struct {
+	gorm.Model
+	QQ     int64  `gorm:"column:qq"`
+	Msg    string `gorm:"column:msg"`
+	Status int    `gorm:"column:status"` // 1-审核中,2-同意,3-拒绝
+	Tag    string `gorm:"column:tag"`
+}
+
+// TableName 表名
+func (emotion) TableName() string {
+	return "emotion"
+}
+
+func (qdb *qzonedb) saveEmotion(e emotion) (id int64, err error) {
+	db := (*gorm.DB)(qdb)
+	err = db.Create(&e).Error
+	id = int64(e.ID)
+	return
+}
+
+func (qdb *qzonedb) getEmotionByID(id int64) (e emotion, err error) {
+	db := (*gorm.DB)(qdb)
+	err = db.Take(&e, "id = ?", id).Error
+	return
+}
+
+func (qdb *qzonedb) getEmotionByStatus(status int) (el []emotion, err error) {
+	db := (*gorm.DB)(qdb)
+	if status == 0 {
+		err = db.Find(&el).Error
+		return
+	}
+	err = db.Find(&el, "status = ?", status).Error
+	return
+}
+
+func (qdb *qzonedb) updateEmotionStatusByID(id int64, status int) (err error) {
+	db := (*gorm.DB)(qdb)
+	err = db.Model(&emotion{}).Where("id = ?", id).Update("status", status).Error
 	return
 }
