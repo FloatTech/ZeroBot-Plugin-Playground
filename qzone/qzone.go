@@ -258,7 +258,7 @@ func init() { // 插件主体
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
-			t := "所有" + regexMatched[1] + "说说\n\n发送\"查看说说[序号]\"可查看详情, 例:查看说说1\n\n"
+			t := "所有" + regexMatched[1] + "说说\n可发送\"查看说说[序号]\"查看详情\n"
 			for _, v := range el {
 				t += fmt.Sprintf("%v. %v: %v\n\n", v.ID, ctx.CardOrNickName(v.QQ), simpleMsg(v.Msg))
 			}
@@ -295,14 +295,6 @@ func publishEmotion(qq int64, text string, base64imgs []string) (err error) {
 	if err != nil {
 		return
 	}
-	// for i := 0; i <= refreshTimes && err != nil; i++ {
-	// 	time.Sleep(200 * time.Millisecond)
-	// 	if i == refreshTimes {
-	// 		err = errors.New("多次获取qzonetoken失败")
-	// 		return
-	// 	}
-	// 	err = m.RefreshToken()
-	// }
 	_, err = m.SendShuoShuoWithBase64Pic(text, base64imgs)
 	return
 }
