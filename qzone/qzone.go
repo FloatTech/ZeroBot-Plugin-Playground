@@ -18,6 +18,7 @@ import (
 	"github.com/FloatTech/zbputils/control"
 	"github.com/FloatTech/zbputils/ctxext"
 	"github.com/FloatTech/zbputils/img/text"
+	"github.com/guohuiyuan/qzone"
 	"github.com/jinzhu/gorm"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
@@ -28,7 +29,7 @@ func init() { // 插件主体
 		DisableOnDefault: false,
 		Help: "QQ空间表白墙\n" +
 			"- 登录QQ空间\n" +
-			"- 发表白墙 xxx\n" +
+			"- 发表白墙[xxx]\n" +
 			"- [同意|拒绝]说说 [说说ID]\n" +
 			"- 查看[等待|同意|拒绝]说说\n" +
 			"- 查看说说 [说说ID]",
@@ -41,8 +42,6 @@ func init() { // 插件主体
 		Handle(func(ctx *zero.Ctx) {
 			var (
 				uin     string
-				skey    string
-				pskey   string
 				cookies string
 			)
 
@@ -96,11 +95,6 @@ func init() { // 插件主体
 					return
 				}
 				defer checkResp.Body.Close()
-				// for _, v := range checkResp.Cookies() {
-				// 	if v.Value != "" {
-				// 		cookies += v.Name + "=" + v.Value + ";"
-				// 	}
-				// }
 				checkData, err := io.ReadAll(checkResp.Body)
 				if err != nil {
 					ctx.SendChain(message.Text("ERROR: ", err))
@@ -138,12 +132,6 @@ func init() { // 插件主体
 					}
 					defer redirectResp.Body.Close()
 					for _, v := range redirectResp.Cookies() {
-						if v.Name == "skey" && skey == "" {
-							skey = v.Value
-						}
-						if v.Name == "p_skey" && pskey == "" {
-							pskey = v.Value
-						}
 						if v.Value != "" {
 							cookies += v.Name + "=" + v.Value + ";"
 						}
@@ -153,7 +141,7 @@ func init() { // 插件主体
 						ctx.SendChain(message.Text("ERROR: ", err))
 						return
 					}
-					err = qdb.insertOrUpdate(int64(qq), skey, pskey, cookies)
+					err = qdb.insertOrUpdate(int64(qq), cookies)
 					if err != nil {
 						ctx.SendChain(message.Text("ERROR: ", err))
 						return
@@ -290,11 +278,8 @@ func publishEmotion(qq int64, text string, base64imgs []string) (err error) {
 	if err != nil {
 		return
 	}
-	m := newManager(qc.QQ, qc.Skey, qc.Pskey, qc.Cookies)
-	err = m.RefreshToken()
-	if err != nil {
-		return
-	}
+	m := qzone.NewManager(qc.Cookie)
+	_ = m.RefreshToken()
 	_, err = m.SendShuoShuoWithBase64Pic(text, base64imgs)
 	return
 }

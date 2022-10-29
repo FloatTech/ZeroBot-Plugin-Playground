@@ -34,11 +34,9 @@ func initialize(dbpath string) *qzonedb {
 
 // qzoneConfig qq空间初始化信息
 type qzoneConfig struct {
-	ID      uint   `gorm:"primary_key;AUTO_INCREMENT"`
-	QQ      int64  `gorm:"column:qq;unique;not null"`
-	Skey    string `gorm:"column:skey"`
-	Pskey   string `gorm:"column:pskey"`
-	Cookies string `gorm:"column:cookies;type:varchar(1024)"`
+	ID     uint   `gorm:"primary_key;AUTO_INCREMENT"`
+	QQ     int64  `gorm:"column:qq;unique;not null"`
+	Cookie string `gorm:"column:cookie;type:varchar(1024)"`
 }
 
 // TableName 表名
@@ -46,13 +44,11 @@ func (qzoneConfig) TableName() string {
 	return "qzone_config"
 }
 
-func (qdb *qzonedb) insertOrUpdate(qq int64, skey, pskey, cookies string) (err error) {
+func (qdb *qzonedb) insertOrUpdate(qq int64, cookie string) (err error) {
 	db := (*gorm.DB)(qdb)
 	qc := qzoneConfig{
-		QQ:      qq,
-		Skey:    skey,
-		Pskey:   pskey,
-		Cookies: cookies,
+		QQ:     qq,
+		Cookie: cookie,
 	}
 	var oqc qzoneConfig
 	err = db.Take(&oqc, "qq = ?", qc.QQ).Error
