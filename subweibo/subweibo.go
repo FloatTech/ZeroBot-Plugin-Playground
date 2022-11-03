@@ -2,17 +2,18 @@ package subweibo
 
 import (
 	"fmt"
+	"io"
+	"net/http"
+	"regexp"
+	"strings"
+	"time"
+
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
 	"github.com/patrickmn/go-cache"
 	"github.com/tidwall/gjson"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
-	"io"
-	"net/http"
-	"regexp"
-	"strings"
-	"time"
 )
 
 type channelItem struct {
@@ -34,19 +35,19 @@ var (
 )
 
 func (w *wbFunc) TrimHtml(src string) string {
-	//将HTML标签全转换成小写
+	// 将HTML标签全转换成小写
 	re, _ := regexp.Compile("<[\\S\\s]+?>")
 	src = re.ReplaceAllStringFunc(src, strings.ToLower)
-	//去除STYLE
+	// 去除STYLE
 	re, _ = regexp.Compile("<style[\\S\\s]+?</style>")
 	src = re.ReplaceAllString(src, "")
-	//去除SCRIPT
+	// 去除SCRIPT
 	re, _ = regexp.Compile("<script[\\S\\s]+?</script>")
 	src = re.ReplaceAllString(src, "")
-	//去除所有尖括号内的HTML代码，并换成换行符
+	// 去除所有尖括号内的HTML代码，并换成换行符
 	re, _ = regexp.Compile("<[\\S\\s]+?>")
 	src = re.ReplaceAllString(src, "\n")
-	//去除连续的换行符
+	// 去除连续的换行符
 	re, _ = regexp.Compile("\\s{2,}")
 	src = re.ReplaceAllString(src, "\n")
 	return strings.TrimSpace(src)
@@ -69,7 +70,6 @@ func (w *wbFunc) getRequest(url string) string {
 }
 
 func (w *wbFunc) getWeiboMessageBox(url string) (string, string, []gjson.Result, string, string, string) {
-
 	cont := w.getRequest(url)
 	cards := gjson.Get(cont, "data.cards").Array()
 	for _, card := range cards {
@@ -187,7 +187,6 @@ func (w *wbFunc) running(ctx *zero.Ctx) {
 			}
 		}
 	}
-
 }
 func (w *wbFunc) stop(ctx *zero.Ctx) {
 	if messageSwitch == true {
@@ -221,7 +220,6 @@ func (w *wbFunc) selectAllSubChannelsInfo(ctx *zero.Ctx) {
 			message.Text("当前还为订阅任何内容哦～"),
 		})
 	}
-
 }
 
 func init() {
