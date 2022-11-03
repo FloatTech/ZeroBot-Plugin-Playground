@@ -234,20 +234,20 @@ func init() {
 			"- 退订微博 [UID] 停止订阅xxx的微博消息\n" +
 			"- 查看订阅 查看当前所有订阅",
 	})
-	engine.OnFullMatch("开启订阅").SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnFullMatch("开启订阅", zero.AdminPermission, zero.OnlyGroup).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		go wb.running(ctx)
 	})
-	engine.OnFullMatch("关闭订阅").SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnFullMatch("关闭订阅", zero.AdminPermission, zero.OnlyGroup).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		wb.stop(ctx)
 	})
-	engine.OnFullMatch("查看订阅").SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnFullMatch("查看订阅", zero.AdminPermission, zero.OnlyGroup).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		wb.selectAllSubChannelsInfo(ctx)
 	})
-	engine.OnPrefix("订阅微博").SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnPrefix("订阅微博", zero.AdminPermission, zero.OnlyGroup).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		args := ctx.State["args"].(string)
 		wb.getChannels(args, ctx)
 	})
-	engine.OnPrefix("退订微博").SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnPrefix("退订微博", zero.AdminPermission, zero.OnlyGroup).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		arg := ctx.State["args"].(string)
 		wb.delChannels(arg, ctx)
 	})
