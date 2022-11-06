@@ -237,8 +237,9 @@ func init() {
 	engine.OnRegex(`^查看(.{0,2})表白墙\s?(\d*)$`, zero.SuperUserPermission).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			var (
-				pageNum int
-				err     error
+				pageNum   int
+				err       error
+				base64Str []byte
 			)
 			regexMatched := ctx.State["regex_matched"].([]string)
 			if regexMatched[2] == "" {
@@ -274,14 +275,21 @@ func init() {
 			}
 			m := message.Message{}
 			for _, v := range el {
-				m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Text(v.textBrief(), "\n呢称: ", ctx.CardOrNickName(v.QQ))))
-				base64Str, err := renderForwardMsg(v.QQ, v.Msg)
+				t := v.textBrief() + "\n呢称: " + ctx.CardOrNickName(v.QQ)
+				base64Str, err = text.RenderToBase64(t, text.FontFile, 400, 20)
+				if err != nil {
+					ctx.SendChain(message.Text("ERROR: ", err))
+					return
+				}
+				m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Image("base64://"+binary.BytesToString(base64Str))))
+				base64Str, err = renderForwardMsg(v.QQ, v.Msg)
 				if err != nil {
 					ctx.SendChain(message.Text("ERROR: ", err))
 					return
 				}
 				m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Image("base64://"+binary.BytesToString(base64Str))))
 			}
+			time.Sleep(time.Second)
 			if id := ctx.Send(m).ID(); id == 0 {
 				ctx.SendChain(message.Text("ERROR: 可能被风控或下载图片用时过长，请耐心等待"))
 			}
