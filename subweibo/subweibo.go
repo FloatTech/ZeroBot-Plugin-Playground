@@ -69,8 +69,6 @@ func (w *wbFunc) getRequest(url string) (result []byte, err error) {
 	return result, nil
 }
 
-
-
 type WeiboContentResponse struct {
 	profileId string
 	msgText   string
