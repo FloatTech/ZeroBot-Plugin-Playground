@@ -97,6 +97,7 @@ func (w *wbFunc) getWeiboMessageBox(url string) (WeiboContentResponse, error) {
 			weiboContentData.scheme = gjson.Get(card.String(), "scheme").String()
 			weiboContentData.username = gjson.Get(card.String(), "mblog.user.screen_name").String()
 			weiboContentData.createdAt, err = time.Parse(time.RubyDate, gjson.Get(card.String(), "mblog.created_at").String())
+			break
 		}
 	}
 	return weiboContentData, nil
