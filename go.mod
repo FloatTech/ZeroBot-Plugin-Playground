@@ -14,6 +14,7 @@ require (
 	github.com/guohuiyuan/go-fyzhq v0.0.0-20220807135412-25c16c843e5a
 	github.com/guohuiyuan/qzone v1.0.0
 	github.com/jinzhu/gorm v1.9.16
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/playwright-community/playwright-go v0.2000.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/tidwall/gjson v1.14.3
