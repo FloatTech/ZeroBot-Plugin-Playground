@@ -1,6 +1,7 @@
 package qzone
 
 import (
+	"fmt"
 	"os"
 
 	_ "github.com/fumiama/sqlite3" // use sql
@@ -71,10 +72,29 @@ func (qdb *qzonedb) getByUin(qq int64) (qc qzoneConfig, err error) {
 // emotion 说说信息
 type emotion struct {
 	gorm.Model
-	QQ     int64  `gorm:"column:qq"`
-	Msg    string `gorm:"column:msg"`
-	Status int    `gorm:"column:status"` // 1-审核中,2-同意,3-拒绝
-	Tag    string `gorm:"column:tag"`
+	Anonymous bool   `gorm:"column:anonymous"`
+	QQ        int64  `gorm:"column:qq"`
+	Msg       string `gorm:"column:msg"`
+	Status    int    `gorm:"column:status"` // 1-审核中,2-同意,3-拒绝
+	Tag       string `gorm:"column:tag"`
+}
+
+func (e emotion) textBrief() (t string) {
+	t = fmt.Sprintf("序号: %v\nQQ: %v\n创建时间: %v\n", e.ID, e.QQ, e.CreatedAt.Format("2006-01-02 15:04:05"))
+	switch e.Status {
+	case 1:
+		t += "状态: 审核中\n"
+	case 2:
+		t += "状态: 同意\n"
+	case 3:
+		t += "状态: 拒绝\n"
+	}
+	if e.Anonymous {
+		t += "匿名: 是"
+	} else {
+		t += "匿名: 否"
+	}
+	return
 }
 
 // TableName 表名
@@ -89,24 +109,24 @@ func (qdb *qzonedb) saveEmotion(e emotion) (id int64, err error) {
 	return
 }
 
-func (qdb *qzonedb) getEmotionByID(id int64) (e emotion, err error) {
+func (qdb *qzonedb) getEmotionByIDList(idList []int64) (el []emotion, err error) {
 	db := (*gorm.DB)(qdb)
-	err = db.Take(&e, "id = ?", id).Error
+	err = db.Find(&el, "id in (?)", idList).Error
 	return
 }
 
-func (qdb *qzonedb) getEmotionByStatus(status int) (el []emotion, err error) {
+func (qdb *qzonedb) getLoveEmotionByStatus(status int, pageNum int) (el []emotion, err error) {
 	db := (*gorm.DB)(qdb)
 	if status == 0 {
-		err = db.Find(&el).Error
+		err = db.Order("created_at desc").Limit(5).Offset(pageNum*5).Find(&el, "tag like ?", "%"+loveTag+"%").Error
 		return
 	}
-	err = db.Find(&el, "status = ?", status).Error
+	err = db.Order("created_at desc").Limit(5).Offset(pageNum*5).Find(&el, "status = ? and tag like ?", status, "%"+loveTag+"%").Error
 	return
 }
 
-func (qdb *qzonedb) updateEmotionStatusByID(id int64, status int) (err error) {
+func (qdb *qzonedb) updateEmotionStatusByIDList(idList []int64, status int) (err error) {
 	db := (*gorm.DB)(qdb)
-	err = db.Model(&emotion{}).Where("id = ?", id).Update("status", status).Error
+	err = db.Model(&emotion{}).Where("id in (?)", idList).Update("status", status).Error
 	return
 }
