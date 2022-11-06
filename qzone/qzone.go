@@ -198,7 +198,7 @@ func init() {
 			}
 			ctx.SendChain(message.Text("已收稿, 请耐心等待审核"))
 		})
-	engine.OnRegex(`^(同意|拒绝)表白墙\s?((?:\d+,){0,4}\d+)$`, zero.SuperUserPermission).SetBlock(true).
+	engine.OnRegex(`^(同意|拒绝)表白墙\s?((?:\d+,){0,8}\d+)$`, zero.SuperUserPermission).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			var err error
 			var ti int64
@@ -224,21 +224,22 @@ func init() {
 					ctx.SendChain(message.Text("ERROR: ", err))
 					return
 				}
-				ctx.SendChain(message.Text("同意说说", regexMatched[2], ", 发表成功"))
+				ctx.SendChain(message.Text("同意表白墙", regexMatched[2], ", 发表成功"))
 			case "拒绝":
 				err = qdb.updateEmotionStatusByIDList(idList, disagreeStatus)
 				if err != nil {
 					ctx.SendChain(message.Text("ERROR: ", err))
 					return
 				}
-				ctx.SendChain(message.Text("拒绝说说", regexMatched[2]))
+				ctx.SendChain(message.Text("拒绝表白墙", regexMatched[2]))
 			}
 		})
 	engine.OnRegex(`^查看(.{0,2})表白墙\s?(\d*)$`, zero.SuperUserPermission).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			var (
-				pageNum int
-				err     error
+				pageNum   int
+				err       error
+				base64Str []byte
 			)
 			regexMatched := ctx.State["regex_matched"].([]string)
 			if regexMatched[2] == "" {
@@ -274,14 +275,21 @@ func init() {
 			}
 			m := message.Message{}
 			for _, v := range el {
-				m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Text(v.textBrief(), "\n呢称: ", ctx.CardOrNickName(v.QQ))))
-				base64Str, err := renderForwardMsg(v.QQ, v.Msg)
+				t := v.textBrief() + "\n呢称: " + ctx.CardOrNickName(v.QQ)
+				base64Str, err = text.RenderToBase64(t, text.FontFile, 400, 20)
+				if err != nil {
+					ctx.SendChain(message.Text("ERROR: ", err))
+					return
+				}
+				m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Image("base64://"+binary.BytesToString(base64Str))))
+				base64Str, err = renderForwardMsg(v.QQ, v.Msg)
 				if err != nil {
 					ctx.SendChain(message.Text("ERROR: ", err))
 					return
 				}
 				m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Image("base64://"+binary.BytesToString(base64Str))))
 			}
+			time.Sleep(time.Second)
 			if id := ctx.Send(m).ID(); id == 0 {
 				ctx.SendChain(message.Text("ERROR: 可能被风控或下载图片用时过长，请耐心等待"))
 			}
