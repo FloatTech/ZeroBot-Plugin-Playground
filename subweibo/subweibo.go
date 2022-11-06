@@ -52,11 +52,11 @@ func (w *wbFunc) TrimHtml(src string) string {
 	return strings.TrimSpace(src)
 }
 
-func (w *wbFunc) getRequest(url string) string {
+func (w *wbFunc) getRequest(url string) (result []byte, err error) {
 	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Get(url)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
@@ -64,30 +64,44 @@ func (w *wbFunc) getRequest(url string) string {
 			panic(err)
 		}
 	}(resp.Body)
-	result, _ := io.ReadAll(resp.Body)
-	return string(result)
+	result, _ = io.ReadAll(resp.Body)
+	return result, nil
 }
 
-func (w *wbFunc) getWeiboMessageBox(url string) (string, string, []gjson.Result, string, string, string) {
+/*
+ */
 
-	cont := w.getRequest(url)
-	cards := gjson.Get(cont, "data.cards").Array()
+type WeiboContentResponse struct {
+	profileId string
+	msgText   string
+	msgPic    []gjson.Result
+	scheme    string
+	username  string
+	createdAt time.Time
+}
+
+func (w *wbFunc) getWeiboMessageBox(url string) (WeiboContentResponse, error) {
+	var weiboContentData WeiboContentResponse
+	cont, err := w.getRequest(url)
+	if err != nil {
+		return weiboContentData, err
+	}
+	cards := gjson.Get(string(cont), "data.cards").Array()
 	for _, card := range cards {
 		// 排除置顶微博
 		isTop := gjson.Get(card.String(), "mblog.title").String()
 		if isTop != "" {
 			continue
 		} else {
-			profileId := gjson.Get(card.String(), "profile_type_id").String()
-			msgText := gjson.Get(card.String(), "mblog.text").String()
-			msgPic := gjson.Get(card.String(), "mblog.pics.#.large.url").Array()
-			scheme := gjson.Get(card.String(), "scheme").String()
-			username := gjson.Get(card.String(), "mblog.user.screen_name").String()
-			createdAt, _ := time.Parse(time.RubyDate, gjson.Get(card.String(), "mblog.created_at").String())
-			return profileId, msgText, msgPic, scheme, username, createdAt.String()
+			weiboContentData.profileId = gjson.Get(card.String(), "profile_type_id").String()
+			weiboContentData.msgText = gjson.Get(card.String(), "mblog.text").String()
+			weiboContentData.msgPic = gjson.Get(card.String(), "mblog.pics.#.large.url").Array()
+			weiboContentData.scheme = gjson.Get(card.String(), "scheme").String()
+			weiboContentData.username = gjson.Get(card.String(), "mblog.user.screen_name").String()
+			weiboContentData.createdAt, err = time.Parse(time.RubyDate, gjson.Get(card.String(), "mblog.created_at").String())
 		}
 	}
-	return "", "", nil, "", "", ""
+	return weiboContentData, nil
 }
 
 func (w *wbFunc) getImageByUrl(url string) []byte {
@@ -104,15 +118,23 @@ func (w *wbFunc) getImageByUrl(url string) []byte {
 	return body
 }
 
-func (w *wbFunc) getWeiboLink(url string) string {
-	conn := w.getRequest(url)
-	value := gjson.Get(conn, "data.userInfo.screen_name")
-	return value.String()
+func (w *wbFunc) getWeiboLink(url string) (str string, err error) {
+	conn, err := w.getRequest(url)
+	if err != nil {
+		return "", err
+	}
+	value := gjson.Get(string(conn), "data.userInfo.screen_name")
+	return value.String(), nil
 }
 func (w *wbFunc) getChannels(arg string, ctx *zero.Ctx) {
 	value, ok := cacheMap.Get(arg)
 	if value == false || !ok {
-		weiboName := wb.getWeiboLink(testApi + arg)
+		weiboName, err := wb.getWeiboLink(testApi + arg)
+		if err != nil {
+			ctx.Send(message.Message{
+				message.Text("geiWeiboLink:", err),
+			})
+		}
 		if weiboName != "" {
 			ctx.Send(message.Message{
 				message.Text("已经成功订阅:  " + weiboName + ",uid:(" + arg + ")"),
@@ -167,16 +189,30 @@ func (w *wbFunc) running(ctx *zero.Ctx) {
 			case <-ticker.C:
 				for _, item := range channelItemData {
 					cUrl := item.ContUri
-					pId, mText, mPic, scheme, username, creatAt := w.getWeiboMessageBox(cUrl)
-					_, ok := cacheMap.Get(pId)
-					if ok == false {
-						cacheMap.Set(pId, true, cache.NoExpiration)
+					var weiboMsgBoxData WeiboContentResponse
+					weiboMsgBoxData, err := w.getWeiboMessageBox(cUrl)
+					if err != nil {
 						ctx.Send(message.Message{
-							message.Text(creatAt + "\n" + username + "发布了微博:\n" + w.TrimHtml(mText) + "\n\nURL:" + scheme),
+							message.Text("geiWeiboMessageBox", err),
 						})
-						for _, picUrl := range mPic {
+						continue
+					}
+					_, ok := cacheMap.Get(weiboMsgBoxData.profileId)
+					if ok == false {
+						cacheMap.Set(weiboMsgBoxData.profileId, true, cache.NoExpiration)
+						ctx.Send(message.Message{
+							message.Text(weiboMsgBoxData.createdAt.String() + "\n" + weiboMsgBoxData.username + "发布了微博:\n" + w.TrimHtml(weiboMsgBoxData.msgText) + "\n\nURL:" + weiboMsgBoxData.scheme),
+						})
+						for _, picUrl := range weiboMsgBoxData.msgPic {
+							picData, err := w.getRequest(picUrl.String())
+							if err != nil {
+								ctx.Send(message.Message{
+									message.Text("picUrl", err),
+								})
+								continue
+							}
 							ctx.Send(message.Message{
-								message.ImageBytes(w.getImageByUrl(picUrl.String())),
+								message.ImageBytes(picData),
 							})
 						}
 					}
@@ -235,7 +271,7 @@ func init() {
 			"- 查看订阅 查看当前所有订阅",
 	})
 	engine.OnFullMatch("开启订阅", zero.AdminPermission, zero.OnlyGroup).SetBlock(true).Handle(func(ctx *zero.Ctx) {
-		go wb.running(ctx)
+		wb.running(ctx)
 	})
 	engine.OnFullMatch("关闭订阅", zero.AdminPermission, zero.OnlyGroup).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		wb.stop(ctx)
