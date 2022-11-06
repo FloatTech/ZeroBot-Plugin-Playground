@@ -198,7 +198,7 @@ func init() {
 			}
 			ctx.SendChain(message.Text("已收稿, 请耐心等待审核"))
 		})
-	engine.OnRegex(`^(同意|拒绝)表白墙\s?((?:\d+,){0,4}\d+)$`, zero.SuperUserPermission).SetBlock(true).
+	engine.OnRegex(`^(同意|拒绝)表白墙\s?((?:\d+,){0,8}\d+)$`, zero.SuperUserPermission).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			var err error
 			var ti int64
@@ -224,14 +224,14 @@ func init() {
 					ctx.SendChain(message.Text("ERROR: ", err))
 					return
 				}
-				ctx.SendChain(message.Text("同意说说", regexMatched[2], ", 发表成功"))
+				ctx.SendChain(message.Text("同意表白墙", regexMatched[2], ", 发表成功"))
 			case "拒绝":
 				err = qdb.updateEmotionStatusByIDList(idList, disagreeStatus)
 				if err != nil {
 					ctx.SendChain(message.Text("ERROR: ", err))
 					return
 				}
-				ctx.SendChain(message.Text("拒绝说说", regexMatched[2]))
+				ctx.SendChain(message.Text("拒绝表白墙", regexMatched[2]))
 			}
 		})
 	engine.OnRegex(`^查看(.{0,2})表白墙\s?(\d*)$`, zero.SuperUserPermission).SetBlock(true).
