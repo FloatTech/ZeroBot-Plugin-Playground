@@ -180,6 +180,10 @@ func init() {
 	engine.OnRegex(`^(.{0,2})发表白墙.*?([\s\S]*)`).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			regexMatched := ctx.State["regex_matched"].([]string)
+			if strings.TrimSpace(regexMatched[2]) == "" {
+				ctx.SendChain(message.Text("请不要发送空内容"))
+				return
+			}
 			qq := ctx.Event.UserID
 			e := emotion{
 				QQ:        qq,
