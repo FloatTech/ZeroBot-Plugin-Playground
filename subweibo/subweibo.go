@@ -49,14 +49,14 @@ type WeiboWebData struct {
 	retweetedPic      []gjson.Result
 }
 
-type weiboDbData struct {
+type weiboDBData struct {
 	ID        int64     `db:"id"`
 	Scheme    string    `db:"scheme"`
 	Username  string    `db:"username"`
 	CreatedAt time.Time `db:"created_at"`
 }
 
-func (d *weiboDbData) throw(db *sql.Sqlite) error {
+func (d *weiboDBData) throw(db *sql.Sqlite) error {
 	weiboMsgLocker.Lock()
 	defer weiboMsgLocker.Unlock()
 	return db.Insert("weiboMsg", d)
@@ -96,8 +96,8 @@ func getWeiboMessageBox(url string) (WeiboWebData, error) {
 	return weiboWebData, nil
 }
 
-func dataBuild(id int64, scheme string, username string, createdAt time.Time) *weiboDbData {
-	return &weiboDbData{
+func dataBuild(id int64, scheme string, username string, createdAt time.Time) *weiboDBData {
+	return &weiboDBData{
 		ID:        id,
 		Scheme:    scheme,
 		Username:  username,
@@ -263,7 +263,7 @@ func init() {
 		if err != nil {
 			panic(err)
 		}
-		err = db.Create("weiboMsg", &weiboDbData{})
+		err = db.Create("weiboMsg", &weiboDBData{})
 		if err != nil {
 			panic(err)
 		}
@@ -307,19 +307,19 @@ func initChannel() {
 
 func TrimHtml(src string) string {
 	// 将HTML标签全转换成小写
-	re, _ := regexp.Compile(`<[\S\s]+?>`)
+	re := regexp.MustCompile(`<[\S\s]+?>`)
 	src = re.ReplaceAllStringFunc(src, strings.ToLower)
 	// 去除STYLE
-	re, _ = regexp.Compile(`<style[\S\s]+?</style>`)
+	re = regexp.MustCompile(`<style[\S\s]+?</style>`)
 	src = re.ReplaceAllString(src, "")
 	// 去除SCRIPT
-	re, _ = regexp.Compile(`<script[\S\s]+?</script>`)
+	re = regexp.MustCompile(`<script[\S\s]+?</script>`)
 	src = re.ReplaceAllString(src, "")
 	// 去除所有尖括号内的HTML代码，并换成换行符
-	re, _ = regexp.Compile(`<[\S\s]+?>`)
+	re = regexp.MustCompile(`<[\S\s]+?>`)
 	src = re.ReplaceAllString(src, "\n")
 	// 去除连续的换行符
-	re, _ = regexp.Compile(`\s{2,}`)
+	re = regexp.MustCompile(`\s{2,}`)
 	src = re.ReplaceAllString(src, "\n")
 	return strings.TrimSpace(src)
 }
