@@ -9,8 +9,8 @@ require (
 	github.com/FloatTech/zbpctrl v1.5.2-0.20220921013146-40d64bc7799c
 	github.com/FloatTech/zbputils v1.5.1-0.20221004094248-ad5a9235757e
 	github.com/fumiama/sqlite3 v1.14.6
+	github.com/go-resty/resty/v2 v2.7.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
-	github.com/gorilla/websocket v1.4.2
 	github.com/guohuiyuan/go-fyzhq v0.0.0-20220807135412-25c16c843e5a
 	github.com/guohuiyuan/qzone v1.0.0
 	github.com/jinzhu/gorm v1.9.16
@@ -46,6 +46,7 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
+	golang.org/x/net v0.0.0-20211029224645-99673261e6eb // indirect
 	golang.org/x/sys v0.0.0-20220915200043-7b5979e65e41 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
