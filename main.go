@@ -13,7 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/animegan"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/bottle"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/dailynews"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/deepdanbooru"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
@@ -27,7 +26,6 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/playwright"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/qqci"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/qqclean"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/qzone"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/recall" // SGK2401
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/subweibo"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/tgyj"
