@@ -312,7 +312,7 @@ func trimHTML(src string) string {
 	re = regexp.MustCompile(`<[\S\s]+?>`)
 	src = re.ReplaceAllString(src, "\n")
 	// 去除连续的换行符
-	re = regexp.MustCompile(`\s{2, }`)
+	re = regexp.MustCompile(`\s{2,}`)
 	src = re.ReplaceAllString(src, "\n")
 	return strings.TrimSpace(src)
 }
