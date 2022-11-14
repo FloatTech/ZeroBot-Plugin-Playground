@@ -4,6 +4,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"math/rand"
 	"os"
 	"strconv"
@@ -46,6 +47,10 @@ var config zbpcfg
 
 func init() {
 	sus := make([]int64, 0, 16)
+	// 解析命令行参数
+	d := flag.Bool("d", false, "Enable debug level log and higher.")
+	w := flag.Bool("w", false, "Enable warning level log and higher.")
+	h := flag.Bool("h", false, "Display this help.")
 	// 直接写死 AccessToken 时，请更改下面第二个参数
 	token := flag.String("t", "", "Set AccessToken of WSClient.")
 	// 直接写死 URL 时，请更改下面第二个参数
@@ -54,8 +59,25 @@ func init() {
 	adana := flag.String("n", "椛椛", "Set default nickname.")
 	prefix := flag.String("p", "/", "Set command prefix.")
 	runcfg := flag.String("c", "", "Run from config file.")
+	save := flag.String("s", "", "Save default config to file and exit.")
+	late := flag.Uint("l", 233, "Response latency (ms).")
+	rsz := flag.Uint("r", 4096, "Receiving buffer ring size.")
+	maxpt := flag.Uint("x", 4, "Max process time (min).")
 
 	flag.Parse()
+
+	if *h {
+		fmt.Println("Usage:")
+		flag.PrintDefaults()
+		os.Exit(0)
+	} else {
+		if *d && !*w {
+			logrus.SetLevel(logrus.DebugLevel)
+		}
+		if *w {
+			logrus.SetLevel(logrus.WarnLevel)
+		}
+	}
 
 	for _, s := range flag.Args() {
 		i, err := strconv.ParseInt(s, 10, 64)
@@ -64,7 +86,11 @@ func init() {
 		}
 		sus = append(sus, i)
 	}
-	// sus = append(sus, 123456)
+
+	// 通过代码写死的方式添加主人账号
+	// sus = append(sus, 12345678)
+	// sus = append(sus, 87654321)
+
 	if *runcfg != "" {
 		f, err := os.Open(*runcfg)
 		if err != nil {
@@ -86,10 +112,27 @@ func init() {
 
 	config.W = []*driver.WSClient{driver.NewWebSocketClient(*url, *token)}
 	config.Z = zero.Config{
-		NickName:      append([]string{*adana}, "ATRI", "atri", "亚托莉", "アトリ"),
-		CommandPrefix: *prefix,
-		SuperUsers:    sus,
-		Driver:        []zero.Driver{config.W[0]},
+		NickName:       append([]string{*adana}, "ATRI", "atri", "亚托莉", "アトリ"),
+		CommandPrefix:  *prefix,
+		SuperUsers:     sus,
+		RingLen:        *rsz,
+		Latency:        time.Duration(*late) * time.Millisecond,
+		MaxProcessTime: time.Duration(*maxpt) * time.Minute,
+		Driver:         []zero.Driver{config.W[0]},
+	}
+
+	if *save != "" {
+		f, err := os.Create(*save)
+		if err != nil {
+			panic(err)
+		}
+		err = json.NewEncoder(f).Encode(&config)
+		f.Close()
+		if err != nil {
+			panic(err)
+		}
+		logrus.Infoln("[main] 配置文件已保存到", *save)
+		os.Exit(0)
 	}
 }
 func main() {
@@ -100,5 +143,5 @@ func main() {
 			ctx.Send("world")
 		})
 
-	zero.RunAndBlock(config.Z, process.GlobalInitMutex.Unlock)
+	zero.RunAndBlock(&config.Z, process.GlobalInitMutex.Unlock)
 }
