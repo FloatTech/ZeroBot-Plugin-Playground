@@ -2,7 +2,6 @@ package partygame
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"sync"
@@ -56,7 +55,7 @@ func saveItem(dataPath string, info Session) {
 		panic(err)
 	}
 	// 将数据data写入文件filePath中，并且修改文件权限为755
-	if err = ioutil.WriteFile(dataPath, bytes, 0644); err != nil {
+	if err = os.WriteFile(dataPath, bytes, 0644); err != nil {
 		panic(err)
 	}
 }
@@ -66,7 +65,7 @@ func loadSessions(dataPath string) []Session {
 	rlmu.RLock()
 	defer rlmu.RUnlock()
 	ss := make([]Session, 0)
-	data, err := ioutil.ReadFile(dataPath)
+	data, err := os.ReadFile(dataPath)
 	if err != nil {
 		return ss
 	}
@@ -129,7 +128,7 @@ func (cls Session) close() {
 		panic(err)
 	}
 	// 将数据data写入文件filePath中，并且修改文件权限为755
-	if err = ioutil.WriteFile(dataPath, bytes, 0644); err != nil {
+	if err = os.WriteFile(dataPath, bytes, 0644); err != nil {
 		panic(err)
 	}
 }

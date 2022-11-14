@@ -1,3 +1,4 @@
+// Package subweibo 微博订阅
 package subweibo
 
 import (
@@ -21,29 +22,29 @@ import (
 type channelItem struct {
 	ChannelKey  string `json:"channelKey"`
 	ChannelName string `json:"channelName"`
-	TestUrl     string `json:"testApi"`
-	ContUri     string `json:"contApi"`
+	TestURL     string `json:"testApi"`
+	ContURL     string `json:"contApi"`
 }
 
 var (
-	testApi         = "https://m.weibo.cn/api/container/getIndex?containerid=100505"
-	contApi         = "https://m.weibo.cn/api/container/getIndex?containerid=107603"
+	testAPI         = "https://m.weibo.cn/api/container/getIndex?containerid=100505"
+	contAPI         = "https://m.weibo.cn/api/container/getIndex?containerid=107603"
 	channelItemData []*channelItem
-	//  15天清除一次缓存清除订阅信息, flush cache 后会产生会重复发message
+	//  15天清除一次缓存清除订阅信息,  flush cache 后会产生会重复发message
 	cacheMap       = cache.New(5*time.Minute, 360*time.Hour)
 	messageSwitch  = false
 	db             = &sql.Sqlite{}
 	weiboMsgLocker sync.RWMutex
 )
 
-type WeiboWebData struct {
-	Id                int64
+type weiboWebData struct {
+	id                int64
 	msgText           string
 	msgPic            []gjson.Result
 	scheme            string
 	username          string
 	createdAt         time.Time
-	retweetedId       int64
+	retweetedID       int64
 	retweetedUserName string
 	retweetedText     string
 	retweetedPic      []gjson.Result
@@ -62,8 +63,8 @@ func (d *weiboDBData) throw(db *sql.Sqlite) error {
 	return db.Insert("weiboMsg", d)
 }
 
-func getWeiboMessageBox(url string) (WeiboWebData, error) {
-	var weiboWebData WeiboWebData
+func getWeiboMessageBox(url string) (weiboWebData, error) {
+	var weiboWebData weiboWebData
 	cont, err := getRequest(url)
 	if err != nil {
 		logrus.Error(cont)
@@ -77,7 +78,7 @@ func getWeiboMessageBox(url string) (WeiboWebData, error) {
 		if isTop == 2 || cardType != 9 {
 			continue
 		} else {
-			weiboWebData.Id = gjson.Get(card.String(), "mblog.id").Int()
+			weiboWebData.id = gjson.Get(card.String(), "mblog.id").Int()
 			weiboWebData.msgText = gjson.Get(card.String(), "mblog.text").String()
 			weiboWebData.msgPic = gjson.Get(card.String(), "mblog.pics.#.large.url").Array()
 			weiboWebData.scheme = gjson.Get(card.String(), "scheme").String()
@@ -85,7 +86,7 @@ func getWeiboMessageBox(url string) (WeiboWebData, error) {
 			weiboWebData.createdAt, _ = time.Parse(time.RubyDate, gjson.Get(card.String(), "mblog.created_at").String())
 			isRetweeted := gjson.Get(card.String(), "mblog.retweeted_status").Exists()
 			if isRetweeted {
-				weiboWebData.retweetedId = gjson.Get(card.String(), "mblog.retweeted_status.id").Int()
+				weiboWebData.retweetedID = gjson.Get(card.String(), "mblog.retweeted_status.id").Int()
 				weiboWebData.retweetedUserName = gjson.Get(card.String(), "mblog.retweeted_status.user.screen_name").String()
 				weiboWebData.retweetedText = gjson.Get(card.String(), "mblog.retweeted_status.text").String()
 				weiboWebData.retweetedPic = gjson.Get(card.String(), "mblog.retweeted_status.pics.#.large.url").Array()
@@ -116,7 +117,7 @@ func getWeiboLink(url string) (str string, err error) {
 func getChannels(arg string) string {
 	value, ok := cacheMap.Get(arg)
 	if value == false || !ok {
-		weiboName, err := getWeiboLink(testApi + arg)
+		weiboName, err := getWeiboLink(testAPI + arg)
 		if err != nil {
 			return ""
 		}
@@ -124,17 +125,15 @@ func getChannels(arg string) string {
 			channelItemData = append(channelItemData, &channelItem{
 				ChannelKey:  arg,
 				ChannelName: weiboName,
-				TestUrl:     testApi + arg,
-				ContUri:     contApi + arg,
+				TestURL:     testAPI + arg,
+				ContURL:     contAPI + arg,
 			})
 			cacheMap.Set(arg, true, cache.NoExpiration)
-			return "已经成功订阅: " + weiboName + ", UID: " + arg
-		} else {
-			return "未查询到订阅用户信息,确认uid信息是否正确～"
+			return "已经成功订阅: " + weiboName + ",  UID: " + arg
 		}
-	} else {
-		return "请勿重复添加订阅:  " + arg
+		return "未查询到订阅用户信息, 确认uid信息是否正确～"
 	}
+	return "请勿重复添加订阅:  " + arg
 }
 func delChannels(arg string) string {
 	value, ok := cacheMap.Get(arg)
@@ -144,13 +143,11 @@ func delChannels(arg string) string {
 				delName := item.ChannelName
 				channelItemData = append(channelItemData[:i], channelItemData[i+1:]...)
 				cacheMap.Set(arg, false, cache.NoExpiration)
-				return "取消订阅: " + delName + ",UID:  " + arg + " 成功~"
-			} else {
-				return "还没有订阅：" + arg + ",无法取消哦"
+				return "取消订阅: " + delName + ", UID:  " + arg + " 成功~"
 			}
 		}
 	}
-	return "还没有订阅：" + arg + ",无法取消哦"
+	return "还没有订阅: " + arg + ", 无法取消哦"
 }
 func running(ctx *zero.Ctx) {
 	if messageSwitch {
@@ -159,29 +156,29 @@ func running(ctx *zero.Ctx) {
 		})
 	} else {
 		ctx.Send(message.Message{
-			message.Text("开启订阅成功,准备开始接收消息"),
+			message.Text("开启订阅成功, 准备开始接收消息"),
 		})
 		ticker := time.NewTicker(60 * time.Second)
 		messageSwitch = true
 		for range ticker.C {
 			for _, item := range channelItemData {
-				cUrl := item.ContUri
-				weiboMsgBoxData, err := getWeiboMessageBox(cUrl)
+				cURL := item.ContURL
+				weiboMsgBoxData, err := getWeiboMessageBox(cURL)
 				if err != nil || weiboMsgBoxData.msgText == "" {
 					logrus.Error(err)
 					continue
 				}
-				ok := db.CanFind("weiboMsg", "WHERE id="+strconv.FormatInt(weiboMsgBoxData.Id, 10))
+				ok := db.CanFind("weiboMsg", "WHERE id="+strconv.FormatInt(weiboMsgBoxData.id, 10))
 				if !ok {
-					_ = dataBuild(weiboMsgBoxData.Id, weiboMsgBoxData.scheme, weiboMsgBoxData.username, weiboMsgBoxData.createdAt).throw(db)
+					_ = dataBuild(weiboMsgBoxData.id, weiboMsgBoxData.scheme, weiboMsgBoxData.username, weiboMsgBoxData.createdAt).throw(db)
 					if weiboMsgBoxData.retweetedText == "" {
 						ctx.Send(message.Message{
-							message.Text(weiboMsgBoxData.createdAt.String() + "\n" + weiboMsgBoxData.username + "发布了微博:\n" + TrimHtml(weiboMsgBoxData.msgText) + "\n\nURL:" + weiboMsgBoxData.scheme),
+							message.Text(weiboMsgBoxData.createdAt.String() + "\n" + weiboMsgBoxData.username + "发布了微博:\n" + trimHTML(weiboMsgBoxData.msgText) + "\n\nURL:" + weiboMsgBoxData.scheme),
 						})
-						for _, picUrl := range weiboMsgBoxData.msgPic {
-							picData, err := getRequest(picUrl.String())
+						for _, picURL := range weiboMsgBoxData.msgPic {
+							picData, err := getRequest(picURL.String())
 							if err != nil {
-								logrus.Error("pic,Error: ", err)
+								logrus.Error("pic, Error: ", err)
 								continue
 							}
 							ctx.Send(message.Message{
@@ -189,16 +186,16 @@ func running(ctx *zero.Ctx) {
 							})
 						}
 					} else {
-						ok = db.CanFind("weiboMsg", "WHERE id="+strconv.FormatInt(weiboMsgBoxData.retweetedId, 10))
+						ok = db.CanFind("weiboMsg", "WHERE id="+strconv.FormatInt(weiboMsgBoxData.retweetedID, 10))
 						if !ok {
-							_ = dataBuild(weiboMsgBoxData.retweetedId, weiboMsgBoxData.scheme, weiboMsgBoxData.username, weiboMsgBoxData.createdAt).throw(db)
+							_ = dataBuild(weiboMsgBoxData.retweetedID, weiboMsgBoxData.scheme, weiboMsgBoxData.username, weiboMsgBoxData.createdAt).throw(db)
 							ctx.Send(message.Message{
-								message.Text(weiboMsgBoxData.createdAt.String() + "\n" + weiboMsgBoxData.username + "  转发了  " + weiboMsgBoxData.retweetedUserName + "  的微博:\n" + TrimHtml(weiboMsgBoxData.retweetedText) + "\n评论了:\n" + TrimHtml(weiboMsgBoxData.msgText) + "\nURL:" + weiboMsgBoxData.scheme),
+								message.Text(weiboMsgBoxData.createdAt.String() + "\n" + weiboMsgBoxData.username + "  转发了  " + weiboMsgBoxData.retweetedUserName + "  的微博:\n" + trimHTML(weiboMsgBoxData.retweetedText) + "\n评论了:\n" + trimHTML(weiboMsgBoxData.msgText) + "\nURL:" + weiboMsgBoxData.scheme),
 							})
-							for _, retUrl := range weiboMsgBoxData.retweetedPic {
-								retPicData, err := getRequest(retUrl.String())
+							for _, retURL := range weiboMsgBoxData.retweetedPic {
+								retPicData, err := getRequest(retURL.String())
 								if err != nil {
-									logrus.Error("pic,Error: ", err)
+									logrus.Error("pic, Error: ", err)
 									continue
 								}
 								ctx.Send(message.Message{
@@ -233,7 +230,7 @@ func stop(ctx *zero.Ctx) {
 func selectAllSubChannelsInfo(ctx *zero.Ctx) {
 	var allChannelsInfo string
 	for _, channel := range channelItemData {
-		allChannelsInfo = allChannelsInfo + "\n" + channel.ChannelName + ",   UID:  " + channel.ChannelKey
+		allChannelsInfo = allChannelsInfo + "\n" + channel.ChannelName + ",    UID:  " + channel.ChannelKey
 	}
 	if allChannelsInfo != "" {
 		ctx.Send(message.Message{
@@ -281,23 +278,19 @@ func init() {
 	engine.OnPrefix("订阅微博", zero.OnlyGroup).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		args := ctx.State["args"].(string)
 		msg := getChannels(args)
-		ctx.Send(message.Message{
-			message.Text(msg),
-		})
+		ctx.SendChain(message.Text(msg))
 	})
 	engine.OnPrefix("退订微博", zero.OnlyGroup).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		arg := ctx.State["args"].(string)
 		msg := delChannels(arg)
-		ctx.Send(message.Message{
-			message.Text(msg),
-		})
+		ctx.SendChain(message.Text(msg))
 	})
 	initChannel()
 }
 
 func initChannel() {
 	var args []string
-	// "7791102134", "3273865405", "5533669771", "2732469654", "3223557554", "2339808364"
+	// "7791102134",  "3273865405",  "5533669771",  "2732469654",  "3223557554",  "2339808364"
 	args = append(args, "")
 	for _, arg := range args {
 		msg := getChannels(arg)
@@ -305,7 +298,7 @@ func initChannel() {
 	}
 }
 
-func TrimHtml(src string) string {
+func trimHTML(src string) string {
 	// 将HTML标签全转换成小写
 	re := regexp.MustCompile(`<[\S\s]+?>`)
 	src = re.ReplaceAllStringFunc(src, strings.ToLower)
@@ -319,7 +312,7 @@ func TrimHtml(src string) string {
 	re = regexp.MustCompile(`<[\S\s]+?>`)
 	src = re.ReplaceAllString(src, "\n")
 	// 去除连续的换行符
-	re = regexp.MustCompile(`\s{2,}`)
+	re = regexp.MustCompile(`\s{2, }`)
 	src = re.ReplaceAllString(src, "\n")
 	return strings.TrimSpace(src)
 }
