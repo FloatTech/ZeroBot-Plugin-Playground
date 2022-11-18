@@ -3,6 +3,7 @@ package chinesebqb
 import (
 	"encoding/json"
 	"os"
+	"strings"
 
 	"github.com/FloatTech/floatbox/web"
 	"github.com/glebarez/sqlite"
@@ -84,7 +85,7 @@ func (bqb) TableName() string {
 
 func (bdb *bqbdb) getByKey(key string) (b []bqb, err error) {
 	db := (*gorm.DB)(bdb)
-	err = db.Where("category like ?", "%"+key+"%").Or("name like ?", "%"+key+"%").Find(&b).Error
+	err = db.Where("name like ?", "%"+key+"%").Find(&b).Error
 	return
 }
 
@@ -113,11 +114,18 @@ func (bdb *bqbdb) truncateAndInsert() (err error) {
 	blist := make([]bqb, 0, 100)
 	for _, v := range r.Data {
 		b := bqb{
-			Name:     v.Name,
 			Category: v.Category,
 			URL:      v.URL,
 		}
-		blist = append(blist, b)
+		_, back, flag := strings.Cut(v.Name, "-")
+		if flag {
+			b.Name = back
+		} else {
+			b.Name = v.Name
+		}
+		if b.URL != "" {
+			blist = append(blist, b)
+		}
 		if len(blist) >= 100 {
 			err = db.Create(&blist).Error
 			if err != nil {

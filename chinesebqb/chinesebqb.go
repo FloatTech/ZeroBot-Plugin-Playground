@@ -38,7 +38,7 @@ func init() { // 插件主体
 				imageList[i], imageList[j] = imageList[j], imageList[i]
 			})
 			m := message.Message{}
-			for _, v := range imageList[:5] {
+			for _, v := range imageList[:10] {
 				m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Image(v)))
 			}
 			if id := ctx.Send(m).ID(); id == 0 {
