@@ -3,8 +3,8 @@ package qqci
 import (
 	"os"
 
-	_ "github.com/fumiama/sqlite3" // import sql
-	"github.com/jinzhu/gorm"
+	"github.com/glebarez/sqlite"
+	"gorm.io/gorm"
 )
 
 var adb *appdb
@@ -44,7 +44,7 @@ func initialize(dbpath string) *appdb {
 		}
 		defer f.Close()
 	}
-	adb, err := gorm.Open("sqlite3", dbpath)
+	adb, err := gorm.Open(sqlite.Open(dbpath), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
