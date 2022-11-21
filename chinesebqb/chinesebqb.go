@@ -30,7 +30,7 @@ func init() { // 插件主体
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
-			imageList := make([]string, 0, 64)
+			imageList := make([]string, 0)
 			for _, v := range blist {
 				imageList = append(imageList, v.URL)
 			}
