@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/FloatTech/floatbox/binary"
@@ -30,7 +31,7 @@ func init() { // 插件主体
 		Handle(func(ctx *zero.Ctx) {
 			ctx.SendChain(message.Text("少女祈祷中..."))
 			args := ctx.State["args"].(string)
-			blist, err := bdb.getByKey(args)
+			blist, err := bdb.getByKey(strings.TrimSpace(args))
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
