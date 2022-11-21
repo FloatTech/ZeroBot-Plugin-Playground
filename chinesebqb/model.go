@@ -137,3 +137,20 @@ func (bdb *bqbdb) truncateAndInsert() (err error) {
 	err = db.Create(&blist).Error
 	return
 }
+
+type result struct {
+	Category string
+	Count    int
+}
+
+func (bdb *bqbdb) getAllCategory() (results []result, err error) {
+	db := (*gorm.DB)(bdb)
+	err = db.Table("bqb").Select("category, count(1) as count").Group("category").Scan(&results).Error
+	return
+}
+
+func (bdb *bqbdb) getByCategory(category string) (b []bqb, err error) {
+	db := (*gorm.DB)(bdb)
+	err = db.Where("category = ?", category).Find(&b).Error
+	return
+}
