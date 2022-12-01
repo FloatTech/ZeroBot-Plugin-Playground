@@ -21,6 +21,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/fadian"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/fyzhq"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/games"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/kfccrazythursday"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/moegozh"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/ottoshout"

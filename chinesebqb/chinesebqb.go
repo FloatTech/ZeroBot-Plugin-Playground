@@ -121,5 +121,4 @@ func init() { // 插件主体
 			}
 			ctx.SendChain(message.Text("chinesebqb表情包更新完毕"))
 		})
-
 }
