@@ -48,7 +48,10 @@ func initialize(dbpath string) *appdb {
 	if err != nil {
 		panic(err)
 	}
-	adb.AutoMigrate(&application{})
+	err = adb.AutoMigrate(&application{})
+	if err != nil {
+		panic(err)
+	}
 	return (*appdb)(adb)
 }
 

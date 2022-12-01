@@ -76,11 +76,6 @@ func init() {
 				vc = vc[:20]
 			}
 			// 绘图
-			_, err := file.GetLazyData(text.FontFile, true)
-			if err != nil {
-				ctx.SendChain(message.Text("ERROR:", err))
-				return
-			}
 			b, err := os.ReadFile(text.FontFile)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR:", err))

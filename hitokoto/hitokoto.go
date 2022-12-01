@@ -1,5 +1,5 @@
-// Package chinesebqb 表情包
-package chinesebqb
+// Package hitokoto 一言
+package hitokoto
 
 import (
 	"fmt"
@@ -18,50 +18,50 @@ import (
 )
 
 func init() { // 插件主体
-	engine := control.Register("chinesebqb", &ctrl.Options[*zero.Ctx]{
+	engine := control.Register("hitokoto", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
-		Help: "chinesebqb表情包\n" +
-			"- 表情包",
-		PrivateDataFolder: "chinesebqb",
+		Help: "hitokoto表情包\n" +
+			"- 一言[xxx]",
+		PrivateDataFolder: "hitokoto",
 	})
 	go func() {
-		bdb = initialize(engine.DataFolder() + "chinesebqb.db")
+		hdb = initialize(engine.DataFolder() + "hitokoto.db")
 	}()
-	engine.OnPrefix(`表情包`).SetBlock(true).
+	engine.OnPrefix(`一言`).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			ctx.SendChain(message.Text("少女祈祷中..."))
 			args := ctx.State["args"].(string)
-			blist, err := bdb.getByKey(strings.TrimSpace(args))
+			blist, err := hdb.getByKey(strings.TrimSpace(args))
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
-			imageList := make([]string, 0, 10)
+			textList := make([]string, 0, 10)
 			for _, v := range blist {
-				imageList = append(imageList, v.URL)
+				textList = append(textList, v.Hitokoto+"\n——"+v.From)
 			}
-			rand.Shuffle(len(imageList), func(i, j int) {
-				imageList[i], imageList[j] = imageList[j], imageList[i]
+			rand.Shuffle(len(textList), func(i, j int) {
+				textList[i], textList[j] = textList[j], textList[i]
 			})
 			m := message.Message{}
-			for _, v := range imageList[:10] {
-				m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Image(v)))
+			for _, v := range textList[:10] {
+				m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Text(v)))
 			}
 			if id := ctx.Send(m).ID(); id == 0 {
 				ctx.SendChain(message.Text("ERROR: 可能被风控或下载图片用时过长，请耐心等待"))
 			}
 		})
-	engine.OnFullMatch(`系列表情包`).SetBlock(true).
+	engine.OnFullMatch(`系列一言`).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			next := zero.NewFutureEvent("message", 999, false, ctx.CheckSession())
 			recv, cancel := next.Repeat()
 			defer cancel()
-			results, err := bdb.getAllCategory()
+			results, err := hdb.getAllCategory()
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
-			tex := "请输入系列表情包序号\n"
+			tex := "请输入系列一言序号\n"
 			for i, v := range results {
 				tex += fmt.Sprintf("%d. %s\n", i, v.Category)
 			}
@@ -74,7 +74,7 @@ func init() { // 插件主体
 			for {
 				select {
 				case <-time.After(time.Second * 120):
-					ctx.SendChain(message.Text("系列表情包指令过期"))
+					ctx.SendChain(message.Text("系列一言指令过期"))
 					return
 				case c := <-recv:
 					msg := c.Event.Message.ExtractPlainText()
@@ -87,22 +87,22 @@ func init() { // 插件主体
 						ctx.SendChain(message.Text("序号非法!"))
 						continue
 					}
-					ctx.SendChain(message.Text("请欣赏系列表情包: ", results[num].Category))
-					blist, err := bdb.getByCategory(results[num].Category)
+					ctx.SendChain(message.Text("请欣赏系列一言: ", results[num].Category))
+					hlist, err := hdb.getByCategory(results[num].Category)
 					if err != nil {
 						ctx.SendChain(message.Text("ERROR: ", err))
 						return
 					}
-					imageList := make([]string, 0, 50)
-					for _, v := range blist {
-						imageList = append(imageList, v.URL)
+					textList := make([]string, 0, 10)
+					for _, v := range hlist {
+						textList = append(textList, v.Hitokoto+"\n——"+v.From)
 					}
-					rand.Shuffle(len(imageList), func(i, j int) {
-						imageList[i], imageList[j] = imageList[j], imageList[i]
+					rand.Shuffle(len(textList), func(i, j int) {
+						textList[i], textList[j] = textList[j], textList[i]
 					})
 					m := message.Message{}
-					for _, v := range imageList[:50] {
-						m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Image(v)))
+					for _, v := range textList[:10] {
+						m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Text(v)))
 					}
 					if id := ctx.Send(m).ID(); id == 0 {
 						ctx.SendChain(message.Text("ERROR: 可能被风控或下载图片用时过长，请耐心等待"))
@@ -111,14 +111,14 @@ func init() { // 插件主体
 				}
 			}
 		})
-	engine.OnFullMatch(`更新表情包`, zero.SuperUserPermission).SetBlock(true).
+	engine.OnFullMatch(`更新一言`, zero.SuperUserPermission).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			ctx.SendChain(message.Text("少女祈祷中..."))
-			err := bdb.truncateAndInsert()
+			err := hdb.truncateAndInsert()
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
-			ctx.SendChain(message.Text("chinesebqb表情包更新完毕"))
+			ctx.SendChain(message.Text("hitokoto表情包更新完毕"))
 		})
 }
