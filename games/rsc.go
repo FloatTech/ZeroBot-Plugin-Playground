@@ -11,7 +11,7 @@ import (
 	"github.com/wdvxdr1123/ZeroBot/message"
 
 	// 载入游戏系统
-	"github.com/FloatTech/ZeroBot-Plugin/plugin/_personal/games/gamesystem" // 游戏系统
+	"github.com/FloatTech/ZeroBot-Plugin-Playground/games/gamesystem" // 游戏系统
 )
 
 var point = map[string]int{

@@ -88,7 +88,7 @@ func init() {
 			var yOfLine1 int // 第一列最大高度
 			var yOfLine2 int // 第二列最大高度
 			for gameName, info := range gamelist {
-				img, err := rendercard.TextCardInfo{
+				img, err := rendercard.Titleinfo{
 					FontOfTitle:  text.SakuraFontFile,
 					FontOfText:   text.SakuraFontFile,
 					Title:        gameName,
