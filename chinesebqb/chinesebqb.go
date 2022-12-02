@@ -21,7 +21,9 @@ func init() { // 插件主体
 	engine := control.Register("chinesebqb", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Help: "chinesebqb表情包\n" +
-			"- 表情包",
+			"- 表情包 [xxx]\n" +
+			"- 系列表情包\n" +
+			"- 更新表情包",
 		PrivateDataFolder: "chinesebqb",
 	})
 	go func() {

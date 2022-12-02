@@ -20,8 +20,10 @@ import (
 func init() { // 插件主体
 	engine := control.Register("hitokoto", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
-		Help: "hitokoto表情包\n" +
-			"- 一言[xxx]",
+		Help: "一言\n" +
+			"- 一言[xxx]\n" +
+			"- 系列一言\n" +
+			"- 更新一言",
 		PrivateDataFolder: "hitokoto",
 	})
 	go func() {

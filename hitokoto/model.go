@@ -57,7 +57,7 @@ func initialize(dbpath string) *hitokotodb {
 	if err != nil {
 		panic(err)
 	}
-	logrus.Infoln("[chinesebqb]加载", count, "条表情包")
+	logrus.Infoln("[hitokoto]加载", count, "条一言")
 	return (*hitokotodb)(db)
 }
 

@@ -27,23 +27,6 @@ func init() {
 		})
 		ctx.SendPrivateMessage(ctx.Event.UserID, message.Text("已清理bot群聊: (", strings.Join(cleanGroupnameList, ", "), ")"))
 	})
-	engine.On("request/group/invite").SetBlock(true).Handle(func(ctx *zero.Ctx) {
-		freecnt := 0
-		ctx.GetGroupList().ForEach(func(_, value gjson.Result) bool {
-			if ctx.GetGroupMemberInfo(value.Get("group_id").Int(), ctx.Event.SelfID, true).Get("role").String() == "member" {
-				freecnt++
-			}
-			return true
-		})
-		if freecnt < 20 {
-			ctx.SetGroupAddRequest(ctx.Event.Flag, "invite", true, "爱你哟")
-		} else {
-			ctx.SetGroupAddRequest(ctx.Event.Flag, "invite", false, "游离群聊大于20")
-		}
-	})
-	engine.On("request/friend").SetBlock(true).Handle(func(ctx *zero.Ctx) {
-		ctx.SetFriendAddRequest(ctx.Event.Flag, true, "")
-	})
 	engine.OnFullMatch("清理好友", zero.SuperUserPermission, zero.OnlyToMe).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		cleanFriendnameList := make([]string, 0, 64)
 		ctx.GetFriendList().ForEach(func(_, value gjson.Result) bool {
