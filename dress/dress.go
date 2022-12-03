@@ -65,7 +65,7 @@ func init() { // 插件主体
 						continue
 					}
 					name := nameList[num]
-					ctx.SendChain(message.Text("请欣赏系列", matched, ": ", name))
+					ctx.SendChain(message.Text("请欣赏", matched, ": ", name))
 					count, err := detail(sex, name)
 					if err != nil {
 						ctx.SendChain(message.Text("ERROR: ", err))
