@@ -3,7 +3,9 @@ package dress
 
 import (
 	"fmt"
+	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/FloatTech/floatbox/binary"
@@ -20,7 +22,9 @@ func init() { // 插件主体
 		DisableOnDefault: false,
 		Help: "女装\n" +
 			"- 女装\n" +
-			"- 男装",
+			"- 男装\n" +
+			"- 随机女装\n" +
+			"- 随机男装",
 		PrivateDataFolder: "dress",
 	})
 	engine.OnFullMatchGroup([]string{"女装", "男装"}).SetBlock(true).
@@ -65,25 +69,44 @@ func init() { // 插件主体
 						continue
 					}
 					name := nameList[num]
-					ctx.SendChain(message.Text("请欣赏", matched, ": ", name))
-					count, err := detail(sex, name)
-					if err != nil {
-						ctx.SendChain(message.Text("ERROR: ", err))
-						return
-					}
-					imageList := make([]string, count)
-					for i := range imageList {
-						imageList[i] = fmt.Sprintf(dressImageURL, sex, name, i+1)
-					}
-					m := message.Message{}
-					for _, v := range imageList {
-						m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Image(v)))
-					}
-					if id := ctx.Send(m).ID(); id == 0 {
-						ctx.SendChain(message.Text("ERROR: 可能被风控或下载图片用时过长，请耐心等待"))
-					}
+					sendImage(ctx, sex, matched, name)
 					return
 				}
 			}
 		})
+	engine.OnFullMatchGroup([]string{"随机女装", "随机男装"}).SetBlock(true).
+		Handle(func(ctx *zero.Ctx) {
+			matched := strings.TrimPrefix(ctx.State["matched"].(string), "随机")
+			sex := male
+			if matched == "男装" {
+				sex = female
+			}
+			nameList, err := dressList(sex)
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR: ", err))
+				return
+			}
+			name := nameList[rand.Intn(len(nameList))]
+			sendImage(ctx, sex, matched, name)
+		})
+}
+
+func sendImage(ctx *zero.Ctx, sex, matched, name string) {
+	ctx.SendChain(message.Text("请欣赏", matched, ": ", name))
+	count, err := detail(sex, name)
+	if err != nil {
+		ctx.SendChain(message.Text("ERROR: ", err))
+		return
+	}
+	imageList := make([]string, count)
+	for i := range imageList {
+		imageList[i] = fmt.Sprintf(dressImageURL, sex, name, i+1)
+	}
+	m := message.Message{}
+	for _, v := range imageList {
+		m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Image(v)))
+	}
+	if id := ctx.Send(m).ID(); id == 0 {
+		ctx.SendChain(message.Text("ERROR: 可能被风控或下载图片用时过长，请耐心等待"))
+	}
 }
