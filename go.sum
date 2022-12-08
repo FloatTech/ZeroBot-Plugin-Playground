@@ -4,20 +4,14 @@ github.com/FloatTech/AnimeAPI v1.6.0 h1:y7wFL6huEVhL/n8elpFoYm3YSxwXZGrlhScpA2gZ
 github.com/FloatTech/AnimeAPI v1.6.0/go.mod h1:YbhdF9X+IDTzWuZd8cDewAMY+0TN/1TkktXOCbAlj/Y=
 github.com/FloatTech/floatbox v0.0.0-20221121105530-7707db99d240 h1:EZnPtrSLAY0Rvar25K+Wfx9W3/2H/raosAqCarmh/xU=
 github.com/FloatTech/floatbox v0.0.0-20221121105530-7707db99d240/go.mod h1:o++SAnZq+KpGC5gZmYd02H3Msr6Q2Qpoz3pC3ebbJaE=
-github.com/FloatTech/rendercard v0.0.1 h1:BouAX5P7VFBf0HIqoD9OFUzsGt8ClKGlYm0GoHVQhvM=
-github.com/FloatTech/rendercard v0.0.1/go.mod h1:e2M5OWspdblwq182zbVgRefiOc+gXtB1XzTW/2z86/I=
 github.com/FloatTech/rendercard v0.0.2-0.20221116145901-79858ddd4cad h1:Bidfkufddy52ywvjCpXwSnZqgcQgv7xF1rBDZYhbSOc=
 github.com/FloatTech/rendercard v0.0.2-0.20221116145901-79858ddd4cad/go.mod h1:e2M5OWspdblwq182zbVgRefiOc+gXtB1XzTW/2z86/I=
 github.com/FloatTech/sqlite v0.5.1 h1:IjTdnqMVIVIoIEFXhvh/KKBfYxFvG0tk7Rghz65/DAU=
 github.com/FloatTech/sqlite v0.5.1/go.mod h1:i33d92OtR8jcp5fBUvQtospf27+MkfUxnGwnZ95E/dA=
 github.com/FloatTech/ttl v0.0.0-20220715042055-15612be72f5b h1:tvciXWq2nuvTbFeJGLDNIdRX3BI546D3O7k7vrVueZw=
 github.com/FloatTech/ttl v0.0.0-20220715042055-15612be72f5b/go.mod h1:fHZFWGquNXuHttu9dUYoKuNbm3dzLETnIOnm1muSfDs=
-github.com/FloatTech/zbpctrl v1.5.2-0.20220921013146-40d64bc7799c h1:zYcKvMbwQeifSQg0LnxhmCdyP3mb7ZqS6rjt68jbukw=
-github.com/FloatTech/zbpctrl v1.5.2-0.20220921013146-40d64bc7799c/go.mod h1:+2mGs9vUWJsvfcbodcmFegqOKEqHnLwopF1jTLVs/gU=
 github.com/FloatTech/zbpctrl v1.5.3-0.20221110070900-b2888434e9fc h1:jNHQsG7kKKkRwey4u9XpQIIBfNXX3SLBCeiTyjhBRQc=
 github.com/FloatTech/zbpctrl v1.5.3-0.20221110070900-b2888434e9fc/go.mod h1:zfrIWujK6ORPhOuUUzeKGNOLGI/XXz+78FRHRF9zEFo=
-github.com/FloatTech/zbputils v1.5.1-0.20221004094248-ad5a9235757e h1:3B58NvXqYrIEDhFOl2535yL9zj2cwDAv1eq63adh/Wg=
-github.com/FloatTech/zbputils v1.5.1-0.20221004094248-ad5a9235757e/go.mod h1:0hU2b4bnYGHBll52SHErCf34yU/PditejgAOkGZ/Czw=
 github.com/FloatTech/zbputils v1.6.0 h1:LfCeQS6mY35aBXi1kZEVTegHl5t4Op3Nyxfa4Z8wgFg=
 github.com/FloatTech/zbputils v1.6.0/go.mod h1:/nyGbeK8hd4cZ9dFK1U+0hbIdlyjQzz+HEc9aUu4/Js=
 github.com/RomiChan/syncx v0.0.0-20220404072119-d7ea0ae15a4c h1:cNPOdTNiVwxLpROLjXCgbIPvdkE+BwvxDvgmdYmWx6Q=
@@ -34,6 +28,8 @@ github.com/disintegration/imaging v1.6.2/go.mod h1:44/5580QXChDfwIclfc/PCwrr44am
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
 github.com/ericpauley/go-quantize v0.0.0-20200331213906-ae555eb2afa4 h1:BBade+JlV/f7JstZ4pitd4tHhpN+w+6I+LyOS7B4fyU=
 github.com/ericpauley/go-quantize v0.0.0-20200331213906-ae555eb2afa4/go.mod h1:H7chHJglrhPPzetLdzBleF8d22WYOv7UM/lEKYiwlKM=
+github.com/fogleman/gg v1.3.0 h1:/7zJX8F6AaYQc57WQCyN9cAIz+4bCJGO9B+dyW29am8=
+github.com/fogleman/gg v1.3.0/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=
 github.com/fumiama/cron v1.3.0 h1:ZWlwuexF+HQHl3cYytEE5HNwD99q+3vNZF1GrEiXCFo=
 github.com/fumiama/cron v1.3.0/go.mod h1:bz5Izvgi/xEUI8tlBN8BI2jr9Moo8N4or0KV8xXuPDY=
 github.com/fumiama/go-base16384 v1.6.1 h1:4yb4JgmBJDnQtq3XGXXdLrVwEnRpjhMUt4eAcsNeA30=
@@ -60,6 +56,7 @@ github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0/go.mod h1:E/TSTwGw
 github.com/google/go-cmp v0.5.3/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/gorilla/websocket v1.4.2 h1:+/TMaTYc4QFitKJxsQ7Yye35DkWvkdLcvGKqM+x0Ufc=
 github.com/gorilla/websocket v1.4.2/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/guohuiyuan/go-fyzhq v0.0.0-20220807135412-25c16c843e5a h1:sSbq6g6ofG33GfKtQXRjC+Z7YIjJJhkJXzPT4LXwROM=
 github.com/guohuiyuan/go-fyzhq v0.0.0-20220807135412-25c16c843e5a/go.mod h1:AfOiF6dEJ10INSyuLQIFJr+l//v510xaXxaXbuq2f/k=

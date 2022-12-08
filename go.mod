@@ -10,9 +10,11 @@ require (
 	github.com/FloatTech/sqlite v0.5.1
 	github.com/FloatTech/zbpctrl v1.5.3-0.20221110070900-b2888434e9fc
 	github.com/FloatTech/zbputils v1.6.0
+	github.com/fogleman/gg v1.3.0
 	github.com/glebarez/sqlite v1.5.0
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
+	github.com/gorilla/websocket v1.4.2
 	github.com/guohuiyuan/go-fyzhq v0.0.0-20220807135412-25c16c843e5a
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/playwright-community/playwright-go v0.2000.1
@@ -20,7 +22,6 @@ require (
 	github.com/tidwall/gjson v1.14.3
 	github.com/wcharczuk/go-chart/v2 v2.1.0
 	github.com/wdvxdr1123/ZeroBot v1.6.3
-	golang.org/x/image v0.1.0
 	gorm.io/gorm v1.24.1
 )
 
@@ -47,6 +48,7 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
+	golang.org/x/image v0.1.0 // indirect
 	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
 	golang.org/x/sys v0.0.0-20220915200043-7b5979e65e41 // indirect
 	golang.org/x/text v0.4.0 // indirect
