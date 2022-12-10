@@ -12,7 +12,7 @@
 ## 约法四章
 1. 每个实现特定功能的插件应该放在根目录的一个文件夹下，不要越界，否则会被移除。
 2. 不要在不经允许的情况下随意改动其他人的插件，否则会被踢出[maintainer](https://github.com/orgs/FloatTech/teams/maintainer)。
-3. 一些补充：关于 lint 和编译等 CI 相关 (#75)
+3. 一些补充：[关于 lint 和编译等 CI 相关](https://github.com/FloatTech/ZeroBot-Plugin-Playground/issues/75)
 4. 礼貌交谈。
 ## 完善教程
 目前开发教程还不是很全面，欢迎大家编辑此README完善它，让更多人轻松加入zbp大家庭！
