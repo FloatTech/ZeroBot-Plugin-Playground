@@ -9,10 +9,11 @@
 1. 你需要成为[FloatTech](https://github.com/FloatTech)组织的成员。这可以通过在此仓库提出issue完成。
 2. 同时，我们会邀请你加入组织，并加入[maintainer](https://github.com/orgs/FloatTech/teams/maintainer)组。你需要查看邮件确认邀请。
 3. 现在你已经获得了对本仓库的写权限，可以推送你的插件了！
-## 约法三章
+## 约法四章
 1. 每个实现特定功能的插件应该放在根目录的一个文件夹下，不要越界，否则会被移除。
 2. 不要在不经允许的情况下随意改动其他人的插件，否则会被踢出[maintainer](https://github.com/orgs/FloatTech/teams/maintainer)。
-3. 礼貌交谈。
+3. 一些补充：关于 lint 和编译等 CI 相关(#75)
+4. 礼貌交谈。
 ## 完善教程
 目前开发教程还不是很全面，欢迎大家编辑此README完善它，让更多人轻松加入zbp大家庭！
 
