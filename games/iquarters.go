@@ -147,7 +147,7 @@ func init() {
 					ctx.SendChain(message.At(uid), message.Text("ERROR]:", err))
 				}
 				winmsg = append(winmsg, message.At(uid))
-			case int(math.Abs(guess-positive)) <= 2:
+			case math.Abs(guess-positive) <= 2:
 				err := wallet.InsertWalletOf(uid, positive*5)
 				if err != nil {
 					ctx.SendChain(message.At(uid), message.Text("ERROR]:", err))
