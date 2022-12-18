@@ -7,11 +7,12 @@ import (
 	"time"
 
 	"github.com/FloatTech/AnimeAPI/wallet"
-	"github.com/FloatTech/ZeroBot-Plugin-Playground/games/gamesystem"
 	"github.com/FloatTech/floatbox/math"
 	"github.com/FloatTech/floatbox/process"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
+
+	"github.com/FloatTech/ZeroBot-Plugin-Playground/games/gamesystem"
 )
 
 func init() {
@@ -135,7 +136,7 @@ func init() {
 		ctx.SendChain(message.Text("OK,我要开始投掷银币了～"))
 		process.SleepAbout1sTo2s()
 		ctx.SendChain(message.Text("一共投掷了", len(duel), "枚银币,其中正面的有", positive, "枚正面。\n具体结果如下", result))
-		//数据结算
+		// 数据结算
 		winmsg := message.Message{}
 		othermsg := message.Message{}
 		losemsg := message.Message{}
