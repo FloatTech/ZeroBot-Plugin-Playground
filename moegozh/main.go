@@ -25,7 +25,7 @@ var speakers = map[string]uint{
 }
 
 func init() {
-	en := control.Register("moegoe", &ctrl.Options[*zero.Ctx]{
+	en := control.Register("moegoezh", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Help: "moegoe\n" +
 			"- 让[宁宁|爱瑠|芳乃|茉子|丛雨|小春|七海]用中文说(中文)\n" +
