@@ -31,15 +31,17 @@ const (
 	kanbanpath = "data/Control/icon.jpg"
 )
 
+// GameInfo ...
 type GameInfo struct {
 	Command string `json:"游玩指令"` // 游玩指令
 	Help    string `json:"游戏说明"` // 游戏说明
 	Rewards string `json:"奖励说明"` // 奖励说明
 }
 
-type gameStatus struct {
+// GameStatus ...
+type GameStatus struct {
 	Name  string         `json:"游戏名称"`
-	Info  GameInfo       `json:"游戏介绍"`
+	Info  *GameInfo      `json:"游戏介绍"`
 	Sales map[int64]bool `json:"上架情况"`
 	Rooms []int64        `json:"房间列表"`
 }
@@ -56,7 +58,7 @@ var (
 	cfgFile     = gamesystem.DataFolder() + "gamesystem.json"
 	mu          sync.RWMutex
 	gamelist    = make(map[string]GameInfo, 30)
-	gameManager = make(map[string]*gameStatus, 30)
+	gameManager = make(map[string]*GameStatus, 30)
 )
 
 func init() {
@@ -88,7 +90,7 @@ func init() {
 			var yOfLine1 int // 第一列最大高度
 			var yOfLine2 int // 第二列最大高度
 			for gameName, info := range gamelist {
-				img, err := rendercard.Titleinfo{
+				img, err := rendercard.TextCardInfo{
 					FontOfTitle:  text.SakuraFontFile,
 					FontOfText:   text.SakuraFontFile,
 					Title:        gameName,
@@ -159,9 +161,8 @@ func loadConfig(cfgFile string) error {
 			return err
 		}
 		return reader.Close()
-	} else {
-		return saveConfig(cfgFile)
 	}
+	return saveConfig(cfgFile)
 }
 
 // 保存游戏状态
@@ -173,8 +174,8 @@ func saveConfig(cfgFile string) error {
 	return err
 }
 
-// 注册游戏
-func Register(gameName string, gameinfo *GameInfo) (en *control.Engine, manager *gameStatus, err error) {
+// Register 注册游戏
+func Register(gameName string, gameinfo *GameInfo) (en *control.Engine, manager *GameStatus, err error) {
 	if len(gameManager) == 0 {
 		err = loadConfig(cfgFile)
 		if err != nil {
@@ -185,9 +186,9 @@ func Register(gameName string, gameinfo *GameInfo) (en *control.Engine, manager 
 	defer mu.Unlock()
 	status, ok := gameManager[gameName]
 	if !ok {
-		gameManager[gameName] = &gameStatus{
+		gameManager[gameName] = &GameStatus{
 			Name:  gameName,
-			Info:  *gameinfo,
+			Info:  gameinfo,
 			Sales: make(map[int64]bool),
 			Rooms: make([]int64, 0),
 		}
@@ -195,7 +196,7 @@ func Register(gameName string, gameinfo *GameInfo) (en *control.Engine, manager 
 		err = saveConfig(cfgFile)
 		return gamesystem, gameManager[gameName], err
 	}
-	gamelist[gameName] = status.Info
+	gamelist[gameName] = *status.Info
 	return gamesystem, status, nil
 }
 
@@ -217,7 +218,7 @@ func whichGamePlayIn(gameName string, groupID int64) bool {
 }
 
 // PlayIn 判断游戏是否上架
-func (gameManager *gameStatus) PlayIn(groupID int64) bool {
+func (gameManager *GameStatus) PlayIn(groupID int64) bool {
 	mu.Lock()
 	defer mu.Unlock()
 	sales, ok := gameManager.Sales[groupID]
@@ -232,24 +233,24 @@ func (gameManager *gameStatus) PlayIn(groupID int64) bool {
 	return sales
 }
 
-// 上架游戏
-func (gameManager *gameStatus) SalesIn(groupID int64) error {
+// SalesIn 上架游戏
+func (gameManager *GameStatus) SalesIn(groupID int64) error {
 	mu.Lock()
 	defer mu.Unlock()
 	gameManager.Sales[groupID] = true
 	return saveConfig(cfgFile)
 }
 
-// 下架游戏
-func (gameManager *gameStatus) SalesOut(groupID int64) error {
+// SalesOut 下架游戏
+func (gameManager *GameStatus) SalesOut(groupID int64) error {
 	mu.Lock()
 	defer mu.Unlock()
 	gameManager.Sales[groupID] = false
 	return saveConfig(cfgFile)
 }
 
-// 创建房间
-func (gameManager *gameStatus) CreateRoom(groupID int64) error {
+// CreateRoom 创建房间
+func (gameManager *GameStatus) CreateRoom(groupID int64) error {
 	if !gameManager.PlayIn(groupID) {
 		return errors.New("游戏已下架,无法游玩")
 	}
@@ -265,8 +266,8 @@ func (gameManager *gameStatus) CreateRoom(groupID int64) error {
 	return nil
 }
 
-// 关闭房间
-func (gameManager *gameStatus) CloseRoom(groupID int64) {
+// CloseRoom 关闭房间
+func (gameManager *GameStatus) CloseRoom(groupID int64) {
 	mu.Lock()
 	defer mu.Unlock()
 	index := 0

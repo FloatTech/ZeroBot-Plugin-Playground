@@ -51,7 +51,7 @@ func init() {
 			result := point[model] - botchoose
 
 			// 如果是石头和布的比较，比较值正负取反
-			if int(math.Abs(result)) == 2 {
+			if math.Abs(result) == 2 {
 				result = -(result)
 			}
 			switch {

@@ -7,9 +7,10 @@ import (
 	"time"
 
 	"github.com/FloatTech/AnimeAPI/wallet"
-	"github.com/FloatTech/ZeroBot-Plugin-Playground/games/gamesystem"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
+
+	"github.com/FloatTech/ZeroBot-Plugin-Playground/games/gamesystem"
 )
 
 func init() {
@@ -111,7 +112,7 @@ func init() {
 			if dice1 != dice2 {
 				break
 			}
-			//如果点数一样就清空
+			// 如果点数一样就清空
 			ctx.SendChain(message.Text("你们投掷的数目相同,请重新投掷"))
 			duel = make(map[int64]int, 2)
 		}
@@ -130,7 +131,7 @@ func init() {
 			uid = duelUser
 			duelUser = ctx.Event.UserID
 		}
-		//数据结算
+		// 数据结算
 		err := wallet.InsertWalletOf(uid, points)
 		if err == nil {
 			err = wallet.InsertWalletOf(duelUser, -points)
