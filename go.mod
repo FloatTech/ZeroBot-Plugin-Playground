@@ -5,11 +5,11 @@ go 1.19
 require (
 	github.com/Coloured-glaze/gg v1.3.4
 	github.com/FloatTech/AnimeAPI v1.6.0
-	github.com/FloatTech/floatbox v0.0.0-20221214135630-bb902dba05ac
-	github.com/FloatTech/rendercard v0.0.2-0.20221128165614-a41216d2422e
+	github.com/FloatTech/floatbox v0.0.0-20221228150204-a2bededce74d
+	github.com/FloatTech/rendercard v0.0.2
 	github.com/FloatTech/sqlite v1.5.7
 	github.com/FloatTech/zbpctrl v1.5.3-0.20221210051848-740ab7bd6ec3
-	github.com/FloatTech/zbputils v1.6.1-0.20221212090658-d0de5338e354
+	github.com/FloatTech/zbputils v1.6.1-0.20221230110225-f0786b77b297
 	github.com/fogleman/gg v1.3.0
 	github.com/glebarez/sqlite v1.6.0
 	github.com/go-resty/resty/v2 v2.7.0
@@ -46,6 +46,7 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/mozillazg/go-pinyin v0.19.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20220927061507-ef77025ab5aa // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
