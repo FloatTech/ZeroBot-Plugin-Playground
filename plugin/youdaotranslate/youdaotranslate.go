@@ -32,9 +32,8 @@ type youdao struct {
 func init() {
 	en := control.Register("youdaotranslate", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
-		Brief: "有道翻译",
-		Help: 
-			"- 有道(英语|日语|韩语)翻译\n",
+		Brief:            "有道翻译",
+		Help:             "- 有道(英语|日语|韩语)翻译\n",
 	})
 	en.OnMessage(func(ctx *zero.Ctx) bool {
 		msg := ctx.Event.Message

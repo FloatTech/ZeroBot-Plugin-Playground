@@ -43,10 +43,9 @@ var aliveMsg = []string{
 
 func init() { // 插件主体
 	engine := control.Register("roulette", &ctrl.Options[*zero.Ctx]{
-		DisableOnDefault: false,
-		Brief: "轮盘赌",
-		Help: 
-			"- 创建轮盘赌\n- 加入轮盘赌\n- 开始轮盘赌\n- 开火\n- 终止轮盘赌",
+		DisableOnDefault:  false,
+		Brief:             "轮盘赌",
+		Help:              "- 创建轮盘赌\n- 加入轮盘赌\n- 开始轮盘赌\n- 开火\n- 终止轮盘赌",
 		PrivateDataFolder: "roulette",
 	})
 	dataPath := engine.DataFolder() + "rate.json"
