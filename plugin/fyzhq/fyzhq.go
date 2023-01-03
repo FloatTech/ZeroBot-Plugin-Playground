@@ -15,7 +15,7 @@ import (
 func init() {
 	engine := control.Register("fyzhq", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
-		Brief: "发音转换器",
+		Brief:            "发音转换器",
 		Help:             "- /发音转换 -l jp -t 你好世界 (语言: jp,en,fr,gm,ru,kr,th)",
 	})
 	engine.OnCommand("发音转换").SetBlock(true).Handle(func(ctx *zero.Ctx) {

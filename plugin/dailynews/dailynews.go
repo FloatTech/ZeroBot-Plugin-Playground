@@ -12,10 +12,9 @@ import (
 
 func init() { // 插件主体
 	engine := control.Register("dailynews", &ctrl.Options[*zero.Ctx]{
-		DisableOnDefault: false,
-		Brief: "今日早报",
-		Help:
-			"- 今日早报",
+		DisableOnDefault:  false,
+		Brief:             "今日早报",
+		Help:              "- 今日早报",
 		PrivateDataFolder: "dailynews",
 	})
 

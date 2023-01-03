@@ -21,10 +21,9 @@ import (
 
 func init() {
 	engine := control.Register("vote", &ctrl.Options[*zero.Ctx]{
-		DisableOnDefault: false,
-		Brief: "投票",
-		Help: 
-			"- 投票选择可口可乐还是百事可乐\n",
+		DisableOnDefault:  false,
+		Brief:             "投票",
+		Help:              "- 投票选择可口可乐还是百事可乐\n",
 		PrivateDataFolder: "vote",
 	})
 

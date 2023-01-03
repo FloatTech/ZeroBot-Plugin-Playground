@@ -29,9 +29,8 @@ var (
 func init() { // 插件主体
 	engine := control.Register("fadian", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
-		Brief: "每日发癫",
-		Help: 
-			"- 每日发癫 嘉然",
+		Brief:            "每日发癫",
+		Help:             "- 每日发癫 嘉然",
 		PublicDataFolder: "Fadian",
 	})
 
