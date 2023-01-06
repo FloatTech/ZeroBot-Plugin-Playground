@@ -4,6 +4,7 @@ package vtbmusic
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"strconv"
 	"strings"
 	"time"
@@ -91,9 +92,10 @@ type musicList struct {
 
 func init() { // 插件主体
 	engine := control.Register("vtbmusic", &ctrl.Options[*zero.Ctx]{
-		DisableOnDefault:  false,
-		Brief:             "vtb点歌",
-		Help:              "- vtb点歌",
+		DisableOnDefault: false,
+		Brief:            "vtbmusic.com点歌",
+		Help: "- vtb点歌\n" +
+			"- vtb随机点歌",
 		PrivateDataFolder: "vtbmusic",
 	})
 
@@ -136,20 +138,19 @@ func init() { // 插件主体
 			for {
 				select {
 				case <-time.After(time.Second * 120):
-					cancel()
-					ctx.SendChain(message.Text("vtb点歌超时"))
+					ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("vtb点歌超时"))
 					return
 				case c := <-recv:
 					msg := c.Event.Message.ExtractPlainText()
 					num, err = strconv.Atoi(msg)
 					if err != nil {
-						ctx.SendChain(message.Text("请输入数字!"))
+						ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("请输入数字!"))
 						continue
 					}
 					switch i {
 					case 0:
 						if num < 0 || num >= len(gl.Data) {
-							ctx.SendChain(message.Text("序号非法!"))
+							ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("序号非法!"))
 							continue
 						}
 						paras[0] = num
@@ -167,7 +168,7 @@ func init() { // 插件主体
 						}
 					case 1:
 						if num < 0 || num >= len(gl.Data[paras[0]].VocalList) {
-							ctx.SendChain(message.Text("序号非法!"))
+							ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("序号非法!"))
 							continue
 						}
 						paras[1] = num
@@ -195,7 +196,7 @@ func init() { // 插件主体
 						}
 					case 2:
 						if num < 0 || num >= len(ml.Data) {
-							ctx.SendChain(message.Text("序号非法!"))
+							ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("序号非法!"))
 							continue
 						}
 						paras[2] = num
@@ -209,5 +210,41 @@ func init() { // 插件主体
 					i++
 				}
 			}
+		})
+	engine.OnFullMatch(`vtb随机点歌`).SetBlock(true).
+		Handle(func(ctx *zero.Ctx) {
+			var (
+				paras = [3]int{}
+				gl    groupsList
+				ml    musicList
+			)
+			data, err := web.PostData(getGroupListURL, "application/json", strings.NewReader(`{"PageIndex":1,"PageRows":9999}`))
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR: ", err))
+				return
+			}
+			err = json.Unmarshal(data, &gl)
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR: ", err))
+				return
+			}
+			paras[0] = rand.Intn(len(gl.Data))
+			paras[1] = rand.Intn(len(gl.Data[paras[0]].VocalList))
+			data, err = web.PostData(getMusicListURL, "application/json", strings.NewReader(fmt.Sprintf(musicListBody, gl.Data[paras[0]].VocalList[paras[1]].ID)))
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR: ", err))
+				return
+			}
+			err = json.Unmarshal(data, &ml)
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR: ", err))
+				return
+			}
+			paras[2] = rand.Intn(len(ml.Data))
+			// 最后播放歌曲
+			vtbName := gl.Data[paras[0]].VocalList[paras[1]].OriginName
+			musicName := ml.Data[paras[2]].OriginName
+			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("请欣赏", vtbName, "的《", musicName, "》"))
+			ctx.SendChain(message.Record(fileURL + ml.Data[paras[2]].Music))
 		})
 }
