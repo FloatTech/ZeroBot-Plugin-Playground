@@ -2,15 +2,92 @@
 package vtbmusic
 
 import (
+	"encoding/json"
+	"fmt"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/FloatTech/floatbox/binary"
+	"github.com/FloatTech/floatbox/web"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
+	"github.com/FloatTech/zbputils/img/text"
 	zero "github.com/wdvxdr1123/ZeroBot"
+	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
 const (
 	getGroupListURL = "https://aqua.chat/v1/GetGroupsList"
 	getMusicListURL = "https://aqua.chat/v1/GetMusicList"
+	fileURL         = "https://cdn.aqua.chat/"
+	musicListBody   = `{"search":{"condition":"VocalId","keyword":"%v"},"sortField":"CreateTime","sortType":"desc","pageIndex":1,"pageRows":10000}`
 )
+
+type groupsList struct {
+	Total int `json:"Total"`
+	Data  []struct {
+		ID         string `json:"Id"`
+		CreateTime string `json:"CreateTime"`
+		Name       string `json:"Name"`
+		GroupImg   string `json:"GroupImg"`
+		VocalList  []struct {
+			ID          string `json:"Id"`
+			CreateTime  string `json:"CreateTime"`
+			ChineseName string `json:"ChineseName"`
+			OriginName  string `json:"OriginName"`
+			AvatarImg   string `json:"AvatarImg"`
+		} `json:"VocalList"`
+	} `json:"Data"`
+	Success   bool        `json:"Success"`
+	ErrorCode int         `json:"ErrorCode"`
+	Msg       interface{} `json:"Msg"`
+}
+
+type musicList struct {
+	Total int `json:"Total"`
+	Data  []struct {
+		ID              string      `json:"Id"`
+		CreateTime      string      `json:"CreateTime"`
+		PublishTime     interface{} `json:"PublishTime"`
+		CreatorID       interface{} `json:"CreatorId"`
+		CreatorRealName interface{} `json:"CreatorRealName"`
+		Deleted         bool        `json:"Deleted"`
+		OriginName      string      `json:"OriginName"`
+		VocalID         string      `json:"VocalId"`
+		VocalName       string      `json:"VocalName"`
+		CoverImg        string      `json:"CoverImg"`
+		Music           string      `json:"Music"`
+		Lyric           interface{} `json:"Lyric"`
+		CDN             string      `json:"CDN"`
+		BiliBili        interface{} `json:"BiliBili"`
+		YouTube         interface{} `json:"YouTube"`
+		Twitter         interface{} `json:"Twitter"`
+		Likes           interface{} `json:"Likes"`
+		Length          float64     `json:"Length"`
+		Label           interface{} `json:"Label"`
+		IsLike          bool        `json:"isLike"`
+		Duration        float64     `json:"Duration"`
+		Source          interface{} `json:"Source"`
+		SourceName      interface{} `json:"SourceName"`
+		Statis          struct {
+			PlayCount    int `json:"PlayCount"`
+			CommentCount int `json:"CommentCount"`
+			LikeCount    int `json:"LikeCount"`
+			ShareCount   int `json:"ShareCount"`
+		} `json:"Statis"`
+		VocalList []struct {
+			ID         string `json:"Id"`
+			Cn         string `json:"cn"`
+			Jp         string `json:"jp"`
+			En         string `json:"en"`
+			Originlang string `json:"originlang"`
+		} `json:"VocalList"`
+	} `json:"Data"`
+	Success   bool        `json:"Success"`
+	ErrorCode int         `json:"ErrorCode"`
+	Msg       interface{} `json:"Msg"`
+}
 
 func init() { // 插件主体
 	engine := control.Register("vtbmusic", &ctrl.Options[*zero.Ctx]{
@@ -23,6 +100,114 @@ func init() { // 插件主体
 	// 开启
 	engine.OnFullMatch(`vtb点歌`).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
-
+			next := zero.NewFutureEvent("message", 999, false, ctx.CheckSession(), zero.RegexRule(`^\d+$`))
+			recv, cancel := next.Repeat()
+			defer cancel()
+			i := 0
+			paras := [3]int{}
+			data, err := web.PostData(getGroupListURL, "application/json", strings.NewReader(`{"PageIndex":1,"PageRows":9999}`))
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR: ", err))
+				return
+			}
+			var (
+				gl         groupsList
+				ml         musicList
+				num        int
+				imageBytes []byte
+			)
+			err = json.Unmarshal(data, &gl)
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR: ", err))
+				return
+			}
+			tex := "请输入群组序号\n"
+			for i, v := range gl.Data {
+				tex += fmt.Sprintf("%d. %s\n", i, v.Name)
+			}
+			imageBytes, err = text.RenderToBase64(tex, text.FontFile, 400, 20)
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR: ", err))
+				return
+			}
+			if id := ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Image("base64://"+binary.BytesToString(imageBytes))); id.ID() == 0 {
+				ctx.SendChain(message.Text("ERROR: 可能被风控了"))
+			}
+			for {
+				select {
+				case <-time.After(time.Second * 120):
+					cancel()
+					ctx.SendChain(message.Text("vtb点歌超时"))
+					return
+				case c := <-recv:
+					msg := c.Event.Message.ExtractPlainText()
+					num, err = strconv.Atoi(msg)
+					if err != nil {
+						ctx.SendChain(message.Text("请输入数字!"))
+						continue
+					}
+					switch i {
+					case 0:
+						if num < 0 || num >= len(gl.Data) {
+							ctx.SendChain(message.Text("序号非法!"))
+							continue
+						}
+						paras[0] = num
+						tex = "请输入vtb序号\n"
+						for i, v := range gl.Data[paras[0]].VocalList {
+							tex += fmt.Sprintf("%d. %s\n", i, v.OriginName)
+						}
+						imageBytes, err = text.RenderToBase64(tex, text.FontFile, 400, 20)
+						if err != nil {
+							ctx.SendChain(message.Text("ERROR: ", err))
+							return
+						}
+						if id := ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Image("base64://"+binary.BytesToString(imageBytes))); id.ID() == 0 {
+							ctx.SendChain(message.Text("ERROR: 可能被风控了"))
+						}
+					case 1:
+						if num < 0 || num >= len(gl.Data[paras[0]].VocalList) {
+							ctx.SendChain(message.Text("序号非法!"))
+							continue
+						}
+						paras[1] = num
+						data, err := web.PostData(getMusicListURL, "application/json", strings.NewReader(fmt.Sprintf(musicListBody, gl.Data[paras[0]].VocalList[paras[1]].ID)))
+						if err != nil {
+							ctx.SendChain(message.Text("ERROR: ", err))
+							return
+						}
+						err = json.Unmarshal(data, &ml)
+						if err != nil {
+							ctx.SendChain(message.Text("ERROR: ", err))
+							return
+						}
+						tex = "请输入歌曲序号\n"
+						for i, v := range ml.Data {
+							tex += fmt.Sprintf("%d. %s\n", i, v.OriginName)
+						}
+						imageBytes, err = text.RenderToBase64(tex, text.FontFile, 400, 20)
+						if err != nil {
+							ctx.SendChain(message.Text("ERROR: ", err))
+							return
+						}
+						if id := ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Image("base64://"+binary.BytesToString(imageBytes))); id.ID() == 0 {
+							ctx.SendChain(message.Text("ERROR: 可能被风控了"))
+						}
+					case 2:
+						if num < 0 || num >= len(ml.Data) {
+							ctx.SendChain(message.Text("序号非法!"))
+							continue
+						}
+						paras[2] = num
+						// 最后播放歌曲
+						vtbName := gl.Data[paras[0]].VocalList[paras[1]].OriginName
+						musicName := ml.Data[paras[2]].OriginName
+						ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("请欣赏", vtbName, "的《", musicName, "》"))
+						ctx.SendChain(message.Record(fileURL + ml.Data[paras[2]].Music))
+						return
+					}
+					i++
+				}
+			}
 		})
 }

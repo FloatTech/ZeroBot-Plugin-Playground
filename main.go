@@ -35,6 +35,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/subweibo"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/tgyj"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vote"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vtbmusic"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/youdaotranslate"
 
 	// 程序主体
