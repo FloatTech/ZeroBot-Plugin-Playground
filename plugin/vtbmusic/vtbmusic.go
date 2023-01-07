@@ -159,6 +159,10 @@ func init() { // 插件主体
 							ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("序号非法!"))
 							continue
 						}
+						if len(gl.Data[num].VocalList) == 0 {
+							ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("无内容, 点歌失败"))
+							return
+						}
 						paras[0] = num
 						tex = "请输入vtb序号\n"
 						for i, v := range gl.Data[paras[0]].VocalList {
@@ -186,6 +190,10 @@ func init() { // 插件主体
 						err = json.Unmarshal(data, &ml)
 						if err != nil {
 							ctx.SendChain(message.Text("ERROR: ", err))
+							return
+						}
+						if len(ml.Data) == 0 {
+							ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("无内容, 点歌失败"))
 							return
 						}
 						tex = "请输入歌曲序号\n"
@@ -247,9 +255,13 @@ func init() { // 插件主体
 				return
 			}
 			if len(gl.Data) == 0 {
-
+				ctx.SendChain(message.Text("ERROR: 数组为空"))
+				return
 			}
 			paras[0] = rand.Intn(len(gl.Data))
+			for len(gl.Data[paras[0]].VocalList) == 0 {
+				paras[0] = rand.Intn(len(gl.Data))
+			}
 			paras[1] = rand.Intn(len(gl.Data[paras[0]].VocalList))
 			data, err = web.PostData(getMusicListURL, "application/json", strings.NewReader(fmt.Sprintf(musicListBody, gl.Data[paras[0]].VocalList[paras[1]].ID)))
 			if err != nil {
@@ -260,6 +272,19 @@ func init() { // 插件主体
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
+			}
+			for len(ml.Data) == 0 {
+				paras[1] = rand.Intn(len(gl.Data[paras[0]].VocalList))
+				data, err = web.PostData(getMusicListURL, "application/json", strings.NewReader(fmt.Sprintf(musicListBody, gl.Data[paras[0]].VocalList[paras[1]].ID)))
+				if err != nil {
+					ctx.SendChain(message.Text("ERROR: ", err))
+					return
+				}
+				err = json.Unmarshal(data, &ml)
+				if err != nil {
+					ctx.SendChain(message.Text("ERROR: ", err))
+					return
+				}
 			}
 			paras[2] = rand.Intn(len(ml.Data))
 			// 最后播放歌曲
