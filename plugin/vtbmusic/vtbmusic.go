@@ -205,7 +205,9 @@ func init() { // 插件主体
 						vtbName := gl.Data[paras[0]].VocalList[paras[1]].OriginName
 						musicName := ml.Data[paras[2]].OriginName
 						ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("请欣赏", groupName, "-", vtbName, "的《", musicName, "》"))
-						ctx.SendChain(message.Record(fileURL + ml.Data[paras[2]].Music))
+						if id := ctx.SendChain(message.Record(fileURL + ml.Data[paras[2]].Music)); id.ID() == 0 {
+							ctx.SendChain(message.Text(fileURL+ml.Data[paras[2]].Music, " 失效"))
+						}
 						return
 					}
 					i++
@@ -247,6 +249,8 @@ func init() { // 插件主体
 			vtbName := gl.Data[paras[0]].VocalList[paras[1]].OriginName
 			musicName := ml.Data[paras[2]].OriginName
 			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("请欣赏", groupName, "-", vtbName, "的《", musicName, "》"))
-			ctx.SendChain(message.Record(fileURL + ml.Data[paras[2]].Music))
+			if id := ctx.SendChain(message.Record(fileURL + ml.Data[paras[2]].Music)); id.ID() == 0 {
+				ctx.SendChain(message.Text(fileURL+ml.Data[paras[2]].Music, " 失效"))
+			}
 		})
 }
