@@ -4,12 +4,17 @@ package vtbmusic
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"math/rand"
+	"net/http"
+	"os"
+	"path"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/FloatTech/floatbox/binary"
+	"github.com/FloatTech/floatbox/file"
 	"github.com/FloatTech/floatbox/web"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
@@ -98,7 +103,8 @@ func init() { // 插件主体
 			"- vtb随机点歌",
 		PrivateDataFolder: "vtbmusic",
 	})
-
+	storePath := engine.DataFolder() + "store/"
+	_ = os.MkdirAll(storePath, 0755)
 	// 开启
 	engine.OnFullMatch(`vtb点歌`).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
@@ -204,10 +210,19 @@ func init() { // 插件主体
 						groupName := gl.Data[paras[0]].Name
 						vtbName := gl.Data[paras[0]].VocalList[paras[1]].OriginName
 						musicName := ml.Data[paras[2]].OriginName
+						recURL := fileURL + ml.Data[paras[2]].Music
 						ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("请欣赏", groupName, "-", vtbName, "的《", musicName, "》"))
-						if id := ctx.SendChain(message.Record(fileURL + ml.Data[paras[2]].Music)); id.ID() == 0 {
-							ctx.SendChain(message.Text(fileURL+ml.Data[paras[2]].Music, " 失效"))
+						recordFile := storePath + fmt.Sprintf("%d-%d-%d", paras[0], paras[1], paras[2]) + path.Ext(recURL)
+						if file.IsExist(recordFile) {
+							ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + recordFile))
+							return
 						}
+						err = initRecord(recordFile, recURL)
+						if err != nil {
+							ctx.SendChain(message.Text("ERROR: ", err))
+							return
+						}
+						ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + recordFile))
 						return
 					}
 					i++
@@ -231,6 +246,9 @@ func init() { // 插件主体
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
+			if len(gl.Data) == 0 {
+
+			}
 			paras[0] = rand.Intn(len(gl.Data))
 			paras[1] = rand.Intn(len(gl.Data[paras[0]].VocalList))
 			data, err = web.PostData(getMusicListURL, "application/json", strings.NewReader(fmt.Sprintf(musicListBody, gl.Data[paras[0]].VocalList[paras[1]].ID)))
@@ -248,9 +266,41 @@ func init() { // 插件主体
 			groupName := gl.Data[paras[0]].Name
 			vtbName := gl.Data[paras[0]].VocalList[paras[1]].OriginName
 			musicName := ml.Data[paras[2]].OriginName
+			recURL := fileURL + ml.Data[paras[2]].Music
 			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("请欣赏", groupName, "-", vtbName, "的《", musicName, "》"))
-			if id := ctx.SendChain(message.Record(fileURL + ml.Data[paras[2]].Music)); id.ID() == 0 {
-				ctx.SendChain(message.Text(fileURL+ml.Data[paras[2]].Music, " 失效"))
+			recordFile := storePath + fmt.Sprintf("%d-%d-%d", paras[0], paras[1], paras[2]) + path.Ext(recURL)
+			if file.IsExist(recordFile) {
+				ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + recordFile))
+				return
 			}
+			err = initRecord(recordFile, recURL)
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR: ", err))
+				return
+			}
+			ctx.SendChain(message.Record("file:///" + file.BOTPATH + "/" + recordFile))
 		})
+}
+
+func initRecord(recordFile, recordURL string) error {
+	if file.IsNotExist(recordFile) {
+		client := web.NewTLS12Client()
+		req, _ := http.NewRequest("GET", recordURL, nil)
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0) Gecko/20100101 Firefox/6.0")
+		resp, err := client.Do(req)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		data, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		err = os.WriteFile(recordFile, data, 0666)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
