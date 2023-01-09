@@ -2,12 +2,16 @@
 package asoularticle
 
 import (
+	"fmt"
 	"net/url"
 
+	"github.com/FloatTech/floatbox/web"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
+	"github.com/tidwall/gjson"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
+	"jaytaylor.com/html2text"
 )
 
 func init() { // 插件主体
@@ -27,10 +31,15 @@ func init() { // 插件主体
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
-			tex, err := url.QueryUnescape(a.Brief)
+			u := fmt.Sprintf(detailURL, url.QueryEscape(a.Title))
+			data, err := web.RequestDataWith(web.NewDefaultClient(), u, "GET", u, web.RandUA())
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
+			}
+			tex, err := html2text.FromString(gjson.ParseBytes(data).Get("htmlContent").String(), html2text.Options{PrettyTables: true})
+			if err != nil {
+				panic(err)
 			}
 			ctx.SendChain(message.Text(tex))
 		})

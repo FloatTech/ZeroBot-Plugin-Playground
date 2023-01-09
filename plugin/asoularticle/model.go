@@ -15,7 +15,8 @@ import (
 )
 
 const (
-	asoularticleURL = "https://asoul.icu/v/articles?pageNum=%v&pageSize=48"
+	articlesURL = "https://asoul.icu/v/articles?pageNum=%v&pageSize=48"
+	detailURL   = "https://asoul.icu/v/articles/%v"
 )
 
 type articleReply struct {
@@ -107,7 +108,7 @@ func (adb *articledb) truncateAndInsert() (err error) {
 	if err != nil {
 		return
 	}
-	data, err = web.GetData(fmt.Sprintf(asoularticleURL, pageNum))
+	data, err = web.GetData(fmt.Sprintf(articlesURL, pageNum))
 	if err != nil {
 		return
 	}
@@ -128,7 +129,7 @@ func (adb *articledb) truncateAndInsert() (err error) {
 			})
 		}
 		pageNum++
-		data, err = web.GetData(fmt.Sprintf(asoularticleURL, pageNum))
+		data, err = web.GetData(fmt.Sprintf(articlesURL, pageNum))
 		if err != nil {
 			return
 		}
