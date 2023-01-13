@@ -9,7 +9,7 @@ require (
 	github.com/FloatTech/rendercard v0.0.8
 	github.com/FloatTech/sqlite v1.5.7
 	github.com/FloatTech/zbpctrl v1.5.3-0.20230109124217-41203036b80a
-	github.com/FloatTech/zbputils v1.6.2-0.20230111073858-4d59c5450bfb
+	github.com/FloatTech/zbputils v1.6.2-0.20230112164125-70f5c997b775
 	github.com/fogleman/gg v1.3.0
 	github.com/glebarez/sqlite v1.6.0
 	github.com/go-resty/resty/v2 v2.7.0
@@ -46,7 +46,6 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/mozillazg/go-pinyin v0.19.0 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20220927061507-ef77025ab5aa // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
