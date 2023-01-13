@@ -23,7 +23,7 @@ var (
 func init() {
 	engine := control.Register("example2", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
-		Brief: "小锅饭的示例",
+		Brief:            "小锅饭的示例",
 		Help: "- hello\n- 完全匹配\n- 完全匹配组1 | 完全匹配组2\n- 关键词你好\n- /命令\n- 前缀你好\n- 你好后缀\n" +
 			"- 小锅饭正在洗澡\n- /用户 -n 小锅饭 -a 3\n- 牛逼\n- 消息检测\n- 文本\n- 艾特\n- 图片\n" +
 			"- 回复\n- 语音\n- 表情\n- 音乐\n- tts\n- 戳一戳\n",
