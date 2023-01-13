@@ -146,7 +146,7 @@ func init() {
 		ctx.SendChain(message.Image(screenshot(ctx)))
 	})
 	engine.OnRegex(`^>github\s?(.*)$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
-		data, err := web.RequestDataWith(web.NewDefaultClient(), fmt.Sprintf(githubSearchURL, url.QueryEscape(ctx.State["regex_matched"].([]string)[1])), "GET", "", web.RandUA())
+		data, err := web.RequestDataWith(web.NewDefaultClient(), fmt.Sprintf(githubSearchURL, url.QueryEscape(ctx.State["regex_matched"].([]string)[1])), "GET", "", web.RandUA(), nil)
 		if err != nil {
 			ctx.SendChain(message.Text("ERROR: ", err))
 		}

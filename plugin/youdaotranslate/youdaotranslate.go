@@ -102,7 +102,7 @@ func init() {
 
 func getYoudao(text string, tlType string) (tgt string, err error) {
 	var yd youdao
-	data, err := web.RequestDataWith(web.NewDefaultClient(), fmt.Sprintf(youdaotlURL, tlType, text), "GET", "", web.RandUA())
+	data, err := web.RequestDataWith(web.NewDefaultClient(), fmt.Sprintf(youdaotlURL, tlType, text), "GET", "", web.RandUA(), nil)
 	if err != nil {
 		return
 	}
