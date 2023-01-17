@@ -2,6 +2,7 @@
 package dailynews
 
 import (
+	"github.com/FloatTech/floatbox/binary"
 	"github.com/FloatTech/floatbox/web"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
@@ -9,6 +10,8 @@ import (
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
+
+const api = "http://dwz.2xb.cn/zaob"
 
 func init() { // 插件主体
 	engine := control.Register("dailynews", &ctrl.Options[*zero.Ctx]{
@@ -21,11 +24,11 @@ func init() { // 插件主体
 	// 开启
 	engine.OnKeyword(`今日早报`, zero.OnlyGroup).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
-			data, err := web.RequestDataWith(web.NewDefaultClient(), "http://dwz.2xb.cn/zaob", "GET", "", "")
+			data, err := web.GetData(api)
 			if err != nil {
 				return
 			}
-			picURL := gjson.Get(string(data), "imageUrl").String()
+			picURL := gjson.Get(binary.BytesToString(data), "imageUrl").String()
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR:", err))
 				return

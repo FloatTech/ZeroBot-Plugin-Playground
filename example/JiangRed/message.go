@@ -22,8 +22,12 @@ func init() {
 	engine := control.Register("example", &ctrl.Options[*zero.Ctx]{
 		// 控制插件是否默认启用 true为默认不启用 false反之
 		DisableOnDefault: false,
+		// 插件的简介
+		Brief: "例",
 		// 插件的帮助 管理员发送 /用法 example 可见
 		Help: "- example 插件的帮助",
+		// 插件的背景图, 支持http和本地路径
+		// Banner: "",
 		// 插件的数据存放路径, 分为公共和私有, 都会在/data下创建目录, 公有需要首字母大写, 私有需要首字母小写
 		PublicDataFolder: "Example",
 		// PrivateDataFolder: "example",		// 避免问题所以注释了

@@ -5,11 +5,11 @@ go 1.19
 require (
 	github.com/Coloured-glaze/gg v1.3.4
 	github.com/FloatTech/AnimeAPI v1.6.0
-	github.com/FloatTech/floatbox v0.0.0-20221228150204-a2bededce74d
-	github.com/FloatTech/rendercard v0.0.2
+	github.com/FloatTech/floatbox v0.0.0-20230111053652-a03d6334fadf
+	github.com/FloatTech/rendercard v0.0.8
 	github.com/FloatTech/sqlite v1.5.7
-	github.com/FloatTech/zbpctrl v1.5.3-0.20221210051848-740ab7bd6ec3
-	github.com/FloatTech/zbputils v1.6.1-0.20221230110225-f0786b77b297
+	github.com/FloatTech/zbpctrl v1.5.3-0.20230109124217-41203036b80a
+	github.com/FloatTech/zbputils v1.6.2-0.20230112164125-70f5c997b775
 	github.com/fogleman/gg v1.3.0
 	github.com/glebarez/sqlite v1.6.0
 	github.com/go-resty/resty/v2 v2.7.0
@@ -21,7 +21,7 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 	github.com/tidwall/gjson v1.14.4
 	github.com/wcharczuk/go-chart/v2 v2.1.0
-	github.com/wdvxdr1123/ZeroBot v1.6.6
+	github.com/wdvxdr1123/ZeroBot v1.6.7
 	gorm.io/gorm v1.24.2
 	jaytaylor.com/html2text v0.0.0-20211105163654-bc68cce691ba
 )
@@ -36,7 +36,7 @@ require (
 	github.com/ericpauley/go-quantize v0.0.0-20200331213906-ae555eb2afa4 // indirect
 	github.com/fumiama/cron v1.3.0 // indirect
 	github.com/fumiama/go-base16384 v1.6.4 // indirect
-	github.com/fumiama/go-registry v0.2.5-0.20221121111817-44b0846bdce6 // indirect
+	github.com/fumiama/go-registry v0.2.5 // indirect
 	github.com/fumiama/go-simple-protobuf v0.1.0 // indirect
 	github.com/fumiama/gofastTEA v0.0.10 // indirect
 	github.com/fumiama/jieba v0.0.0-20221203025406-36c17a10b565 // indirect
