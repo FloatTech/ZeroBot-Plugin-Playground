@@ -33,7 +33,7 @@ func init() { // 主函数
 				return true
 			})
 		}
-		service, _ := control.Lookup("kokomi")
+		service, _ := control.Lookup("killall")
 		service.Enable(grp) // 排除本插件
 		ctx.SendChain(message.Text("已" + key + "所有插件喵~"))
 	})
