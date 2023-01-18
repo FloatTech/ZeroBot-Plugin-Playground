@@ -16,9 +16,10 @@ import (
 
 func init() { // 插件主体
 	engine := control.Register("asoularticle", &ctrl.Options[*zero.Ctx]{
-		DisableOnDefault:  false,
-		Brief:             "小作文",
-		Help:              "- 小作文",
+		DisableOnDefault: false,
+		Brief:            "小作文",
+		Help: "- 小作文\n" +
+			"更新小作文",
 		PrivateDataFolder: "asoularticle",
 	})
 	go func() {
@@ -32,7 +33,7 @@ func init() { // 插件主体
 				return
 			}
 			u := fmt.Sprintf(detailURL, url.QueryEscape(a.Title))
-			data, err := web.RequestDataWith(web.NewDefaultClient(), u, "GET", u, web.RandUA())
+			data, err := web.RequestDataWith(web.NewDefaultClient(), u, "GET", u, web.RandUA(), nil)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
