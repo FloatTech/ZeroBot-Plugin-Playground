@@ -27,7 +27,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/hitokoto"
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/kfccrazythursday"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/killall" //一键禁用本群插件
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/killall" // 一键禁用本群插件
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/moegozh"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/ottoshout"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/partygame"
