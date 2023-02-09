@@ -6,6 +6,8 @@ require (
 	github.com/Coloured-glaze/gg v1.3.4
 	github.com/FloatTech/AnimeAPI v1.6.0
 	github.com/FloatTech/floatbox v0.0.0-20230111053652-a03d6334fadf
+	github.com/FloatTech/gg v1.1.1
+	github.com/FloatTech/imgfactory v0.2.1
 	github.com/FloatTech/rendercard v0.0.8
 	github.com/FloatTech/sqlite v1.5.7
 	github.com/FloatTech/zbpctrl v1.5.3-0.20230109124217-41203036b80a
@@ -39,6 +41,7 @@ require (
 	github.com/fumiama/go-registry v0.2.5 // indirect
 	github.com/fumiama/go-simple-protobuf v0.1.0 // indirect
 	github.com/fumiama/gofastTEA v0.0.10 // indirect
+	github.com/fumiama/imgsz v0.0.2 // indirect
 	github.com/fumiama/jieba v0.0.0-20221203025406-36c17a10b565 // indirect
 	github.com/glebarez/go-sqlite v1.20.0 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
@@ -53,10 +56,10 @@ require (
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
-	golang.org/x/image v0.2.0 // indirect
+	golang.org/x/image v0.3.0 // indirect
 	golang.org/x/net v0.4.0 // indirect
 	golang.org/x/sys v0.3.0 // indirect
-	golang.org/x/text v0.5.0 // indirect
+	golang.org/x/text v0.6.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	modernc.org/libc v1.22.2 // indirect
 	modernc.org/mathutil v1.5.0 // indirect
