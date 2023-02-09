@@ -9,8 +9,8 @@ import (
 
 const BASEURL = "https://api.openai.com/v1/"
 
-// ChatGPTResponseBody 请求体
-type ChatGPTResponseBody struct {
+// chatGPTResponseBody 请求体
+type chatGPTResponseBody struct {
 	ID      string                   `json:"id"`
 	Object  string                   `json:"object"`
 	Created int                      `json:"created"`
@@ -22,8 +22,8 @@ type ChatGPTResponseBody struct {
 type ChoiceItem struct {
 }
 
-// ChatGPTRequestBody 响应体
-type ChatGPTRequestBody struct {
+// chatGPTRequestBody 响应体
+type chatGPTRequestBody struct {
 	Model            string  `json:"model"`
 	Prompt           string  `json:"prompt"`
 	MaxTokens        int     `json:"max_tokens"`
@@ -39,7 +39,7 @@ type ChatGPTRequestBody struct {
 // -H "Authorization: Bearer your chatGPT key"
 // -d '{"model": "text-davinci-003", "prompt": "give me good song", "temperature": 0, "max_tokens": 7}'
 func completions(msg string, apiKey string) (string, error) {
-	requestBody := ChatGPTRequestBody{
+	requestBody := chatGPTRequestBody{
 		Model:            "text-davinci-003",
 		Prompt:           msg,
 		MaxTokens:        2048,
@@ -72,7 +72,7 @@ func completions(msg string, apiKey string) (string, error) {
 		return "", err
 	}
 
-	gptResponseBody := &ChatGPTResponseBody{}
+	gptResponseBody := &chatGPTResponseBody{}
 	err = json.Unmarshal(body, gptResponseBody)
 	if err != nil {
 		return "", err
