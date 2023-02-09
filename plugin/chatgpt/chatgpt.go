@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-const baseUrl = "https://api.openai.com/v1/"
+const baseURL = "https://api.openai.com/v1/"
 
 // chatGPTResponseBody 请求体
 type chatGPTResponseBody struct {
@@ -50,7 +50,7 @@ func completions(msg string, apiKey string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	req, err := http.NewRequest("POST", baseUrl+"completions", bytes.NewBuffer(requestData))
+	req, err := http.NewRequest("POST", baseURL+"completions", bytes.NewBuffer(requestData))
 	if err != nil {
 		return "", err
 	}
