@@ -1,3 +1,4 @@
+// Package chatgpt 简易ChatGPT api聊天
 package chatgpt
 
 import (
