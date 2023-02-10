@@ -11,11 +11,13 @@ import (
 	"sync"
 
 	"github.com/FloatTech/floatbox/file"
+	"github.com/FloatTech/floatbox/web"
 	"github.com/FloatTech/gg"
 	"github.com/FloatTech/imgfactory"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
 	"github.com/FloatTech/zbputils/img/text"
+	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
@@ -430,10 +432,16 @@ func truncate(one *gg.Context, text string, maxW float64) (string, float64) {
 // 编码看板娘图片和加载字体
 func (mp *mpic) loadpic() error {
 	if !file.IsExist(mp.font1) { // 获取字体
-		return errors.New("文件 " + mp.font1 + " 不存在")
+		err := downloadData(text.BoldFontFile, "https://gitcode.net/u011570312/zbpdata/-/raw/main/"+text.BoldFontFile[5:]+"?inline=true")
+		if err != nil {
+			return err
+		}
 	}
 	if !file.IsExist(mp.font2) { // 获取字体
-		return errors.New("文件 " + mp.font2 + " 不存在")
+		err := downloadData(text.SakuraFontFile, "https://gitcode.net/u011570312/zbpdata/-/raw/main/"+text.SakuraFontFile[5:]+"?inline=true")
+		if err != nil {
+			return err
+		}
 	}
 	if mp.isDisplay {
 		f, err := os.Open(mp.path)
@@ -449,5 +457,24 @@ func (mp *mpic) loadpic() error {
 		b := mp.im.Bounds().Size()
 		mp.w, mp.h = b.X, b.Y
 	}
+	return nil
+}
+
+// 下载数据,url=dataurl+path[5:]+"?inline=true"
+func downloadData(path, url string) error {
+	data, err := web.RequestDataWith(web.NewTLS12Client(), url, "GET", "gitcode.net", web.RandUA(), nil)
+	if err != nil {
+		return errors.New("下载" + url + "失败!")
+	}
+	logrus.Printf("[file]从镜像下载数据%d字节...", len(data))
+	if len(data) == 0 {
+		return errors.New("read body len <= 0")
+	}
+	// 写入数据
+	err = os.WriteFile(path, data, 0644)
+	if err != nil {
+		return err
+	}
+	logrus.Printf("[file]下载文件成功")
 	return nil
 }
