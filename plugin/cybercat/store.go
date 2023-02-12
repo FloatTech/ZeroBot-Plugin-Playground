@@ -43,13 +43,13 @@ func init() {
 		}
 		userInfo.User = ctx.Event.UserID
 		if userInfo.LastTime != 0 {
-			lastTime := time.Unix(userInfo.LastTime, 0).Day()
-			if lastTime == time.Now().Day() {
-				ctx.SendChain(message.Reply(id), message.Text("一天只能逛一次猫店哦"))
+			lastTime := time.Unix(userInfo.LastTime/10, 0).Day()
+			if lastTime == time.Now().Day() && userInfo.LastTime%10 > 2 {
+				ctx.SendChain(message.Reply(id), message.Text("一天只能逛三次猫店哦"))
 				return
 			}
 		}
-		userInfo.LastTime = time.Now().Unix()
+		userInfo.LastTime = time.Now().Unix()*10 + userInfo.LastTime%10 + 1
 		if catdata.insert(gidStr, userInfo) != nil {
 			ctx.SendChain(message.Text("[ERROR]:", err))
 			return
@@ -57,12 +57,14 @@ func init() {
 		money := wallet.GetWalletOf(ctx.Event.UserID)
 		if money < 100 {
 			ctx.SendChain(message.Reply(id), message.Text("一只喵喵官方售价100哦;\n你身上没有足够的钱,快去赚钱吧~"))
-			// return
-			ctx.SendChain(message.Reply(id), message.Text("当前为测试阶段,赠送你200"))
-			if wallet.InsertWalletOf(ctx.Event.UserID, 200) != nil {
-				ctx.SendChain(message.Text("[ERROR]:", err))
-				return
-			}
+			return
+			/*
+				ctx.SendChain(message.Reply(id), message.Text("当前为测试阶段,赠送你200"))
+				if wallet.InsertWalletOf(ctx.Event.UserID, 200) != nil {
+					ctx.SendChain(message.Text("[ERROR]:", err))
+					return
+				}
+			*/
 		}
 		money = 100
 		messageText := ""
