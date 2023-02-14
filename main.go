@@ -19,7 +19,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/animegan"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/asoularticle"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chinesebqb"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/cybercat"             // 云养猫
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/cybercat" // 云养猫
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/dailynews"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/deepdanbooru"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fadian"
