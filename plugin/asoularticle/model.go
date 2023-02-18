@@ -138,7 +138,7 @@ func (adb *articledb) truncateAndInsert() (err error) {
 			return
 		}
 	}
-	partition := Partition[Article](alist, 100)
+	partition := Partition(alist, 100)
 	for _, v := range partition {
 		err = db.Create(&v).Error
 		if err != nil {

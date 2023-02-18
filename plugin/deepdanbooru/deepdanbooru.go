@@ -17,14 +17,13 @@ import (
 	hf "github.com/FloatTech/AnimeAPI/huggingface"
 	"github.com/FloatTech/floatbox/binary"
 	"github.com/FloatTech/floatbox/file"
-	"github.com/FloatTech/floatbox/img/writer"
 	"github.com/FloatTech/floatbox/web"
+	"github.com/FloatTech/gg"
+	"github.com/FloatTech/imgfactory"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
 	"github.com/FloatTech/zbputils/ctxext"
-	imgutils "github.com/FloatTech/zbputils/img"
 	"github.com/FloatTech/zbputils/img/text"
-	"github.com/fogleman/gg"
 	"github.com/gorilla/websocket"
 	"github.com/tidwall/gjson"
 	zero "github.com/wdvxdr1123/ZeroBot"
@@ -56,7 +55,7 @@ func init() { // 插件主体
 				digest := md5.Sum(binary.StringToBytes(url))
 				f := cachefolder + hex.EncodeToString(digest[:])
 				if file.IsNotExist(f) {
-					_ = writer.SavePNG2Path(f, t)
+					_ = imgfactory.SavePNG2Path(f, t)
 				}
 				m := message.Message{ctxext.FakeSenderForwardNode(ctx, message.Image("file:///"+file.BOTPATH+"/"+f)),
 					ctxext.FakeSenderForwardNode(ctx, message.Text("tags: ", strings.Join(tseq, ",")))}
@@ -132,7 +131,7 @@ func handleImage(url string) (im image.Image, tseq []string, err error) {
 					return
 				}
 
-				img = imgutils.Limit(img, 1280, 720)
+				img = imgfactory.Limit(img, 1280, 720)
 
 				canvas := gg.NewContext(img.Bounds().Size().X, img.Bounds().Size().Y+int(float64(img.Bounds().Size().X)*0.2)+len(arr)*img.Bounds().Size().X/25)
 				canvas.SetRGB(1, 1, 1)

@@ -3,16 +3,14 @@ module github.com/FloatTech/ZeroBot-Plugin-Playground
 go 1.19
 
 require (
-	github.com/Coloured-glaze/gg v1.3.4
 	github.com/FloatTech/AnimeAPI v1.6.0
-	github.com/FloatTech/floatbox v0.0.0-20230111053652-a03d6334fadf
-	github.com/FloatTech/gg v1.1.1
-	github.com/FloatTech/imgfactory v0.2.1
-	github.com/FloatTech/rendercard v0.0.8
+	github.com/FloatTech/floatbox v0.0.0-20230207080446-026a2f086c74
+	github.com/FloatTech/gg v1.1.2
+	github.com/FloatTech/imgfactory v0.2.2-0.20230215052637-9f7b05520ca9
+	github.com/FloatTech/rendercard v0.0.10-0.20230215092509-ff0745852f23
 	github.com/FloatTech/sqlite v1.5.7
-	github.com/FloatTech/zbpctrl v1.5.3-0.20230109124217-41203036b80a
-	github.com/FloatTech/zbputils v1.6.2-0.20230112164125-70f5c997b775
-	github.com/fogleman/gg v1.3.0
+	github.com/FloatTech/zbpctrl v1.5.3-0.20230130095145-714ad318cd52
+	github.com/FloatTech/zbputils v1.6.2-0.20230217063720-e64cc4bde7c6
 	github.com/glebarez/sqlite v1.6.0
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
@@ -23,7 +21,7 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 	github.com/tidwall/gjson v1.14.4
 	github.com/wcharczuk/go-chart/v2 v2.1.0
-	github.com/wdvxdr1123/ZeroBot v1.6.7
+	github.com/wdvxdr1123/ZeroBot v1.6.9
 	gorm.io/gorm v1.24.2
 	jaytaylor.com/html2text v0.0.0-20211105163654-bc68cce691ba
 )
