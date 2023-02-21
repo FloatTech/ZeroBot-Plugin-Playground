@@ -5,11 +5,14 @@ import (
 	"math"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/FloatTech/AnimeAPI/wallet"
 	zbmath "github.com/FloatTech/floatbox/math"
 	"github.com/FloatTech/zbputils/ctxext"
+	"github.com/FloatTech/zbputils/img/text"
+	"github.com/fumiama/jieba/util/helper"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
@@ -49,8 +52,8 @@ func init() {
 			return
 		}
 		/***************************************************************/
-		ctx.SendChain(message.Text("等待对方回应。(发送“取消PK”撤回PK)\n请对方发送“去吧猫猫”接受PK或“拒绝”结束PK"))
-		recv, cancel := zero.NewFutureEvent("message", 999, false, zero.OnlyGroup, zero.RegexRule("^(去吧猫猫|取消PK|拒绝)$"), zero.CheckGroup(ctx.Event.GroupID), zero.CheckUser(zbmath.Str2Int64(duelStr))).Repeat()
+		ctx.SendChain(message.Text("等待对方回应。(发送“取消”撤回PK)\n请对方发送“去吧猫猫”接受PK或“拒绝”结束PK"))
+		recv, cancel := zero.NewFutureEvent("message", 999, false, zero.OnlyGroup, zero.RegexRule("^(去吧猫猫|取消|拒绝)$"), zero.CheckGroup(ctx.Event.GroupID), zero.CheckUser(zbmath.Str2Int64(duelStr), userInfo.User)).Repeat()
 		defer cancel()
 		approve := false
 		over := time.NewTimer(60 * time.Second)
@@ -67,7 +70,7 @@ func init() {
 						ctx.SendChain(message.Reply(id), message.Text("对方拒绝了你的PK"))
 						return
 					}
-				case "取消PK":
+				case "取消":
 					if c.Event.UserID == userInfo.User {
 						over.Stop()
 						ctx.SendChain(message.Reply(id), message.Text("你取消了PK"))
@@ -153,6 +156,7 @@ func init() {
 			loser.Weight -= math.Min(1, loser.Weight/10) * rand.Float64()
 			messageText = append(messageText, message.Text("\n"), message.At(loser.User),
 				message.Text("\n", loser.Name, "在PK中受伤了\n在医疗中心治愈过程中体重降低至", strconv.FormatFloat(loser.Weight, 'f', 2, 64)))
+
 		}
 		userInfo.ArenaTime = time.Now().Unix()
 		err = catdata.insert(gidStr, winer)
@@ -166,6 +170,7 @@ func init() {
 		ctx.Send(messageText)
 	})
 	engine.OnFullMatchGroup([]string{"猫猫排行榜", "喵喵排行榜"}, zero.OnlyGroup, getdb).SetBlock(true).Limit(ctxext.LimitByUser).Handle(func(ctx *zero.Ctx) {
+
 		gidStr := "group" + strconv.FormatInt(ctx.Event.GroupID, 10)
 		infoList, err := catdata.getGroupdata(gidStr)
 		if err != nil {
@@ -175,20 +180,22 @@ func init() {
 		if len(infoList) == 0 {
 			ctx.SendChain(message.Text("没有人养猫哦"))
 		}
-		messageText := make(message.Message, 0, 10)
+		messageText := make([]string, 0, 10)
 		for i, info := range infoList {
 			if i > 9 {
 				break
-			} else if i != 0 {
-				messageText = append(messageText, message.Text("\n"))
 			}
-			messageText = append(messageText, message.Text(
-				i+1, ".", info.Name, "(", info.Type, ")\n",
-				"体重：", strconv.FormatFloat(info.Weight, 'f', 2, 64), "kg\n",
-				"主人:", ctx.CardOrNickName(info.User),
-			))
+			messageText = append(messageText, []string{
+				strconv.Itoa(i+1) + "." + info.Name + "(" + info.Type + ")",
+				"体重：" + strconv.FormatFloat(info.Weight, 'f', 2, 64) + "斤",
+				"主人:" + ctx.CardOrNickName(info.User), "--------------------",
+			}...)
 		}
-		ctx.SendChain(messageText...)
+		textPic, err := text.RenderToBase64(strings.Join(messageText, "\n"), text.BoldFontFile, 1080, 50)
+		if err != nil {
+			return
+		}
+		ctx.SendChain(message.Image("base64://" + helper.BytesToString(textPic)))
 	})
 }
 
