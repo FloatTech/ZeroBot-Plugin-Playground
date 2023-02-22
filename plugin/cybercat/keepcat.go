@@ -32,7 +32,7 @@ func init() {
 		workStauts := "休闲中"
 		money, workEnd := userInfo.settleOfWork(gidStr)
 		if !workEnd {
-			overwork := time.Unix(userInfo.Work, 0).Add(time.Hour * time.Duration(userInfo.Work%10))
+			overwork := time.Unix(userInfo.Work/10, 0).Add(time.Hour * time.Duration(userInfo.Work%10))
 			workStauts = overwork.Format("工作中(将在01月02日15:04下班)")
 		} else {
 			/***************************************************************/
