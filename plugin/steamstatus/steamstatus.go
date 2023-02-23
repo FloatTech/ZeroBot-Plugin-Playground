@@ -2,16 +2,17 @@
 package steamstatus
 
 import (
+	"os"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/FloatTech/floatbox/file"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
-	"os"
-	"strconv"
-	"strings"
-	"time"
 )
 
 var (
@@ -19,9 +20,9 @@ var (
 		DisableOnDefault: false,
 		Brief:            "steam视奸",
 		Help: "一款用来视奸你steam好友的插件\n-----------------------\n" +
-			"- 创建监听 xxxxxxx （可输入自定义 URL 的值或 steamid。" +
-			"- 删除监听 xxxxxxx （删除你创建的对于 URL 或 steamid 的监听）\n-----------------------\n" +
-			"TIP：自定义URL获取：个人资料页面右键复制 URL，选中 /id/ 后到最后一个斜杠之间的内容。",
+			"- 创建监听 xxxxxxx （可输入需要监听的 steamid )\n" +
+			"- 删除监听 xxxxxxx （删除你创建的对于 steamid 的监听）\n-----------------------\n" +
+			"TIP：steamID在用户资料页的链接上面，形如7656119820673xxxx",
 		PrivateDataFolder: "steamstatus",
 	})
 )
@@ -37,14 +38,14 @@ func init() {
 		apiKey = strings.TrimSpace(string(apiKeyByte))
 	} else { // 如果没有配置文件直接退出
 		control.Delete("steamstatus")
-		logrus.Info("【steamstatus插件】未配置对应的插件链接密钥，主动移除插件")
+		logrus.Info("[steamstatus] 未配置对应的插件链接密钥，主动移除插件")
 		return
 	}
 	// 初始化数据库
 	err := initStore()
 	if err != nil {
 		// 抛错误但是不影响程序整体运行
-		logrus.Errorf("【steamstatus插件】初始化数据库失败，请检查data文件目录，错误为：%+v", err)
+		logrus.Errorf("[steamstatus] 初始化数据库失败，请检查data文件目录，错误为：%+v", err)
 		panic(err)
 	}
 	// 初始化循环监听器
@@ -53,12 +54,13 @@ func init() {
 	engine.OnRegex(`^创建监听\s*(.*)$`, zero.OnlyGroup).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		vanityUrl := ctx.State["regex_matched"].([]string)[1]
 		// 获取参数，判断是url还是steamId
-		steamId, err := getPlayerSteamIdWithUrl(vanityUrl)
-		if err != nil {
-			// 这里不直接抛出错误
-			logrus.Error("创建失败，转换steamId接口异常，错误：" + err.Error())
-			steamId = vanityUrl
-		}
+		steamId := vanityUrl
+		//steamId, err = getPlayerSteamIdWithUrl(vanityUrl)
+		//if err != nil {
+		//	// 这里不直接抛出错误
+		//	logrus.Error("[steamstatus] 创建失败，转换steamId接口异常，错误：" + err.Error())
+		//	steamId = vanityUrl
+		//}
 		// 通过steamId来获取用户当前状态
 		playerStatus, err := getPlayerStatus([]string{steamId})
 		if err != nil {
@@ -110,25 +112,18 @@ func init() {
 			ctx.SendChain(message.Text("所需要删除的监听不存在，请检查绑定关系。"))
 			return
 		}
-		targets := strings.Split(info.Target, ",")
 		groupId := strconv.FormatInt(ctx.Event.GroupID, 10)
-		needDel := false
-		index := 0
-		for n, target := range targets {
-			if groupId == target {
-				needDel = true
-				index = n
-			}
-		}
-		if !needDel {
+		if !strings.Contains(info.Target, groupId) {
 			ctx.SendChain(message.Text("所需要删除的监听未在当前群进行绑定，请检查绑定关系。"))
 			return
 		}
+		targets := strings.Split(info.Target, ",")
 		newTargets := make([]string, 0)
-		if index == 0 {
-			newTargets = targets[index+1:]
-		} else {
-			newTargets = append(targets[:index], targets[index+1:]...)
+		for _, target := range targets {
+			if target == groupId {
+				continue
+			}
+			newTargets = append(newTargets, target)
 		}
 		if len(newTargets) == 0 {
 			if err := database.del(steamId); err != nil {
@@ -155,14 +150,17 @@ func init() {
 			return
 		}
 		// 遍历所有信息，如果包含该群就收集对应的steamId
-		steamIds := make([]string, 0)
+		players := make([]string, 0)
 		for _, info := range infos {
 			if strings.Contains(info.Target, groupId) {
-				steamIds = append(steamIds, info.SteamId)
+				players = append(players, info.PersonaName)
 			}
 		}
+		if len(players) == 0 {
+			ctx.SendChain(message.Text("查询成功，该群暂时还没有被监听的用户！"))
+		}
 		// 组装并返回结果
-		result := strings.Join(steamIds, ",\n")
-		ctx.SendChain(message.Text("查询成功，该群监听的SteamId有：\n " + result))
+		result := strings.Join(players, ",\n")
+		ctx.SendChain(message.Text("查询成功，该群监听的用户有：\n" + result))
 	})
 }

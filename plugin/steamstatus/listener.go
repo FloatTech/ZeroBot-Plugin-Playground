@@ -3,20 +3,22 @@ package steamstatus
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/FloatTech/floatbox/web"
 	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
-	"strconv"
-	"strings"
-	"time"
 )
 
 // startListening 开启循环监听器
 func startListening() {
 	// 开启一个循环来不停的扫描用户状态
 	zero.RangeBot(func(id int64, ctx *zero.Ctx) bool {
+		logrus.Info("[steamstatus] 启动循环监听成功")
 		// 监听用户变化
 		listenUserChange(ctx)
 		// 每完成一次循环，等个30秒，然后再继续
@@ -32,6 +34,9 @@ func listenUserChange(ctx *zero.Ctx) {
 	if err != nil {
 		// 挂了就给管理员发消息
 		notice(ctx, err)
+		return
+	}
+	if len(infos) == 0 {
 		return
 	}
 	// 收集这波用户的streamId，然后查当前的状态，并建立信息映射表
@@ -69,7 +74,7 @@ func listenUserChange(ctx *zero.Ctx) {
 		localInfo.GameId = playerInfo.GameId
 		localInfo.GameExtraInfo = playerInfo.GameExtraInfo
 		if database.update(localInfo) != nil {
-			logrus.Errorf("【steamstatus插件】更新数据条目异常，异常对象:[%+v]，错误信息：[%+v]", localInfo, err)
+			logrus.Errorf("[steamstatus] 更新数据条目异常，异常对象:[%+v]，错误信息：[%+v]", localInfo, err)
 		}
 	}
 }
@@ -77,7 +82,7 @@ func listenUserChange(ctx *zero.Ctx) {
 // notice 告警
 func notice(ctx *zero.Ctx, err error) {
 	for _, id := range zero.BotConfig.SuperUsers {
-		ctx.SendPrivateMessage(id, message.Text("【steamstatus插件】喵的插件数据库链接炸了，快喵一眼。报错："+err.Error()))
+		ctx.SendPrivateMessage(id, message.Text("[steamstatus] 喵的插件数据库链接炸了，快喵一眼。报错："+err.Error()))
 	}
 }
 
@@ -87,7 +92,7 @@ func sendGroupMessageForPlayerGroups(ctx *zero.Ctx, playerInfo player, msg strin
 	for _, groupString := range groups {
 		group, err := strconv.ParseInt(groupString, 64, 10)
 		if err != nil {
-			logrus.Errorf("【steamstatus插件】数据条目异常，异常对象:[%+v]，错误信息：[%+v]", playerInfo, err)
+			logrus.Errorf("[steamstatus] 数据条目异常，异常对象:[%+v]，错误信息：[%+v]", playerInfo, err)
 			continue
 		}
 		ctx.SendGroupMessage(group, message.Text(msg))
@@ -96,9 +101,9 @@ func sendGroupMessageForPlayerGroups(ctx *zero.Ctx, playerInfo player, msg strin
 
 // ----------------------- 远程调用 ----------------------
 const (
-	APIUrl    = "https://api.steampowered.com/"                         // steam API 调用地址
-	VanityUrl = "ISteamUser/ResolveVanityURL/v1/?key=%+v&vanityurl=%+v" // 根据用户链接获取用户steamID接口，暂时不用
-	StatusUrl = "ISteamUser/GetPlayerSummaries/v2/?key=%+v&steamids%+v" // 根据用户steamID获取用户状态
+	APIUrl    = "https://api.steampowered.com/"                          // steam API 调用地址
+	VanityUrl = "ISteamUser/ResolveVanityURL/v1/?key=%+v&vanityurl=%+v"  // 根据用户链接获取用户steamID接口，暂时不用
+	StatusUrl = "ISteamUser/GetPlayerSummaries/v2/?key=%+v&steamids=%+v" // 根据用户steamID获取用户状态
 )
 
 var apiKey string
@@ -107,12 +112,48 @@ var apiKey string
 func getPlayerStatus(streamIds []string) ([]player, error) {
 	players := make([]player, 0)
 	url := fmt.Sprintf(APIUrl+StatusUrl, apiKey, strings.Join(streamIds, ","))
+	logrus.Debugf("[steamstatus] getPlayerStatus url：%+v", url)
 	data, err := web.GetData(url)
 	if err != nil {
 		return players, err
 	}
-	if json.Unmarshal(data, &players) != nil {
+	dataStruct := &struct {
+		Response struct {
+			Players []struct {
+				Steamid                  string `json:"steamid"`
+				Communityvisibilitystate int    `json:"communityvisibilitystate"`
+				Profilestate             int    `json:"profilestate"`
+				Personaname              string `json:"personaname"`
+				Commentpermission        int    `json:"commentpermission,omitempty"`
+				Profileurl               string `json:"profileurl"`
+				Avatar                   string `json:"avatar"`
+				Avatarmedium             string `json:"avatarmedium"`
+				Avatarfull               string `json:"avatarfull"`
+				Avatarhash               string `json:"avatarhash"`
+				Lastlogoff               int    `json:"lastlogoff"`
+				Personastate             int    `json:"personastate"`
+				Primaryclanid            string `json:"primaryclanid"`
+				Timecreated              int    `json:"timecreated"`
+				Personastateflags        int    `json:"personastateflags"`
+				Loccountrycode           string `json:"loccountrycode,omitempty"`
+				Locstatecode             string `json:"locstatecode,omitempty"`
+				Realname                 string `json:"realname,omitempty"`
+				Gameextrainfo            string `json:"gameextrainfo,omitempty"`
+				Gameid                   string `json:"gameid,omitempty"`
+			} `json:"players"`
+		} `json:"response"`
+	}{}
+	logrus.Debugf("[steamstatus] getPlayerStatus data：%+v \n", string(data))
+	if err := json.Unmarshal(data, dataStruct); err != nil {
 		return players, err
+	}
+	for _, p := range dataStruct.Response.Players {
+		players = append(players, player{
+			SteamId:       p.Steamid,
+			PersonaName:   p.Personaname,
+			GameId:        p.Gameid,
+			GameExtraInfo: p.Gameextrainfo,
+		})
 	}
 	return players, nil
 }
@@ -120,6 +161,7 @@ func getPlayerStatus(streamIds []string) ([]player, error) {
 // 根据用户的链接获取用户的steamId
 func getPlayerSteamIdWithUrl(vanityUrl string) (string, error) {
 	url := fmt.Sprintf(APIUrl+VanityUrl, apiKey, vanityUrl)
+	logrus.Debugf("[steamstatus] getPlayerSteamIdWithUrl url：%+v", url)
 	data, err := web.GetData(url)
 	if err != nil {
 		return "", err

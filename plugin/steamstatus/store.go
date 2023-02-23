@@ -1,7 +1,6 @@
 package steamstatus
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -56,10 +55,10 @@ func (sql *streamDB) update(dbInfo player) error {
 func (sql *streamDB) find(steamId string) (dbInfo player, err error) {
 	sql.Lock()
 	defer sql.Unlock()
-	if !sql.db.CanFind(database.Table, "where steam_id = "+steamId) {
+	if !sql.db.CanFind(database.Table, "where steamid = "+steamId) {
 		return player{}, nil // 规避没有该用户数据的报错
 	}
-	err = sql.db.Find(database.Table, &dbInfo, "where steam_id = "+steamId)
+	err = sql.db.Find(database.Table, &dbInfo, "where steamid = "+steamId)
 	return
 }
 
@@ -67,9 +66,12 @@ func (sql *streamDB) find(steamId string) (dbInfo player, err error) {
 func (sql *streamDB) findAll() (dbInfos []player, err error) {
 	sql.Lock()
 	defer sql.Unlock()
-	// TODO 数据量分页，应该暂时不需要
-	err = sql.db.FindFor(database.Table, dbInfos, "", func() error {
-		return fmt.Errorf("【steamstatus插件】扫描数据库错误，错误为：%+v", err)
+	info := player{}
+	err = sql.db.FindFor(database.Table, &info, "", func() error {
+		if info.SteamId != "" {
+			dbInfos = append(dbInfos, info)
+		}
+		return nil
 	})
 	return
 }
@@ -78,5 +80,5 @@ func (sql *streamDB) findAll() (dbInfos []player, err error) {
 func (sql *streamDB) del(steamId string) error {
 	sql.Lock()
 	defer sql.Unlock()
-	return sql.db.Del(database.Table, "where steam_id = "+steamId)
+	return sql.db.Del(database.Table, "where steamid = "+steamId)
 }
