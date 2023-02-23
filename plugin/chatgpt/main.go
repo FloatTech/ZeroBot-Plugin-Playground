@@ -15,9 +15,11 @@ var apiKey string
 
 func init() {
 	engine := control.Register("chatgpt", &ctrl.Options[*zero.Ctx]{
-		DisableOnDefault:  false,
-		Brief:             "chatgpt",
-		Help:              "- chatgpt",
+		DisableOnDefault: false,
+		Brief:            "chatgpt",
+		Help: "-@bot chatgpt [对话内容]\n" +
+			"不支持上下文且响应较慢\n" +
+			"(私聊发送)设置OpenAI apikey [apikey]",
 		PrivateDataFolder: "chatgpt",
 	})
 	apikeyfile := engine.DataFolder() + "apikey.txt"
@@ -36,9 +38,9 @@ func init() {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
-			ctx.SendChain(message.Text(ans))
+			ctx.SendChain(message.At(ctx.Event.UserID), message.Text(ans))
 		})
-	engine.OnRegex(`^设置\s*ChatGPT\s*apikey\s*(.*)$`, zero.OnlyPrivate, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnRegex(`^设置\s*OpenAI\s*apikey\s*(.*)$`, zero.OnlyPrivate, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		apiKey = ctx.State["regex_matched"].([]string)[1]
 		f, err := os.Create(apikeyfile)
 		if err != nil {
