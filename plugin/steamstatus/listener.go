@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/FloatTech/floatbox/process"
 	"github.com/FloatTech/floatbox/web"
 	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
@@ -14,17 +15,28 @@ import (
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
-// startListening 开启循环监听器
-func startListening() {
-	// 开启一个循环来不停的扫描用户状态
-	zero.RangeBot(func(id int64, ctx *zero.Ctx) bool {
+// init 开启循环监听器
+func init() {
+	// 开携程保证正常初始化
+	go func() {
+		// 锁用来阻塞插件在主函数初始化完成之后在启动对应的监听器
+		process.GlobalInitMutex.Lock()
+		defer process.GlobalInitMutex.Unlock()
+		process.SleepAbout1sTo2s()
 		logrus.Info("[steamstatus] 启动循环监听成功")
-		// 监听用户变化
-		listenUserChange(ctx)
-		// 每完成一次循环，等个30秒，然后再继续
-		time.Sleep(30 * time.Second)
-		return true
-	})
+		// 这里通过遍历的方式定位到对应的Bot之后就
+		index := int64(0)
+		zero.RangeBot(func(id int64, ctx *zero.Ctx) bool {
+			index = id // 定位到机器人的ID，然后直接退出
+			return false
+		})
+		for { // 开启一个永循环来不停的扫描用户状态
+			// 监听用户变化
+			listenUserChange(zero.GetBot(index))
+			// 每完成一次循环，等个30秒，然后再继续
+			time.Sleep(30 * time.Second)
+		}
+	}()
 }
 
 // listenUserChange 用于监听用户的信息变化
@@ -60,13 +72,15 @@ func listenUserChange(ctx *zero.Ctx) {
 		if localInfo.GameId == "" && playerInfo.GameId != "" { // 打开游戏
 			sendGroupMessageForPlayerGroups(ctx, localInfo, fmt.Sprintf("%+v正在玩%+v",
 				playerInfo.PersonaName, playerInfo.GameExtraInfo))
-		} else if playerInfo.GameId != localInfo.GameId && playerInfo.GameId != "" { // 更换游戏
 			localInfo.LastUpdate = now.Unix()
+		} else if playerInfo.GameId != localInfo.GameId && playerInfo.GameId != "" { // 更换游戏
 			sendGroupMessageForPlayerGroups(ctx, localInfo, fmt.Sprintf("%+v玩了%+v分钟后，丢下了%+v，转头去玩%+v",
 				playerInfo.PersonaName, (now.Unix()-localInfo.LastUpdate)/60, localInfo.GameExtraInfo, playerInfo.GameExtraInfo))
+			localInfo.LastUpdate = now.Unix()
 		} else if playerInfo.GameId != localInfo.GameId && playerInfo.GameId == "" { // 关闭游戏
 			sendGroupMessageForPlayerGroups(ctx, localInfo, fmt.Sprintf("%+v玩了%+v分钟后，关掉了%+v",
 				playerInfo.PersonaName, (now.Unix()-localInfo.LastUpdate)/60, localInfo.GameExtraInfo))
+			localInfo.LastUpdate = 0
 		} else { // 其它情况不更新数据
 			continue
 		}
@@ -82,7 +96,7 @@ func listenUserChange(ctx *zero.Ctx) {
 // notice 告警
 func notice(ctx *zero.Ctx, err error) {
 	for _, id := range zero.BotConfig.SuperUsers {
-		ctx.SendPrivateMessage(id, message.Text("[steamstatus] 喵的插件数据库链接炸了，快喵一眼。报错："+err.Error()))
+		ctx.SendPrivateMessage(id, message.Text("[steamstatus] 出问题了，快喵一眼。报错："+err.Error()))
 	}
 }
 
@@ -90,9 +104,9 @@ func notice(ctx *zero.Ctx, err error) {
 func sendGroupMessageForPlayerGroups(ctx *zero.Ctx, playerInfo player, msg string) {
 	groups := strings.Split(playerInfo.Target, ",")
 	for _, groupString := range groups {
-		group, err := strconv.ParseInt(groupString, 64, 10)
+		group, err := strconv.ParseInt(groupString, 10, 64)
 		if err != nil {
-			logrus.Errorf("[steamstatus] 数据条目异常，异常对象:[%+v]，错误信息：[%+v]", playerInfo, err)
+			logrus.Errorf("[steamstatus] 出现异常，异常对象:[%+v]，错误信息：[%+v]", playerInfo, err)
 			continue
 		}
 		ctx.SendGroupMessage(group, message.Text(msg))

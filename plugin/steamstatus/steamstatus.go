@@ -48,8 +48,6 @@ func init() {
 		logrus.Errorf("[steamstatus] 初始化数据库失败，请检查data文件目录，错误为：%+v", err)
 		panic(err)
 	}
-	// 初始化循环监听器
-	go startListening()
 	// 创建监听流程
 	engine.OnRegex(`^创建监听\s*(.*)$`, zero.OnlyGroup).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		vanityUrl := ctx.State["regex_matched"].([]string)[1]
@@ -90,7 +88,9 @@ func init() {
 				LastUpdate:    time.Now().Unix(),
 			}
 		} else {
-			info.Target = strings.Join([]string{info.Target, groupId}, ",")
+			if !strings.Contains(info.Target, groupId) {
+				info.Target = strings.Join([]string{info.Target, groupId}, ",")
+			}
 		}
 		// 更新数据库
 		if err := database.update(info); err != nil {
