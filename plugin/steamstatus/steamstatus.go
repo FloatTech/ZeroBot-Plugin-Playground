@@ -21,7 +21,8 @@ var (
 		Brief:            "steam视奸",
 		Help: "一款用来视奸你steam好友的插件\n-----------------------\n" +
 			"- 创建监听 xxxxxxx （可输入需要监听的 steamid )\n" +
-			"- 删除监听 xxxxxxx （删除你创建的对于 steamid 的监听）\n-----------------------\n" +
+			"- 删除监听 xxxxxxx （删除你创建的对于 steamid 的监听\n" +
+			"- 查询监听（查询本群内所有的监听对象）\n-----------------------\n" +
 			"TIP：steamID在用户资料页的链接上面，形如7656119820673xxxx",
 		PrivateDataFolder: "steamstatus",
 	})
