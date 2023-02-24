@@ -43,7 +43,7 @@ func init() {
 		}
 		lastTime := time.Unix(userInfo.LastTime, 0).Day()
 		if lastTime != time.Now().Day() {
-			userInfo.Weight = 0
+			userInfo.Work = 0
 			userInfo.LastTime = 0
 		}
 		userInfo.User = ctx.Event.UserID
@@ -64,7 +64,14 @@ func init() {
 		money := wallet.GetWalletOf(ctx.Event.UserID)
 		if money < 100 {
 			ctx.SendChain(message.Reply(id), message.Text("一只喵喵官方售价100哦;\n你身上没有足够的钱,快去赚钱吧~"))
-			return
+			//*
+			return //*/
+			/*
+				ctx.SendChain(message.Reply(id), message.Text("当前为测试阶段,赠送你200"))
+				if wallet.InsertWalletOf(ctx.Event.UserID, 200) != nil {
+					ctx.SendChain(message.Text("[ERROR]:", err))
+					return
+				}//*/
 		}
 		/*******************************************************/
 		messageText := make(message.Message, 0, 3)
@@ -199,6 +206,10 @@ func init() {
 				ctx.SendChain(message.Reply(id), message.Text("猫猫店库存就100袋,你想干嘛"))
 				return
 			}
+			if mun < 1 {
+				ctx.SendChain(message.Reply(id), message.Text("请输入正确的数量"))
+				return
+			}
 		}
 		userInfo, err := catdata.find(gidStr, uidStr)
 		if err != nil {
@@ -206,7 +217,7 @@ func init() {
 			return
 		}
 		if userInfo.Food > 50 {
-			ctx.SendChain(message.Reply(id), message.Text("你家的猫粮已经装满仓库了!"))
+			ctx.SendChain(message.Reply(id), message.Text("你家的猫粮已经装满仓库(上限50斤)了!"))
 			return
 		}
 		userInfo.User = ctx.Event.UserID
