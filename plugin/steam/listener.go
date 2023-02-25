@@ -1,7 +1,6 @@
 package steam
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -120,7 +119,8 @@ func listenUserChange(ctx *zero.Ctx) {
 		localInfo.GameID = playerInfo.GameID
 		localInfo.GameExtraInfo = playerInfo.GameExtraInfo
 		if err = database.update(localInfo); err != nil {
-			logrus.Errorf("[steamstatus] 更新数据条目异常，异常对象:[%+v]，错误信息：[%+v]", localInfo, err)
+			ctx.SendPrivateMessage(zero.BotConfig.SuperUsers[0], message.Text("[steamstatus] 出问题了，异常对象:"+
+				localInfo.SteamID+"，错误信息："+err.Error()))
 		}
 	}
 }
@@ -149,10 +149,6 @@ var apiKey string
 // getPlayerStatus 获取用户状态
 func getPlayerStatus(streamIds []string) ([]player, error) {
 	players := make([]player, 0)
-	// 校验密钥是否初始化
-	if apiKey == "" {
-		return players, errors.New("未进行链接密钥初始化")
-	}
 	// 拼接请求地址
 	url := fmt.Sprintf(URL+StatusURL, apiKey, strings.Join(streamIds, ","))
 	logrus.Debugf("[steamstatus] getPlayerStatus url：%+v", url)
@@ -161,14 +157,15 @@ func getPlayerStatus(streamIds []string) ([]player, error) {
 	if err != nil {
 		return players, err
 	}
-	logrus.Debugf("[steamstatus] getPlayerStatus data：%+v \n", string(data))
-	index := gjson.Get(string(data), "response.players.#").Uint()
+	dataStr := binary.BytesToString(data)
+	logrus.Debugf("[steamstatus] getPlayerStatus data：%+v \n", dataStr)
+	index := gjson.Get(dataStr, "response.players.#").Uint()
 	for i := uint64(0); i < index; i++ {
 		players = append(players, player{
-			SteamID:       gjson.Get(string(data), fmt.Sprintf("response.players.%d.steamid", i)).String(),
-			PersonaName:   gjson.Get(string(data), fmt.Sprintf("response.players.%d.personaname", i)).String(),
-			GameID:        gjson.Get(string(data), fmt.Sprintf("response.players.%d.gameid", i)).String(),
-			GameExtraInfo: gjson.Get(string(data), fmt.Sprintf("response.players.%d.gameextrainfo", i)).String(),
+			SteamID:       gjson.Get(dataStr, fmt.Sprintf("response.players.%d.steamid", i)).String(),
+			PersonaName:   gjson.Get(dataStr, fmt.Sprintf("response.players.%d.personaname", i)).String(),
+			GameID:        gjson.Get(dataStr, fmt.Sprintf("response.players.%d.gameid", i)).String(),
+			GameExtraInfo: gjson.Get(dataStr, fmt.Sprintf("response.players.%d.gameextrainfo", i)).String(),
 		})
 	}
 	logrus.Debugf("[steamstatus] getPlayerStatus players：%+v \n", players)

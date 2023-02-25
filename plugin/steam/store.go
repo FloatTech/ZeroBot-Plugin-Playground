@@ -26,6 +26,11 @@ var (
 			ctx.SendChain(message.Text("[ERROR]:", err))
 			return false
 		}
+		// 校验密钥是否初始化
+		if apiKey == "" {
+			ctx.SendChain(message.Text("[ERROR]:", "Steam API 密钥尚未初始化"))
+			return false
+		}
 		return true
 	})
 )
