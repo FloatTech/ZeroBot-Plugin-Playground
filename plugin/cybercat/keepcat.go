@@ -317,7 +317,7 @@ func (data *catInfo) settleOfWeight() catInfo {
 		= 100
 */
 func (data *catInfo) settleOfMood() catInfo {
-	data.Mood = (data.Mood*2)/10 + int(data.Satiety*0.5-data.Weight*0.1)
+	data.Mood = zbmath.Max((data.Mood*2)/10+int(data.Satiety*0.5-data.Weight*0.1), 0)
 	return *data
 }
 
