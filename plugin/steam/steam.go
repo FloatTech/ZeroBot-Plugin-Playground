@@ -2,6 +2,9 @@
 package steam
 
 import (
+	"fmt"
+	"github.com/FloatTech/floatbox/binary"
+	"github.com/FloatTech/zbputils/img/text"
 	"strconv"
 	"strings"
 	"time"
@@ -122,7 +125,7 @@ func init() {
 		players := make([]string, 0)
 		for _, info := range infos {
 			if strings.Contains(info.Target, groupID) {
-				players = append(players, info.PersonaName+":"+info.SteamID)
+				players = append(players, " "+info.PersonaName+":"+info.SteamID)
 			}
 		}
 		if len(players) == 0 {
@@ -130,7 +133,12 @@ func init() {
 			return
 		}
 		// 组装并返回结果
-		result := strings.Join(players, "\n")
-		ctx.SendChain(message.Text("查询成功，该群绑定的用户有：\n" + result))
+		logText := fmt.Sprintf(" 查询steam用户绑定成功，该群绑定的用户有: \n%+v \n", strings.Join(players, "\n"))
+		data, err := text.RenderToBase64(logText, text.FontFile, 400, 18)
+		if err != nil {
+			ctx.SendChain(message.Text("ERROR:", err))
+			return
+		}
+		ctx.SendChain(message.Image("base64://" + binary.BytesToString(data)))
 	})
 }
