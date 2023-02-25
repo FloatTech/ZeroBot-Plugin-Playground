@@ -46,7 +46,7 @@ type player struct {
 	SteamID       string `json:"steam_id"`        // 绑定用户标识ID
 	PersonaName   string `json:"persona_name"`    // 用户昵称
 	Target        string `json:"target"`          // 信息推送群组
-	GameId        string `json:"game_id"`         // 游戏ID
+	GameID        string `json:"game_id"`         // 游戏ID
 	GameExtraInfo string `json:"game_extra_info"` // 游戏信息
 	LastUpdate    int64  `json:"last_update"`     // 更新时间
 }

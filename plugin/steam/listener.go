@@ -1,19 +1,20 @@
 package steam
 
 import (
+	"errors"
 	"fmt"
-	"github.com/FloatTech/floatbox/binary"
-	"github.com/FloatTech/floatbox/file"
-	ctrl "github.com/FloatTech/zbpctrl"
-	"github.com/FloatTech/zbputils/control"
-	"github.com/tidwall/gjson"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/FloatTech/floatbox/binary"
+	"github.com/FloatTech/floatbox/file"
 	"github.com/FloatTech/floatbox/web"
+	ctrl "github.com/FloatTech/zbpctrl"
+	"github.com/FloatTech/zbputils/control"
 	"github.com/sirupsen/logrus"
+	"github.com/tidwall/gjson"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
@@ -94,29 +95,29 @@ func listenUserChange(ctx *zero.Ctx) {
 	for _, playerInfo := range playerStatus {
 		localInfo := localPlayerMap[playerInfo.SteamID]
 		// 排除不需要处理的情况
-		if localInfo.GameId == "" && playerInfo.GameId == "" {
+		if localInfo.GameID == "" && playerInfo.GameID == "" {
 			continue
 		}
 		// 打开游戏
-		if localInfo.GameId == "" && playerInfo.GameId != "" {
+		if localInfo.GameID == "" && playerInfo.GameID != "" {
 			sendGroupMessageForPlayerGroups(ctx, localInfo, fmt.Sprintf("%+v正在玩%+v",
 				playerInfo.PersonaName, playerInfo.GameExtraInfo))
 			localInfo.LastUpdate = now.Unix()
 		}
 		// 更换游戏
-		if localInfo.GameId != "" && playerInfo.GameId != localInfo.GameId && playerInfo.GameId != "" {
+		if localInfo.GameID != "" && playerInfo.GameID != localInfo.GameID && playerInfo.GameID != "" {
 			sendGroupMessageForPlayerGroups(ctx, localInfo, fmt.Sprintf("%+v玩了%+v分钟后，丢下了%+v，转头去玩%+v",
 				playerInfo.PersonaName, (now.Unix()-localInfo.LastUpdate)/60, localInfo.GameExtraInfo, playerInfo.GameExtraInfo))
 			localInfo.LastUpdate = now.Unix()
 		}
 		// 关闭游戏
-		if playerInfo.GameId != localInfo.GameId && playerInfo.GameId == "" {
+		if playerInfo.GameID != localInfo.GameID && playerInfo.GameID == "" {
 			sendGroupMessageForPlayerGroups(ctx, localInfo, fmt.Sprintf("%+v玩了%+v分钟后，关掉了%+v",
 				playerInfo.PersonaName, (now.Unix()-localInfo.LastUpdate)/60, localInfo.GameExtraInfo))
 			localInfo.LastUpdate = 0
 		}
 		// 更新数据
-		localInfo.GameId = playerInfo.GameId
+		localInfo.GameID = playerInfo.GameID
 		localInfo.GameExtraInfo = playerInfo.GameExtraInfo
 		if err = database.update(localInfo); err != nil {
 			logrus.Errorf("[steamstatus] 更新数据条目异常，异常对象:[%+v]，错误信息：[%+v]", localInfo, err)
@@ -139,8 +140,8 @@ func sendGroupMessageForPlayerGroups(ctx *zero.Ctx, playerInfo player, msg strin
 
 // ----------------------- 远程调用 ----------------------
 const (
-	APIUrl    = "https://api.steampowered.com/"                          // steam API 调用地址
-	StatusUrl = "ISteamUser/GetPlayerSummaries/v2/?key=%+v&steamids=%+v" // 根据用户steamID获取用户状态
+	URL       = "https://api.steampowered.com/"                          // steam API 调用地址
+	StatusURL = "ISteamUser/GetPlayerSummaries/v2/?key=%+v&steamids=%+v" // 根据用户steamID获取用户状态
 )
 
 var apiKey string
@@ -150,10 +151,10 @@ func getPlayerStatus(streamIds []string) ([]player, error) {
 	players := make([]player, 0)
 	// 校验密钥是否初始化
 	if apiKey == "" {
-		return players, fmt.Errorf("未进行链接密钥初始化")
+		return players, errors.New("未进行链接密钥初始化")
 	}
 	// 拼接请求地址
-	url := fmt.Sprintf(APIUrl+StatusUrl, apiKey, strings.Join(streamIds, ","))
+	url := fmt.Sprintf(URL+StatusURL, apiKey, strings.Join(streamIds, ","))
 	logrus.Debugf("[steamstatus] getPlayerStatus url：%+v", url)
 	// 拉取并解析数据
 	data, err := web.GetData(url)
@@ -166,7 +167,7 @@ func getPlayerStatus(streamIds []string) ([]player, error) {
 		players = append(players, player{
 			SteamID:       gjson.Get(string(data), fmt.Sprintf("response.players.%d.steamid", i)).String(),
 			PersonaName:   gjson.Get(string(data), fmt.Sprintf("response.players.%d.personaname", i)).String(),
-			GameId:        gjson.Get(string(data), fmt.Sprintf("response.players.%d.gameid", i)).String(),
+			GameID:        gjson.Get(string(data), fmt.Sprintf("response.players.%d.gameid", i)).String(),
 			GameExtraInfo: gjson.Get(string(data), fmt.Sprintf("response.players.%d.gameextrainfo", i)).String(),
 		})
 	}

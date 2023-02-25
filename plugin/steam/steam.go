@@ -3,14 +3,14 @@ package steam
 
 import (
 	"fmt"
-	"github.com/FloatTech/floatbox/binary"
-	"github.com/FloatTech/zbputils/img/text"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/FloatTech/floatbox/binary"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
+	"github.com/FloatTech/zbputils/img/text"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
@@ -56,7 +56,7 @@ func init() {
 				SteamID:       steamID,
 				PersonaName:   playerData.PersonaName,
 				Target:        groupID,
-				GameId:        playerData.GameId,
+				GameID:        playerData.GameID,
 				GameExtraInfo: playerData.GameExtraInfo,
 				LastUpdate:    time.Now().Unix(),
 			}
