@@ -93,7 +93,7 @@ func init() {
 				"\n状态:", workStauts,
 				"\n\n你的剩余猫粮(斤): ", strconv.FormatFloat(userInfo.Food, 'f', 2, 64)))
 	})
-	engine.OnRegex(`^喂猫(([1-9]+(.[1-9]+)?)斤猫粮)?$`, zero.OnlyGroup, getdb).SetBlock(true).Limit(ctxext.LimitByUser).Handle(func(ctx *zero.Ctx) {
+	engine.OnRegex(`^喂猫((\d+(.\d+)?)斤猫粮)?$`, zero.OnlyGroup, getdb).SetBlock(true).Limit(ctxext.LimitByUser).Handle(func(ctx *zero.Ctx) {
 		id := ctx.Event.MessageID
 		gidStr := "group" + strconv.FormatInt(ctx.Event.GroupID, 10)
 		uidStr := strconv.FormatInt(ctx.Event.UserID, 10)
@@ -120,13 +120,15 @@ func init() {
 			ctx.SendChain(message.Reply(id), message.Text("铲屎官你已经没有足够的猫粮了"))
 			return
 		}
+		result := "表示食物很美味呢~"
 		switch {
 		case food > 5 && rand.Intn(10) < 8:
 			food = 5
-			ctx.SendChain(message.Reply(id), message.Text(userInfo.Name, "并没有选择吃完呢"))
+			result = "并没有选择吃完呢"
 		case food < 0.5:
 			ctx.SendChain(message.Reply(id), message.Text(userInfo.Name, "骂骂咧咧的走了"))
 			return
+
 		}
 		/***************************************************************/
 		if userInfo.Food > 0 && (rand.Intn(10) == 1 || userInfo.Satiety < 10) {
@@ -192,7 +194,6 @@ func init() {
 			ctx.SendChain(message.Text("[ERROR]:", err))
 			return
 		}
-		result := "表示食物很美味呢~"
 		if userInfo.Satiety < 80 && userInfo.Satiety-lastSatiety < 30 {
 			result = "表示完全没有饱呢!"
 		}
@@ -273,7 +274,7 @@ func init() {
 func (data *catInfo) settleOfSatiety(food float64) catInfo {
 	data.Food -= food
 	if food > 0 {
-		if data.Mood < 30 && rand.Intn(data.Mood) < data.Mood/3 {
+		if data.Satiety < 30 && rand.Intn(data.Mood+1) < data.Mood/3 {
 			food *= 4
 		}
 		data.Satiety += food * 100 / math.Max(1, data.Weight)
@@ -316,7 +317,7 @@ func (data *catInfo) settleOfWeight() catInfo {
 		= 100
 */
 func (data *catInfo) settleOfMood() catInfo {
-	data.Mood = (data.Mood*2)/10 + int(data.Satiety*0.5-data.Weight*0.1)
+	data.Mood = zbmath.Max((data.Mood*2)/10+int(data.Satiety*0.5-data.Weight*0.1), 0)
 	return *data
 }
 
@@ -351,7 +352,7 @@ func (data *catInfo) settleOfWork(gid string) (int, bool) {
 		getFood = -(getFood + float64(workTime)*rand.Float64())
 	}
 	data.Satiety += getFood * 10
-	// data.Work = 0
+	//data.Work = 0
 	data.LastTime = time.Now().Add(time.Duration(workTime-int64(subtime)) * time.Hour).Unix()
 	if catdata.insert(gid, *data) != nil {
 		return 0, true
