@@ -1,4 +1,4 @@
-// Package steamstatus 获取steam用户状态
+// Package steam 获取steam用户状态
 package steam
 
 import (
