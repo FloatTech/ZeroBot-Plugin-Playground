@@ -120,13 +120,15 @@ func init() {
 			ctx.SendChain(message.Reply(id), message.Text("铲屎官你已经没有足够的猫粮了"))
 			return
 		}
+		result := "表示食物很美味呢~"
 		switch {
 		case food > 5 && rand.Intn(10) < 8:
 			food = 5
-			ctx.SendChain(message.Reply(id), message.Text(userInfo.Name, "并没有选择吃完呢"))
+			result = "并没有选择吃完呢"
 		case food < 0.5:
 			ctx.SendChain(message.Reply(id), message.Text(userInfo.Name, "骂骂咧咧的走了"))
 			return
+
 		}
 		/***************************************************************/
 		if userInfo.Food > 0 && (rand.Intn(10) == 1 || userInfo.Satiety < 10) {
@@ -192,7 +194,6 @@ func init() {
 			ctx.SendChain(message.Text("[ERROR]:", err))
 			return
 		}
-		result := "表示食物很美味呢~"
 		if userInfo.Satiety < 80 && userInfo.Satiety-lastSatiety < 30 {
 			result = "表示完全没有饱呢!"
 		}
@@ -351,7 +352,7 @@ func (data *catInfo) settleOfWork(gid string) (int, bool) {
 		getFood = -(getFood + float64(workTime)*rand.Float64())
 	}
 	data.Satiety += getFood * 10
-	// data.Work = 0
+	//data.Work = 0
 	data.LastTime = time.Now().Add(time.Duration(workTime-int64(subtime)) * time.Hour).Unix()
 	if catdata.insert(gid, *data) != nil {
 		return 0, true
