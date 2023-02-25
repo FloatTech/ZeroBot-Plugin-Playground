@@ -19,7 +19,6 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/asoularticle"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chinesebqb"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/cybercat"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/dailynews"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/deepdanbooru"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fadian"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fyzhq"
@@ -27,7 +26,6 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/hitokoto"
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/draw" // 服务详情
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/kfccrazythursday"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/moegozh"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/ottoshout"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/partygame"
@@ -39,7 +37,6 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/subweibo"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/tgyj"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vote"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vtbmusic"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/youdaotranslate"
 
 	// 程序主体
