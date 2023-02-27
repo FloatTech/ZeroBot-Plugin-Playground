@@ -128,7 +128,6 @@ func init() {
 		case food < 0.5:
 			ctx.SendChain(message.Reply(id), message.Text(userInfo.Name, "骂骂咧咧的走了"))
 			return
-
 		}
 		/***************************************************************/
 		if userInfo.Food > 0 && (rand.Intn(10) == 1 || userInfo.Satiety < 10) {
@@ -352,7 +351,7 @@ func (data *catInfo) settleOfWork(gid string) (int, bool) {
 		getFood = -(getFood + float64(workTime)*rand.Float64())
 	}
 	data.Satiety += getFood * 10
-	//data.Work = 0
+	// data.Work = 0
 	data.LastTime = time.Now().Add(time.Duration(workTime-int64(subtime)) * time.Hour).Unix()
 	if catdata.insert(gid, *data) != nil {
 		return 0, true
