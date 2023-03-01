@@ -19,16 +19,16 @@ var (
 		database.db.DBPath = engine.DataFolder() + "steam.db"
 		err := database.db.Open(time.Hour * 24)
 		if err != nil {
-			ctx.SendChain(message.Text("[ERROR]:", err))
+			ctx.SendChain(message.Text("[steam] ERROR: ", err))
 			return false
 		}
 		if err = database.db.Create(TableListenPlayer, &player{}); err != nil {
-			ctx.SendChain(message.Text("[ERROR]:", err))
+			ctx.SendChain(message.Text("[steam] ERROR: ", err))
 			return false
 		}
 		// 校验密钥是否初始化
 		if apiKey == "" {
-			ctx.SendChain(message.Text("[ERROR]:", "Steam API 密钥尚未初始化"))
+			ctx.SendChain(message.Text("[steam] ERROR: Steam API 密钥尚未初始化"))
 			return false
 		}
 		return true
