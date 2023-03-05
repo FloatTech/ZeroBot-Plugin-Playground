@@ -35,8 +35,7 @@ func init() {
 		}
 		/***************************************************************/
 		cmd := false
-		switch ctx.State["regex_matched"].([]string)[0] {
-		case "猫猫状态":
+		if ctx.State["regex_matched"].([]string)[0] == "猫猫状态" {
 			cmd = true
 		}
 		/***************************************************************/
