@@ -3,6 +3,7 @@ package chatgpt
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -10,9 +11,9 @@ import (
 
 const (
 	// baseURL  = "https://api.openai.com/v1/"
-	proxyURL          = "https://openai.geekr.cool/v1/"
-	GPT3Dot5Turbo0301 = "gpt-3.5-turbo-0301"
-	GPT3Dot5Turbo     = "gpt-3.5-turbo"
+	proxyURL               = "https://openai.geekr.cool/v1/"
+	modelGPT3Dot5Turbo0301 = "gpt-3.5-turbo-0301"
+	modelGPT3Dot5Turbo     = "gpt-3.5-turbo"
 )
 
 // chatGPTResponseBody 响应体
@@ -70,7 +71,7 @@ func completions(messages []chatMessage, apiKey string) (*chatGPTResponseBody, e
 	}
 	// default model
 	if com.Model == "" {
-		com.Model = GPT3Dot5Turbo
+		com.Model = modelGPT3Dot5Turbo
 	}
 
 	body, err := json.Marshal(com)
@@ -94,7 +95,7 @@ func completions(messages []chatMessage, apiKey string) (*chatGPTResponseBody, e
 	defer res.Body.Close()
 
 	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusBadRequest {
-		return nil, fmt.Errorf("response error code: %d", res.StatusCode)
+		return nil, errors.New("response error")
 	}
 
 	v := new(chatGPTResponseBody)
