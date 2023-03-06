@@ -28,13 +28,11 @@ type chatGPTResponseBody struct {
 
 // chatGPTRequestBody 请求体
 type chatGPTRequestBody struct {
-	Model            string        `json:"model"`
-	Messages         []chatMessage `json:"messages"`
-	MaxTokens        int           `json:"max_tokens"`
-	Temperature      float32       `json:"temperature"`
-	TopP             int           `json:"top_p"`
-	FrequencyPenalty int           `json:"frequency_penalty"`
-	PresencePenalty  int           `json:"presence_penalty"`
+	Model       string        `json:"model,omitempty"` // gpt3.5-turbo
+	Messages    []chatMessage `json:"messages,omitempty"`
+	Temperature float64       `json:"temperature,omitempty"`
+	N           int           `json:"n,omitempty"`
+	MaxTokens   int           `json:"max_tokens,omitempty"`
 }
 
 // chatMessage 消息
@@ -81,7 +79,7 @@ func completions(messages []chatMessage, apiKey string) (*chatGPTResponseBody, e
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, proxyURL, bytes.NewReader(body))
+	req, err := http.NewRequest(http.MethodPost, proxyURL+"chat/completions", bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
