@@ -3,6 +3,7 @@ package chatgpt
 
 import (
 	"os"
+	"strings"
 	"time"
 
 	"github.com/FloatTech/floatbox/file"
@@ -27,7 +28,7 @@ func init() {
 		DisableOnDefault: false,
 		Brief:            "chatgpt",
 		Help: "-@bot chatgpt [对话内容]\n" +
-			"不支持上下文且响应较慢\n" +
+			"暂不支持上下文\n" +
 			"(私聊发送)设置OpenAI apikey [apikey]",
 		PrivateDataFolder: "chatgpt",
 	})
@@ -41,6 +42,10 @@ func init() {
 	}
 	engine.OnRegex(`^chatgpt\s*(.*)$`, zero.OnlyToMe).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
+			if apiKey == "" {
+				ctx.SendChain(message.Text("未设置OpenAI apikey"))
+				return
+			}
 			args := ctx.State["regex_matched"].([]string)[1]
 			key := sessionKey{
 				group: ctx.Event.GroupID,
@@ -48,7 +53,7 @@ func init() {
 			}
 			if args == "reset" {
 				cache.Delete(key)
-				ctx.Send("已清除上下文！")
+				ctx.SendChain(message.Text("已清除上下文！"))
 				return
 			}
 			messages := cache.Get(key)
@@ -56,12 +61,16 @@ func init() {
 				Role:    "user",
 				Content: args,
 			})
-			ans, err := completions(messages, apiKey)
+			resp, err := completions(messages, apiKey)
 			if err != nil {
-				ctx.SendChain(message.Text("ERROR: ", err))
+				ctx.SendChain(message.Text("请求ChatGPT失败: ", err))
 				return
 			}
-			ctx.SendChain(message.At(ctx.Event.UserID), message.Text(ans))
+			reply := resp.Choices[0].Message
+			reply.Content = strings.TrimSpace(reply.Content)
+			messages = append(messages, reply)
+			cache.Set(key, messages)
+			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(reply.Content))
 		})
 	engine.OnRegex(`^设置\s*OpenAI\s*apikey\s*(.*)$`, zero.OnlyPrivate, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		apiKey = ctx.State["regex_matched"].([]string)[1]
