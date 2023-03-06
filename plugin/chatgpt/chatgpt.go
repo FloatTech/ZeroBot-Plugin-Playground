@@ -3,13 +3,17 @@ package chatgpt
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 )
 
-const baseURL = "https://api.openai.com/v1/"
+const (
+	baseURL  = "https://api.openai.com/v1/"
+	proxyURL = "https://openai.geekr.cool/v1/"
+)
 
-// chatGPTResponseBody 请求体
+// chatGPTResponseBody 响应体
 type chatGPTResponseBody struct {
 	ID      string                   `json:"id"`
 	Object  string                   `json:"object"`
@@ -19,26 +23,31 @@ type chatGPTResponseBody struct {
 	Usage   map[string]interface{}   `json:"usage"`
 }
 
-// chatGPTRequestBody 响应体
+// chatGPTRequestBody 请求体
 type chatGPTRequestBody struct {
-	Model            string  `json:"model"`
-	Prompt           string  `json:"prompt"`
-	MaxTokens        int     `json:"max_tokens"`
-	Temperature      float32 `json:"temperature"`
-	TopP             int     `json:"top_p"`
-	FrequencyPenalty int     `json:"frequency_penalty"`
-	PresencePenalty  int     `json:"presence_penalty"`
+	Model            string    `json:"model"`
+	Messages         []Message `json:"messages"`
+	MaxTokens        int       `json:"max_tokens"`
+	Temperature      float32   `json:"temperature"`
+	TopP             int       `json:"top_p"`
+	FrequencyPenalty int       `json:"frequency_penalty"`
+	PresencePenalty  int       `json:"presence_penalty"`
 }
 
-// completions gtp文本模型回复
-// curl https://api.openai.com/v1/completions
+type Message struct {
+	Role    string `json:"role,omitempty"`
+	Content string `json:"content,omitempty"`
+}
+
+// completions gtp3.5文本模型回复
+// curl https://api.openai.com/v1/chat/completions
 // -H "Content-Type: application/json"
-// -H "Authorization: Bearer your chatGPT key"
-// -d '{"model": "text-davinci-003", "prompt": "give me good song", "temperature": 0, "max_tokens": 7}'
-func completions(msg string, apiKey string) (string, error) {
+// -H "Authorization: Bearer YOUR_API_KEY"
+// -d '{ "model": "gpt-3.5-turbo",  "messages": [{"role": "user", "content": "Hello!"}]}'
+func completions(messages []Message, apiKey string) (string, error) {
 	requestBody := chatGPTRequestBody{
 		Model:            "text-davinci-003",
-		Prompt:           msg,
+		Messages:         messages,
 		MaxTokens:        2048,
 		Temperature:      0.7,
 		TopP:             1,
@@ -50,13 +59,13 @@ func completions(msg string, apiKey string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	req, err := http.NewRequest("POST", baseURL+"completions", bytes.NewBuffer(requestData))
+	req, err := http.NewRequest("POST", baseURL+"chat/completions", bytes.NewBuffer(requestData))
 	if err != nil {
 		return "", err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+apiKey)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", apiKey))
 	client := &http.Client{}
 	response, err := client.Do(req)
 	if err != nil {

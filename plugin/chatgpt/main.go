@@ -3,8 +3,10 @@ package chatgpt
 
 import (
 	"os"
+	"time"
 
 	"github.com/FloatTech/floatbox/file"
+	"github.com/FloatTech/ttl"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
 	zero "github.com/wdvxdr1123/ZeroBot"
@@ -12,6 +14,13 @@ import (
 )
 
 var apiKey string
+
+type sessionKey struct {
+	group int64
+	user  int64
+}
+
+var cache = ttl.NewCache[sessionKey, []Message](time.Minute * 15)
 
 func init() {
 	engine := control.Register("chatgpt", &ctrl.Options[*zero.Ctx]{
@@ -33,7 +42,21 @@ func init() {
 	engine.OnRegex(`^chatgpt\s*(.*)$`, zero.OnlyToMe).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			args := ctx.State["regex_matched"].([]string)[1]
-			ans, err := completions(args, apiKey)
+			key := sessionKey{
+				group: ctx.Event.GroupID,
+				user:  ctx.Event.UserID,
+			}
+			if args == "reset" {
+				cache.Delete(key)
+				ctx.Send("已清除上下文！")
+				return
+			}
+			messages := cache.Get(key)
+			messages = append(messages, Message{
+				Role:    "user",
+				Content: args,
+			})
+			ans, err := completions(messages, apiKey)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
