@@ -3,7 +3,6 @@ package chatgpt
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -95,8 +94,7 @@ func completions(messages []chatMessage, apiKey string) (*chatGPTResponseBody, e
 	defer res.Body.Close()
 
 	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusBadRequest {
-		// TODO: introduce typed error
-		return nil, errors.New("response error")
+		return nil, fmt.Errorf("response error code: %d", res.StatusCode)
 	}
 
 	v := new(chatGPTResponseBody)
