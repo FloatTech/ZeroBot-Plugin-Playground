@@ -20,7 +20,7 @@ type sessionKey struct {
 	user  int64
 }
 
-var cache = ttl.NewCache[sessionKey, []Message](time.Minute * 15)
+var cache = ttl.NewCache[sessionKey, []chatMessage](time.Minute * 15)
 
 func init() {
 	engine := control.Register("chatgpt", &ctrl.Options[*zero.Ctx]{
@@ -52,7 +52,7 @@ func init() {
 				return
 			}
 			messages := cache.Get(key)
-			messages = append(messages, Message{
+			messages = append(messages, chatMessage{
 				Role:    "user",
 				Content: args,
 			})

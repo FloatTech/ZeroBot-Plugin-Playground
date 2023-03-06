@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	baseURL  = "https://api.openai.com/v1/"
+	// baseURL  = "https://api.openai.com/v1/"
 	proxyURL = "https://openai.geekr.cool/v1/"
 )
 
@@ -25,18 +25,19 @@ type chatGPTResponseBody struct {
 
 // chatGPTRequestBody 请求体
 type chatGPTRequestBody struct {
-	Model            string    `json:"model"`
-	Messages         []Message `json:"messages"`
-	MaxTokens        int       `json:"max_tokens"`
-	Temperature      float32   `json:"temperature"`
-	TopP             int       `json:"top_p"`
-	FrequencyPenalty int       `json:"frequency_penalty"`
-	PresencePenalty  int       `json:"presence_penalty"`
+	Model            string        `json:"model"`
+	Messages         []chatMessage `json:"messages"`
+	MaxTokens        int           `json:"max_tokens"`
+	Temperature      float32       `json:"temperature"`
+	TopP             int           `json:"top_p"`
+	FrequencyPenalty int           `json:"frequency_penalty"`
+	PresencePenalty  int           `json:"presence_penalty"`
 }
 
-type Message struct {
-	Role    string `json:"role,omitempty"`
-	Content string `json:"content,omitempty"`
+// chatMessage 消息
+type chatMessage struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
 }
 
 // completions gtp3.5文本模型回复
@@ -44,9 +45,9 @@ type Message struct {
 // -H "Content-Type: application/json"
 // -H "Authorization: Bearer YOUR_API_KEY"
 // -d '{ "model": "gpt-3.5-turbo",  "messages": [{"role": "user", "content": "Hello!"}]}'
-func completions(messages []Message, apiKey string) (string, error) {
+func completions(messages []chatMessage, apiKey string) (string, error) {
 	requestBody := chatGPTRequestBody{
-		Model:            "text-davinci-003",
+		Model:            "gpt-3.5-turbo",
 		Messages:         messages,
 		MaxTokens:        2048,
 		Temperature:      0.7,
@@ -59,7 +60,7 @@ func completions(messages []Message, apiKey string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	req, err := http.NewRequest("POST", baseURL+"chat/completions", bytes.NewBuffer(requestData))
+	req, err := http.NewRequest("POST", proxyURL+"chat/completions", bytes.NewBuffer(requestData))
 	if err != nil {
 		return "", err
 	}
