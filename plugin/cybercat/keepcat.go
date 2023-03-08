@@ -80,16 +80,14 @@ func init() {
 			subtime = time.Since(lastTime).Hours()
 			userInfo.LastTime = time.Unix(userInfo.LastTime, 0).Add(time.Duration(subtime) * time.Hour).Unix()
 		}
-		if subtime < 8 {
+		if !cmd && subtime < 8 {
 			userInfo.Mood -= 5
 			if userInfo.Mood < 0 {
 				userInfo.Mood = 0
 			}
 			if rand.Intn(10) < 6 && subtime < 2 && userInfo.Satiety > 90 {
 				_ = catdata.insert(gidStr, userInfo)
-				if !cmd {
-					ctx.SendChain(message.Reply(id), message.Text(userInfo.Name, "肚子已经很饱了,吃不动了"))
-				}
+				ctx.SendChain(message.Reply(id), message.Text(userInfo.Name, "肚子已经很饱了,吃不动了"))
 				return
 			}
 		}
@@ -116,7 +114,7 @@ func init() {
 		/***************************************************************/
 		userInfo = userInfo.settleOfWeight()
 		switch {
-		case userInfo.Mood <= 0 && rand.Intn(10) == 1:
+		case userInfo.Mood <= 0 && rand.Intn(100) < 10:
 			if catdata.delcat(gidStr, uidStr) != nil {
 				ctx.SendChain(message.Text("[ERROR]:", err))
 				return
@@ -131,7 +129,7 @@ func init() {
 			ctx.SendChain(message.Reply(id), message.Text("猫猫", userInfo.Name, "由于瘦骨如柴,已经难以存活去世了..."))
 			return
 		case userInfo.Weight >= 200:
-			if rand.Intn(100) != 50 {
+			if rand.Intn(100) > 10 {
 				if catdata.delcat(gidStr, uidStr) != nil {
 					ctx.SendChain(message.Text("[ERROR]:", err))
 					return
