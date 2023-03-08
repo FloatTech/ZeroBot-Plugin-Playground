@@ -3,8 +3,11 @@ package chatgpt
 
 import (
 	"os"
+	"strings"
+	"time"
 
 	"github.com/FloatTech/floatbox/file"
+	"github.com/FloatTech/ttl"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
 	zero "github.com/wdvxdr1123/ZeroBot"
@@ -13,12 +16,19 @@ import (
 
 var apiKey string
 
+type sessionKey struct {
+	group int64
+	user  int64
+}
+
+var cache = ttl.NewCache[sessionKey, []chatMessage](time.Minute * 15)
+
 func init() {
 	engine := control.Register("chatgpt", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "chatgpt",
 		Help: "-@bot chatgpt [对话内容]\n" +
-			"不支持上下文且响应较慢\n" +
+			"暂不支持上下文\n" +
 			"(私聊发送)设置OpenAI apikey [apikey]",
 		PrivateDataFolder: "chatgpt",
 	})
@@ -32,13 +42,35 @@ func init() {
 	}
 	engine.OnRegex(`^chatgpt\s*(.*)$`, zero.OnlyToMe).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
-			args := ctx.State["regex_matched"].([]string)[1]
-			ans, err := completions(args, apiKey)
-			if err != nil {
-				ctx.SendChain(message.Text("ERROR: ", err))
+			if apiKey == "" {
+				ctx.SendChain(message.Text("未设置OpenAI apikey"))
 				return
 			}
-			ctx.SendChain(message.At(ctx.Event.UserID), message.Text(ans))
+			args := ctx.State["regex_matched"].([]string)[1]
+			key := sessionKey{
+				group: ctx.Event.GroupID,
+				user:  ctx.Event.UserID,
+			}
+			if args == "reset" {
+				cache.Delete(key)
+				ctx.SendChain(message.Text("已清除上下文！"))
+				return
+			}
+			messages := cache.Get(key)
+			messages = append(messages, chatMessage{
+				Role:    "user",
+				Content: args,
+			})
+			resp, err := completions(messages, apiKey)
+			if err != nil {
+				ctx.SendChain(message.Text("请求ChatGPT失败: ", err))
+				return
+			}
+			reply := resp.Choices[0].Message
+			reply.Content = strings.TrimSpace(reply.Content)
+			messages = append(messages, reply)
+			cache.Set(key, messages)
+			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(reply.Content))
 		})
 	engine.OnRegex(`^设置\s*OpenAI\s*apikey\s*(.*)$`, zero.OnlyPrivate, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		apiKey = ctx.State["regex_matched"].([]string)[1]
