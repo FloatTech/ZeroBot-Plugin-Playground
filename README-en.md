@@ -3,6 +3,8 @@ English | [简体中文](https://github.com/FloatTech/ZeroBot-Plugin-Playground/
 
 Welcome~ Here are our playground to test and modify plugins written on Zerobot Framework.
 
+![counter](https://cmoe.azurewebsites.net/cmoe?name=zbpp&theme=r34)
+
 ## Info
 
 This repository is a playground of [ZeroBot-Plugin](https://github.com/FloatTech/ZeroBot-Plugin). Everybody can upload any ideas and debug them here. You can try whatever you want in your own plugin and discuss with other developers freely.
