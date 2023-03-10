@@ -26,7 +26,7 @@ var cache = ttl.NewCache[sessionKey, []chatMessage](time.Minute * 15)
 
 func init() {
 	engine := control.Register("chatgpt", &ctrl.Options[*zero.Ctx]{
-		DisableOnDefault: true,
+		DisableOnDefault: false,
 		Brief:            "chatgpt",
 		Help: "-@bot chatgpt [对话内容]\n" +
 			"添加预设(0-9) xxx\n" +
