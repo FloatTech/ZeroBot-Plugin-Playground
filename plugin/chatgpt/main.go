@@ -160,6 +160,5 @@ func init() {
 				//如果删除成功则输出 file remove OK!
 				ctx.SendChain(message.Text("删除成功"))
 			}
-			return
 		})
 }
