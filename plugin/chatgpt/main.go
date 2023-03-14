@@ -55,7 +55,7 @@ func init() {
 			return
 		}
 	}
-	engine.OnRegex(`^chatgpt\s*(.*)$`, zero.OnlyToMe).SetBlock(true).
+	engine.OnRegex(`^(?:chatgpt|\\)\s*(.*)$`, zero.OnlyToMe).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			if apiKey == "" {
 				ctx.SendChain(message.Text("未设置OpenAI apikey"))
