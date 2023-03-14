@@ -3,7 +3,7 @@
 
 快来这里上传你的奇思妙想吧！好的想法将会被合并入主仓库哦~
 
-![counter](https://cmoe.azurewebsites.net/cmoe?name=zbpp&theme=r34)
+![counter](https://counter.seku.su/cmoe?name=zbpp&theme=r34)
 
 ## 简介
 本仓库是[ZeroBot-Plugin](https://github.com/FloatTech/ZeroBot-Plugin)的插件试验场，无需任何pr即可上传并调试自己的插件。你可以在这里验证你的想法，与其他人进行交流，不会遇到任何阻碍。
