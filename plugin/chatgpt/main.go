@@ -3,6 +3,7 @@ package chatgpt
 
 import (
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -160,5 +161,22 @@ func init() {
 				//如果删除成功则输出 file remove OK!
 				ctx.SendChain(message.Text("删除成功"))
 			}
+		})
+	engine.OnRegex(`^查看预设列表$`).SetBlock(true).
+		Handle(func(ctx *zero.Ctx) {
+			var buff strings.Builder
+			buff.WriteString("当前拥有预设:")
+			err := filepath.Walk(engine.DataFolder()+"system", func(path string, info os.FileInfo, err error) error {
+				if !info.IsDir() {
+					buff.WriteByte('\n')
+					buff.WriteString(info.Name())
+				}
+				return nil
+			})
+			if err != nil {
+				ctx.SendChain(message.Text("Error:", err))
+				return
+			}
+			ctx.SendChain(message.Text(buff.String()))
 		})
 }
