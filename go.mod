@@ -9,8 +9,10 @@ require (
 	github.com/FloatTech/imgfactory v0.2.2-0.20230215052637-9f7b05520ca9
 	github.com/FloatTech/rendercard v0.0.10-0.20230215092509-ff0745852f23
 	github.com/FloatTech/sqlite v1.5.7
+	github.com/FloatTech/ttl v0.0.0-20220715042055-15612be72f5b
 	github.com/FloatTech/zbpctrl v1.5.3-0.20230130095145-714ad318cd52
 	github.com/FloatTech/zbputils v1.6.2-0.20230217063720-e64cc4bde7c6
+	github.com/fumiama/jieba v0.0.0-20221203025406-36c17a10b565
 	github.com/glebarez/sqlite v1.6.0
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
@@ -27,7 +29,6 @@ require (
 )
 
 require (
-	github.com/FloatTech/ttl v0.0.0-20220715042055-15612be72f5b // indirect
 	github.com/RomiChan/syncx v0.0.0-20221202055724-5f842c53020e // indirect
 	github.com/RomiChan/websocket v1.4.3-0.20220227141055-9b2c6168c9c5 // indirect
 	github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964 // indirect
@@ -40,7 +41,6 @@ require (
 	github.com/fumiama/go-simple-protobuf v0.1.0 // indirect
 	github.com/fumiama/gofastTEA v0.0.10 // indirect
 	github.com/fumiama/imgsz v0.0.2 // indirect
-	github.com/fumiama/jieba v0.0.0-20221203025406-36c17a10b565 // indirect
 	github.com/glebarez/go-sqlite v1.20.0 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/google/uuid v1.3.0 // indirect

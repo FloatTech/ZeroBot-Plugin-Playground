@@ -13,10 +13,13 @@ import (
 	"github.com/FloatTech/floatbox/process"
 	"github.com/sirupsen/logrus"
 
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/console"
+
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/asoularticle"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chatgpt"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chinesebqb"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/cybercat"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/deepdanbooru"
