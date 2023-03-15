@@ -36,7 +36,7 @@ var (
 )
 
 func init() {
-	engine.OnRegex(`^[chatgpt|//]([\s\S]*)$`, zero.OnlyToMe, getdb).SetBlock(false).
+	engine.OnRegex(`^(?:chatgpt|//)([\s\S]*)$`, zero.OnlyToMe, getdb).SetBlock(false).
 		Handle(func(ctx *zero.Ctx) {
 			args := ctx.State["regex_matched"].([]string)[1]
 			key := sessionKey{
@@ -87,12 +87,11 @@ func init() {
 		_ = m.Manager.Response(chatgptapikeygid)
 		err := m.Manager.SetExtra(chatgptapikeygid, apiKey)
 		if err != nil {
-			ctx.SendChain(message.Text("设置失败"))
+			ctx.SendChain(message.Text("保存apikey失败"))
 			return
 		}
-		ctx.SendChain(message.Text("设置成功"))
+		ctx.SendChain(message.Text("保存apikey成功"))
 	})
-
 	engine.OnRegex(`^添加预设\s*(\S+)\s+(.*)$`, zero.SuperUserPermission, getdb).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			modename := ctx.State["regex_matched"].([]string)[1]
