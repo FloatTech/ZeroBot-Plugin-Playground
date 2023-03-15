@@ -48,7 +48,7 @@ func init() {
 				ctx.SendChain(message.Text("已清除上下文！"))
 				return
 			}
-			//添加预设
+			// 添加预设
 			var messages []chatMessage
 			gid := ctx.Event.GroupID
 			if gid == 0 {
