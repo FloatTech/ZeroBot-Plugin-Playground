@@ -65,7 +65,7 @@ func init() {
 			case c := <-recv:
 				switch c.Event.Message.String() {
 				case "拒绝":
-					if c.Event.UserID == userInfo.User {
+					if c.Event.UserID == duelInfo.User {
 						over.Stop()
 						ctx.SendChain(message.Reply(id), message.Text("对方拒绝了你的PK"))
 						return
@@ -77,8 +77,10 @@ func init() {
 						return
 					}
 				case "去吧猫猫":
-					over.Stop()
-					approve = true
+					if c.Event.UserID == duelInfo.User {
+						over.Stop()
+						approve = true
+					}
 				}
 			}
 			if approve {
