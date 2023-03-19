@@ -31,6 +31,10 @@ func init() {
 			ctx.SendChain(message.Reply(id), message.Text("铲屎官你还没有属于你的主子喔,快去买一只吧!"))
 			return
 		}
+		if userInfo == (catInfo{}) || userInfo.User == ctx.Event.UserID {
+			ctx.SendChain(message.Reply(id), message.Text("不能自己打自己哦~"))
+			return
+		}
 		lastTime := time.Unix(userInfo.ArenaTime, 0)
 		if time.Since(lastTime).Hours() < 24 {
 			ctx.SendChain(message.Reply(id), message.Text(userInfo.Name, "已经PK过了,让它休息休息吧"))
@@ -65,7 +69,7 @@ func init() {
 			case c := <-recv:
 				switch c.Event.Message.String() {
 				case "拒绝":
-					if c.Event.UserID == userInfo.User {
+					if c.Event.UserID == duelInfo.User {
 						over.Stop()
 						ctx.SendChain(message.Reply(id), message.Text("对方拒绝了你的PK"))
 						return
@@ -77,8 +81,10 @@ func init() {
 						return
 					}
 				case "去吧猫猫":
-					over.Stop()
-					approve = true
+					if c.Event.UserID == duelInfo.User {
+						over.Stop()
+						approve = true
+					}
 				}
 			}
 			if approve {
@@ -177,6 +183,7 @@ func init() {
 		}
 		if len(infoList) == 0 {
 			ctx.SendChain(message.Text("没有人养猫哦"))
+			return
 		}
 		messageText := make([]string, 0, 10)
 		for i, info := range infoList {
