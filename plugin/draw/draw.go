@@ -421,10 +421,9 @@ func truncate(one *gg.Context, text string, maxW float64) (string, float64) {
 		width, _ := one.MeasureString(tmp.String()) // 获取文字宽度
 		if width > maxW {                           // 如果宽度大于文字边距
 			break // 跳出
-		} else {
-			w = width
-			res = append(res, r) // 写入
 		}
+		w = width
+		res = append(res, r) // 写入
 	}
 	return string(res), w
 }
