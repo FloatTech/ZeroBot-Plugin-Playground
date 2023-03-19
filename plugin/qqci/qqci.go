@@ -383,9 +383,8 @@ func deCompress(tarFile, dest string) error {
 		if err != nil {
 			if err == io.EOF {
 				break
-			} else {
-				return err
 			}
+			return err
 		}
 		filename := filepath.Join(dest, hdr.Name)
 		_ = os.MkdirAll(filepath.Dir(filename), 0755)
