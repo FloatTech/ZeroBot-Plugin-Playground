@@ -77,22 +77,21 @@ func getWeiboMessageBox(url string) (weiboWebData, error) {
 		cardType := gjson.Get(card.String(), "card_type").Int()
 		if isTop == 2 || cardType != 9 {
 			continue
-		} else {
-			weiboWebData.id = gjson.Get(card.String(), "mblog.id").Int()
-			weiboWebData.msgText = gjson.Get(card.String(), "mblog.text").String()
-			weiboWebData.msgPic = gjson.Get(card.String(), "mblog.pics.#.large.url").Array()
-			weiboWebData.scheme = gjson.Get(card.String(), "scheme").String()
-			weiboWebData.username = gjson.Get(card.String(), "mblog.user.screen_name").String()
-			weiboWebData.createdAt, _ = time.Parse(time.RubyDate, gjson.Get(card.String(), "mblog.created_at").String())
-			isRetweeted := gjson.Get(card.String(), "mblog.retweeted_status").Exists()
-			if isRetweeted {
-				weiboWebData.retweetedID = gjson.Get(card.String(), "mblog.retweeted_status.id").Int()
-				weiboWebData.retweetedUserName = gjson.Get(card.String(), "mblog.retweeted_status.user.screen_name").String()
-				weiboWebData.retweetedText = gjson.Get(card.String(), "mblog.retweeted_status.text").String()
-				weiboWebData.retweetedPic = gjson.Get(card.String(), "mblog.retweeted_status.pics.#.large.url").Array()
-			}
-			break
 		}
+		weiboWebData.id = gjson.Get(card.String(), "mblog.id").Int()
+		weiboWebData.msgText = gjson.Get(card.String(), "mblog.text").String()
+		weiboWebData.msgPic = gjson.Get(card.String(), "mblog.pics.#.large.url").Array()
+		weiboWebData.scheme = gjson.Get(card.String(), "scheme").String()
+		weiboWebData.username = gjson.Get(card.String(), "mblog.user.screen_name").String()
+		weiboWebData.createdAt, _ = time.Parse(time.RubyDate, gjson.Get(card.String(), "mblog.created_at").String())
+		isRetweeted := gjson.Get(card.String(), "mblog.retweeted_status").Exists()
+		if isRetweeted {
+			weiboWebData.retweetedID = gjson.Get(card.String(), "mblog.retweeted_status.id").Int()
+			weiboWebData.retweetedUserName = gjson.Get(card.String(), "mblog.retweeted_status.user.screen_name").String()
+			weiboWebData.retweetedText = gjson.Get(card.String(), "mblog.retweeted_status.text").String()
+			weiboWebData.retweetedPic = gjson.Get(card.String(), "mblog.retweeted_status.pics.#.large.url").Array()
+		}
+		break
 	}
 	return weiboWebData, nil
 }
