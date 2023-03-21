@@ -1,4 +1,4 @@
-// Package gamesystem 基于zbp的猜歌插件
+// Package gamesystem 基于zbp的游戏插件
 package gamesystem
 
 import (
