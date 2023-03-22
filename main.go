@@ -30,6 +30,7 @@ import (
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/draw" // 服务详情
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/moegozh"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/movies"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/ottoshout"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/partygame"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/playwright"
