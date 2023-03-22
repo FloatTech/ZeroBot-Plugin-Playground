@@ -150,7 +150,7 @@ func init() {
 			// draw info(name, coin, etc)
 			hourWord := getHourWord(now)
 			canvas.SetRGB255(0, 0, 0)
-			data, err := file.GetLazyData(text.MaokenFontFile, control.Md5File, true)
+			data, err := file.GetLazyData(text.BoldFontFile, control.Md5File, true)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
