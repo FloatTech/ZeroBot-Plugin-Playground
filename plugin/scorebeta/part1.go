@@ -1,4 +1,4 @@
-package scorebeta // Package scorebeta
+package scorebeta // Package scorebeta for design
 
 import (
 	"fmt"
@@ -67,7 +67,6 @@ func init() {
 	err = mainCanvas.LoadFontFace("./font.ttf", 35)
 	if err != nil {
 		panic(err)
-		return
 	}
 	mainCanvas.SetRGB255(255, 255, 255)
 	mainCanvas.DrawStringAnchored(fmt.Sprintf("ATRI币 +%d", nowcoin), 130, 420, 0, 0)
@@ -85,16 +84,17 @@ func init() {
 	err = mainCanvas.LoadFontFace("./font.ttf", 45)
 	if err != nil {
 		panic(err)
-		return
 	}
 	mainCanvas.SetRGB255(255, 255, 255)
 	mainCanvas.DrawStringAnchored(date, 150+float64(((backWidth-200)/2)+50), 420, 0, 0)
-	mainCanvas.LoadFontFace("./font.ttf", 20)
+	err = mainCanvas.LoadFontFace("./font.ttf", 20)
+	if err != nil {
+		panic(err)
+	}
 	mainCanvas.DrawStringAnchored("Created By Zerobot-Plugin v1.70-beta5", 150+float64(((backWidth-200)/2)+20), 520, 0, 0)
 	mainCanvas.Fill()
 	err = mainCanvas.SaveJPG("./result.jpg", 100)
 	if err != nil {
 		panic(err)
-		return
 	}
 }
