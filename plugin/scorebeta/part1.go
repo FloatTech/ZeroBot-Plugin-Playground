@@ -1,4 +1,4 @@
-package scorebeta // Package scorebeta for design
+package scorebeta // Package scorebeta 一些用做测试的签到模板
 
 import (
 	"fmt"
