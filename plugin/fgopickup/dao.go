@@ -2,6 +2,7 @@ package fgopickup
 
 import (
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 type dao struct {
@@ -10,7 +11,8 @@ type dao struct {
 
 func (d *dao) listPickup() *[]pickup {
 	pickup := make([]pickup, 0)
-	err := d.DbEngine.Find(&pickup).Error
+	unixTime := time.Now().Unix() * 1000
+	err := d.DbEngine.Where("end_time >= ?", unixTime).Find(&pickup).Error
 	if err != nil {
 		logrus.Debugln(err)
 	}
