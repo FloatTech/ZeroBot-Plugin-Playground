@@ -29,6 +29,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/hitokoto"
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/draw" // 服务详情
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fgopickup"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/moegozh"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/movies"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/ottoshout"
@@ -98,7 +99,7 @@ func init() {
 
 	// 通过代码写死的方式添加主人账号
 	// sus = append(sus, 12345678)
-	// sus = append(sus, 87654321)
+	sus = append(sus, 1170895958)
 
 	if *runcfg != "" {
 		f, err := os.Open(*runcfg)
