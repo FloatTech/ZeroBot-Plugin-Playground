@@ -1,4 +1,4 @@
-package rsshubDomain
+package domain
 
 import (
 	"context"
@@ -99,9 +99,9 @@ func (repo *rssDomain) Subscribe(ctx context.Context, gid int64, feedPath string
 		logrus.WithContext(ctx).Errorf("[rsshub Subscribe] save source error: %v", err)
 		return
 	}
-	logrus.Infof("[rsshub Subscribe] save/update source success %v", rv.Channel.Id)
+	logrus.Infof("[rsshub Subscribe] save/update source success %v", rv.Channel.ID)
 	// 添加群号到订阅
-	subscribe, err := repo.storage.GetSubscribeById(ctx, gid, rv.Channel.Id)
+	subscribe, err := repo.storage.GetSubscribeById(ctx, gid, rv.Channel.ID)
 	if err != nil {
 		logrus.WithContext(ctx).Errorf("[rsshub Subscribe] query subscribe error: %v", err)
 		return
@@ -114,7 +114,7 @@ func (repo *rssDomain) Subscribe(ctx context.Context, gid int64, feedPath string
 		return
 	}
 	// 如果不存在，保存
-	err = repo.storage.CreateSubscribe(ctx, gid, rv.Channel.Id)
+	err = repo.storage.CreateSubscribe(ctx, gid, rv.Channel.ID)
 	if err != nil {
 		logrus.WithContext(ctx).Errorf("[rsshub Subscribe] save subscribe error: %v", err)
 		return
@@ -136,7 +136,7 @@ func (repo *rssDomain) Unsubscribe(ctx context.Context, gid int64, feedPath stri
 		logrus.WithContext(ctx).Infof("[rsshub Subscribe] source existed: %v", ifExisted)
 		return errors.New("频道不存在")
 	}
-	err = repo.storage.DeleteSubscribe(ctx, gid, rf.Id)
+	err = repo.storage.DeleteSubscribe(ctx, gid, rf.ID)
 	if err != nil {
 		logrus.WithContext(ctx).Errorf("[rsshub Subscribe] delete source error: %v", err)
 		return errors.New("删除失败")

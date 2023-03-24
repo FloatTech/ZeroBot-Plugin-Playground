@@ -1,4 +1,4 @@
-package rsshubDomain
+package domain
 
 import (
 	"encoding/hex"
@@ -37,7 +37,7 @@ const (
 // RssFeedChannel 订阅的RSS频道
 type RssFeedChannel struct {
 	// Id 自增id
-	Id int64 `gorm:"primary_key;AUTO_INCREMENT"`
+	ID int64 `gorm:"primary_key;AUTO_INCREMENT"`
 	// RssHubFeedPath 频道路由 用于区分rss_hub 不同的频道 例如: `/bangumi/tv/calendar/today`
 	RssHubFeedPath string `gorm:"column:rss_hub_feed_path;unique;not null" json:"rss_hub_feed_path"`
 	// Title 频道标题
@@ -72,9 +72,9 @@ func (r RssFeedChannel) IfNeedUpdate(cmp *RssFeedChannel) bool {
 // RssContent 订阅的RSS频道的推送信息
 type RssContent struct {
 	// Id 自增id
-	Id               int64     `gorm:"primary_key;AUTO_INCREMENT"`
+	ID               int64     `gorm:"primary_key;AUTO_INCREMENT"`
 	HashId           string    `gorm:"column:hash_id;unique"        json:"hash_id"`
-	RssFeedChannelId int64     `gorm:"column:rss_feed_channel_id;not null"   json:"rss_feed_channel_id"`
+	RssFeedChannelID int64     `gorm:"column:rss_feed_channel_id;not null"   json:"rss_feed_channel_id"`
 	Title            string    `gorm:"column:title"       json:"title"`
 	Description      string    `gorm:"column:description" json:"description"`
 	Link             string    `gorm:"column:link"        json:"link"`
@@ -96,11 +96,11 @@ func (RssContent) TableName() string {
 // RssSubscribe 订阅关系表：群组-RSS频道
 type RssSubscribe struct {
 	// Id 自增id
-	Id int64 `gorm:"primary_key;AUTO_INCREMENT"`
+	ID int64 `gorm:"primary_key;AUTO_INCREMENT"`
 	// 订阅群组
 	GroupId int64 `gorm:"column:group_id;not null"`
 	// 订阅频道
-	RssFeedChannelId int64 `gorm:"column:rss_feed_channel_id;not null"`
+	RssFeedChannelID int64 `gorm:"column:rss_feed_channel_id;not null"`
 	//// Ctime create time
 	//Ctime int64 `gorm:"column:ctime;default:current_timestamp"  json:"ctime"`
 	// Mtime update time

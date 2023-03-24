@@ -1,4 +1,4 @@
-package rsshubDomain
+package domain
 
 import (
 	"encoding/json"
@@ -47,7 +47,7 @@ func convertFeedToRssChannelView(channelId int64, cPath string, feed *gofeed.Fee
 	}
 	view = &RssChannelView{
 		Channel: &RssFeedChannel{
-			Id:             channelId,
+			ID:             channelId,
 			RssHubFeedPath: cPath,
 			Title:          feed.Title,
 			ChannelDesc:    feed.Description,
@@ -75,9 +75,9 @@ func convertFeedToRssChannelView(channelId int64, cPath string, feed *gofeed.Fee
 
 		aus, _ := json.Marshal(item.Authors)
 		view.Contents = append(view.Contents, &RssContent{
-			Id:               0,
+			ID:               0,
 			HashId:           genHashForFeedItem(item.Link, item.GUID),
-			RssFeedChannelId: channelId,
+			RssFeedChannelID: channelId,
 			Title:            item.Title,
 			Description:      item.Description,
 			Link:             item.Link,

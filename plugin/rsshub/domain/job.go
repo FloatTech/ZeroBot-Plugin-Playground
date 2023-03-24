@@ -1,4 +1,4 @@
-package rsshubDomain
+package domain
 
 import (
 	"context"
@@ -44,7 +44,7 @@ func (repo *rssDomain) SyncRssFeedNoNotice(ctx context.Context) (updated map[int
 		if needUpdate {
 			var updateChannelView = &RssChannelView{Channel: cv.Channel, Contents: []*RssContent{}}
 			for _, content := range cv.Contents {
-				content.RssFeedChannelId = cv.Channel.Id
+				content.RssFeedChannelID = cv.Channel.ID
 				var existed bool
 				existed, err = repo.processRssContentUpdate(ctx, content)
 				if err != nil {
@@ -57,7 +57,7 @@ func (repo *rssDomain) SyncRssFeedNoNotice(ctx context.Context) (updated map[int
 					logrus.WithContext(ctx).Infof("[rsshub SyncRssFeedNoNotice] cv %s, add new content: %v", cv.Channel.RssHubFeedPath, content.Title)
 				}
 			}
-			updated[updateChannelView.Channel.Id] = updateChannelView
+			updated[updateChannelView.Channel.ID] = updateChannelView
 			logrus.WithContext(ctx).Infof("[rsshub SyncRssFeedNoNotice] cv %s, new contents: %v", cv.Channel.RssHubFeedPath, len(updateChannelView.Contents))
 		}
 	}
@@ -74,7 +74,7 @@ func (repo *rssDomain) processRssChannelUpdate(ctx context.Context, channel *Rss
 		logrus.WithContext(ctx).Errorf("[rsshub SyncRssFeedNoNotice] channel not found: %v", channel.RssHubFeedPath)
 		return
 	}
-	channel.Id = channelSrc.Id
+	channel.ID = channelSrc.ID
 	// 检查是否需要更新到db
 	if channelSrc.IfNeedUpdate(channel) {
 		needUpdate = true
@@ -123,7 +123,7 @@ func (repo *rssDomain) SyncJobTrigger(ctx context.Context) (groupView map[int64]
 		return
 	}
 	for _, subscribe := range subscribes {
-		groupView[subscribe.GroupId] = append(groupView[subscribe.GroupId], updatedChannelView[subscribe.RssFeedChannelId])
+		groupView[subscribe.GroupId] = append(groupView[subscribe.GroupId], updatedChannelView[subscribe.RssFeedChannelID])
 	}
 	return
 }

@@ -1,5 +1,5 @@
-// Package rsshubDomain RSSHub Domain Repo Package
-package rsshubDomain
+// Package domain RSSHub Domain Repo Package
+package domain
 
 var (
 	// RSSHubMirrors RSSHub镜像站地址列表，第一个为默认地址

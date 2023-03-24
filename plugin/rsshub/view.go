@@ -2,12 +2,12 @@ package rsshub
 
 import (
 	"fmt"
-	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub/rsshubDomain"
+	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub/domain"
 	"github.com/wdvxdr1123/ZeroBot/message"
 	"time"
 )
 
-func formatRssFeedToTextMsg(view *rsshubDomain.RssChannelView) (msg []string) {
+func formatRssFeedToTextMsg(view *domain.RssChannelView) (msg []string) {
 	msg = make([]string, 0)
 	// rssChannel信息
 	msgStr := fmt.Sprintf("【%s】更新时间:%v\n", view.Channel.Title, view.Channel.UpdatedParsed.Format(time.ANSIC))
@@ -20,7 +20,7 @@ func formatRssFeedToTextMsg(view *rsshubDomain.RssChannelView) (msg []string) {
 	return
 }
 
-//func formatRssFeedToTitleAndFakeNode(view *rsshubDomain.RssChannelView) (title message.Message, msg message.Message) {
+//func formatRssFeedToTitleAndFakeNode(view *domain.RssChannelView) (title message.Message, msg message.Message) {
 //	msg = make([]string, 0)
 //	// rssChannel信息
 //	msgStr := fmt.Sprintf("【%s】更新时间:%v\n", view.Channel.Title, view.Channel.UpdatedParsed.Format(time.DateTime))

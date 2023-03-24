@@ -1,9 +1,10 @@
+// Package rsshub rss_hub订阅插件
 package rsshub
 
 import (
 	"context"
 	"fmt"
-	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub/rsshubDomain"
+	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub/domain"
 	"github.com/FloatTech/floatbox/ctxext"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
@@ -17,7 +18,7 @@ import (
 // 初始化 repo
 var (
 	rssCron          = cron.New(cron.WithSeconds())
-	rssRepo, initErr = rsshubDomain.NewRssDomain(engine.DataFolder() + "rsshub.db")
+	rssRepo, initErr = domain.NewRssDomain(engine.DataFolder() + "rsshub.db")
 
 	// getRssRepo repo 初始化方法，单例
 	getRssRepo = ctxext.DoOnceOnSuccess(func(ctx *zero.Ctx) bool {

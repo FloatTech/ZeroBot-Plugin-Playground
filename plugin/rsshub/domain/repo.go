@@ -1,4 +1,4 @@
-package rsshubDomain
+package domain
 
 import "context"
 
@@ -17,23 +17,23 @@ type RepoSource interface {
 	// UpsertSource 添加一个订阅源
 	UpsertSource(ctx context.Context, rfc *RssFeedChannel) error
 	// GetSource 获取一个订阅源信息
-	GetSource(ctx context.Context, ID int64) (*RssFeedChannel, error)
+	GetSource(ctx context.Context, fID int64) (*RssFeedChannel, error)
 	// GetSources 获取所有订阅源信息
 	GetSources(ctx context.Context) ([]*RssFeedChannel, error)
 	// GetSourceByRssHubFeedLink 通过 rssHub 的 feed 链接获取订阅源信息
 	GetSourceByRssHubFeedLink(ctx context.Context, url string) (*RssFeedChannel, error)
 	// DeleteSource 删除一个订阅源
-	DeleteSource(ctx context.Context, ID int64) error
+	DeleteSource(ctx context.Context, fID int64) error
 }
 
 // RepoSubscribe RSS 订阅存储接口
 type RepoSubscribe interface {
 	// CreateSubscribe 添加一个订阅
-	CreateSubscribe(ctx context.Context, gid, subscribe int64) error
+	CreateSubscribe(ctx context.Context, gid, rssFeedChannelID int64) error
 	// DeleteSubscribe 删除一个订阅
-	DeleteSubscribe(ctx context.Context, gid int64, subscribeId int64) error
+	DeleteSubscribe(ctx context.Context, gid int64, subscribeID int64) error
 	// GetSubscribeById 获取一个订阅
-	GetSubscribeById(ctx context.Context, gid int64, subscribeId int64) (*RssSubscribe, error)
+	GetSubscribeById(ctx context.Context, gid int64, subscribeID int64) (*RssSubscribe, error)
 	// GetSubscribes 获取全部订阅
 	GetSubscribes(ctx context.Context) ([]*RssSubscribe, error)
 }

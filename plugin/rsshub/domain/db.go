@@ -1,4 +1,4 @@
-package rsshubDomain
+package domain
 
 import (
 	"context"
@@ -105,14 +105,14 @@ func (s *repoStorage) UpsertSource(ctx context.Context, source *RssFeedChannel) 
 		logrus.WithContext(ctx).Errorf("[rsshub] update source error: %v", err)
 		return
 	}
-	logrus.Println("[rsshub] add source success: ", source.Id)
+	logrus.Println("[rsshub] add source success: ", source.ID)
 	return nil
 }
 
 // GetSource Impl
-func (s *repoStorage) GetSource(ctx context.Context, ID int64) (source *RssFeedChannel, err error) {
+func (s *repoStorage) GetSource(ctx context.Context, fID int64) (source *RssFeedChannel, err error) {
 	source = &RssFeedChannel{}
-	err = s.db.Find(tableNameRssFeedChannel, source, fmt.Sprintf("id = %d", ID))
+	err = s.db.Find(tableNameRssFeedChannel, source, fmt.Sprintf("id = %d", fID))
 	if err != nil {
 		if errors.Is(err, sql.ErrNullResult) {
 			return nil, errors.New("source not found")
@@ -153,8 +153,8 @@ func (s *repoStorage) GetSourceByRssHubFeedLink(ctx context.Context, rssHubFeedL
 }
 
 // DeleteSource Impl
-func (s *repoStorage) DeleteSource(ctx context.Context, ID int64) (err error) {
-	err = s.db.Del(tableNameRssFeedChannel, fmt.Sprintf("id = %d", ID))
+func (s *repoStorage) DeleteSource(ctx context.Context, fID int64) (err error) {
+	err = s.db.Del(tableNameRssFeedChannel, fmt.Sprintf("id = %d", fID))
 	if err != nil {
 		logrus.WithContext(ctx).Errorf("[rsshub] storage.DeleteSource: %v", err)
 		if errors.Is(err, sql.ErrNullResult) {
@@ -177,7 +177,7 @@ func (s *repoStorage) UpsertContent(ctx context.Context, content *RssContent) (e
 		return
 	}
 	// check params.RssHubFeedPath and params.HashId
-	if content.RssFeedChannelId < 0 || content.HashId == "" || content.Title == "" {
+	if content.RssFeedChannelID < 0 || content.HashId == "" || content.Title == "" {
 		err = errors.New("content.RssFeedChannelRoute or content.HashId is empty")
 		return
 	}
@@ -191,7 +191,7 @@ func (s *repoStorage) UpsertContent(ctx context.Context, content *RssContent) (e
 
 // DeleteSourceContents Impl
 func (s *repoStorage) DeleteSourceContents(ctx context.Context, channelID int64) (rows int64, err error) {
-	err = s.orm.Delete(&RssSubscribe{}).Where(&RssSubscribe{RssFeedChannelId: channelID}).Error
+	err = s.orm.Delete(&RssSubscribe{}).Where(&RssSubscribe{RssFeedChannelID: channelID}).Error
 	if err != nil {
 		logrus.WithContext(ctx).Errorf("[rsshub] storage.DeleteSourceContents: %v", err)
 		return
@@ -211,13 +211,13 @@ func (s *repoStorage) IsContentHashIDExist(ctx context.Context, hashID string) (
 // ==================== RepoSubscribe ==================== [Start]
 
 // CreateSubscribe Impl
-func (s *repoStorage) CreateSubscribe(ctx context.Context, gid, rssFeedChannelId int64) (err error) {
+func (s *repoStorage) CreateSubscribe(ctx context.Context, gid, rssFeedChannelID int64) (err error) {
 	// check subscribe
-	if rssFeedChannelId < 0 || gid == 0 {
+	if rssFeedChannelID < 0 || gid == 0 {
 		err = errors.New("gid or rssFeedChannelId is empty")
 		return
 	}
-	err = s.orm.Create(&RssSubscribe{GroupId: gid, RssFeedChannelId: rssFeedChannelId}).Omit("id").Error
+	err = s.orm.Create(&RssSubscribe{GroupId: gid, RssFeedChannelID: rssFeedChannelID}).Omit("id").Error
 	if err != nil {
 		logrus.WithContext(ctx).Errorf("[rsshub] storage.CreateSubscribe: %v", err)
 		return
@@ -226,8 +226,8 @@ func (s *repoStorage) CreateSubscribe(ctx context.Context, gid, rssFeedChannelId
 }
 
 // DeleteSubscribe Impl
-func (s *repoStorage) DeleteSubscribe(ctx context.Context, gid int64, subscribeId int64) (err error) {
-	err = s.orm.Delete(&RssSubscribe{}, "rss_feed_channel_id = ? and group_id = ?", subscribeId, gid).Error
+func (s *repoStorage) DeleteSubscribe(ctx context.Context, gid int64, subscribeID int64) (err error) {
+	err = s.orm.Delete(&RssSubscribe{}, "rss_feed_channel_id = ? and group_id = ?", subscribeID, gid).Error
 	if err != nil {
 		logrus.WithContext(ctx).Errorf("[rsshub] storage.DeleteSubscribe error: %v", err)
 		return
@@ -236,9 +236,9 @@ func (s *repoStorage) DeleteSubscribe(ctx context.Context, gid int64, subscribeI
 }
 
 // GetSubscribeById Impl
-func (s *repoStorage) GetSubscribeById(ctx context.Context, gid int64, subscribeId int64) (res *RssSubscribe, err error) {
+func (s *repoStorage) GetSubscribeById(ctx context.Context, gid int64, subscribeID int64) (res *RssSubscribe, err error) {
 	res = &RssSubscribe{}
-	err = s.orm.First(res, &RssSubscribe{GroupId: gid, RssFeedChannelId: subscribeId}).Error
+	err = s.orm.First(res, &RssSubscribe{GroupId: gid, RssFeedChannelID: subscribeID}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
