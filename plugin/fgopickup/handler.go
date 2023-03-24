@@ -4,6 +4,7 @@ import (
 	"github.com/FloatTech/zbputils/ctxext"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
+	"strconv"
 	"time"
 )
 
@@ -12,14 +13,22 @@ func listPickups(ctx *zero.Ctx) {
 	pickups := service.getPickups()
 
 	msg := message.Message{}
-	for _, pickup := range pickups {
+	for index, pickup := range pickups {
+		id := message.Text("id:" + strconv.Itoa(pickup.Id) + "\n")
 		banner := message.Image(pickup.Banner)
 		name := message.Text("\n" + pickup.Name)
 		date := message.Text("\n" +
 			parseTime(pickup.StartTime) + "~" + parseTime(pickup.EndTime))
-		msg = append(msg, ctxext.FakeSenderForwardNode(ctx, banner, name, date))
+		msg = append(msg, ctxext.FakeSenderForwardNode(ctx, id, banner, name, date))
+		if (index+1)%20 == 0 {
+			ctx.Send(msg)
+			msg = message.Message{}
+		}
 	}
-	ctx.Send(msg)
+
+	if len(msg) > 0 {
+		ctx.Send(msg)
+	}
 }
 
 func parseTime(timeInSeconds int64) string {

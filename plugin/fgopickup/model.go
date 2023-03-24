@@ -15,7 +15,7 @@ type pickupServant struct {
 }
 
 type servant struct {
-	Id   int    `gorm:"primary_key;AUTO_INCREMENT"`
-	Name string `gorm:"column:name"`
-	Star int    `gorm:"column:star"`
+	Id     int    `gorm:"primary_key;AUTO_INCREMENT"`
+	Name   string `gorm:"column:name"`
+	Avatar string `gorm:"column:avatar"`
 }
