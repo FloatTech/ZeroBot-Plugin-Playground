@@ -1,4 +1,4 @@
-package rss_pkg
+package rsshubDomain
 
 import (
 	"context"
@@ -34,11 +34,11 @@ func (repo *rssDomain) SyncRssFeedNoNotice(ctx context.Context) (updated map[int
 		var needUpdate bool
 		needUpdate, err = repo.processRssChannelUpdate(ctx, cv.Channel)
 		if err != nil {
-			logrus.WithContext(ctx).Errorf("[rss_hub SyncRssFeedNoNotice] process rss cv update error: %v", err)
+			logrus.WithContext(ctx).Errorf("[rsshub SyncRssFeedNoNotice] process rss cv update error: %v", err)
 			err = nil
 			continue
 		}
-		logrus.WithContext(ctx).Infof("[rss_hub SyncRssFeedNoNotice] cv %s, need update(real): %v", cv.Channel.RssHubFeedPath, needUpdate)
+		logrus.WithContext(ctx).Infof("[rsshub SyncRssFeedNoNotice] cv %s, need update(real): %v", cv.Channel.RssHubFeedPath, needUpdate)
 		needUpdate = true
 		// 如果需要更新，更新content db
 		if needUpdate {
@@ -48,17 +48,17 @@ func (repo *rssDomain) SyncRssFeedNoNotice(ctx context.Context) (updated map[int
 				var existed bool
 				existed, err = repo.processRssContentUpdate(ctx, content)
 				if err != nil {
-					logrus.WithContext(ctx).Errorf("[rss_hub SyncRssFeedNoNotice] upsert content error: %v", err)
+					logrus.WithContext(ctx).Errorf("[rsshub SyncRssFeedNoNotice] upsert content error: %v", err)
 					err = nil
 					continue
 				}
 				if !existed {
 					updateChannelView.Contents = append(updateChannelView.Contents, content)
-					logrus.WithContext(ctx).Infof("[rss_hub SyncRssFeedNoNotice] cv %s, add new content: %v", cv.Channel.RssHubFeedPath, content.Title)
+					logrus.WithContext(ctx).Infof("[rsshub SyncRssFeedNoNotice] cv %s, add new content: %v", cv.Channel.RssHubFeedPath, content.Title)
 				}
 			}
 			updated[updateChannelView.Channel.Id] = updateChannelView
-			logrus.WithContext(ctx).Infof("[rss_hub SyncRssFeedNoNotice] cv %s, new contents: %v", cv.Channel.RssHubFeedPath, len(updateChannelView.Contents))
+			logrus.WithContext(ctx).Infof("[rsshub SyncRssFeedNoNotice] cv %s, new contents: %v", cv.Channel.RssHubFeedPath, len(updateChannelView.Contents))
 		}
 	}
 	return
@@ -71,7 +71,7 @@ func (repo *rssDomain) processRssChannelUpdate(ctx context.Context, channel *Rss
 		return
 	}
 	if channelSrc == nil {
-		logrus.WithContext(ctx).Errorf("[rss_hub SyncRssFeedNoNotice] channel not found: %v", channel.RssHubFeedPath)
+		logrus.WithContext(ctx).Errorf("[rsshub SyncRssFeedNoNotice] channel not found: %v", channel.RssHubFeedPath)
 		return
 	}
 	channel.Id = channelSrc.Id
@@ -81,7 +81,7 @@ func (repo *rssDomain) processRssChannelUpdate(ctx context.Context, channel *Rss
 		// 保存
 		err = repo.storage.UpsertSource(ctx, channel)
 		if err != nil {
-			logrus.WithContext(ctx).Errorf("[rss_hub SyncRssFeedNoNotice] upsert source error: %v", err)
+			logrus.WithContext(ctx).Errorf("[rsshub SyncRssFeedNoNotice] upsert source error: %v", err)
 			return
 		}
 	}
@@ -100,7 +100,7 @@ func (repo *rssDomain) processRssContentUpdate(ctx context.Context, content *Rss
 	// 保存
 	err = repo.storage.UpsertContent(ctx, content)
 	if err != nil {
-		logrus.WithContext(ctx).Errorf("[rss_hub SyncRssFeedNoNotice] upsert content error: %v", err)
+		logrus.WithContext(ctx).Errorf("[rsshub SyncRssFeedNoNotice] upsert content error: %v", err)
 		return
 	}
 	return
@@ -113,13 +113,13 @@ func (repo *rssDomain) SyncJobTrigger(ctx context.Context) (groupView map[int64]
 	// 获取所有频道
 	updatedChannelView, err := repo.SyncRssFeedNoNotice(ctx)
 	if err != nil {
-		logrus.WithContext(ctx).Errorf("[rss_hub SyncJobTrigger] sync rss feed error: %v", err)
+		logrus.WithContext(ctx).Errorf("[rsshub SyncJobTrigger] sync rss feed error: %v", err)
 		return
 	}
-	logrus.WithContext(ctx).Infof("[rss_hub SyncJobTrigger] updated channels: %v", len(updatedChannelView))
+	logrus.WithContext(ctx).Infof("[rsshub SyncJobTrigger] updated channels: %v", len(updatedChannelView))
 	subscribes, err := repo.storage.GetSubscribes(ctx)
 	if err != nil {
-		logrus.WithContext(ctx).Errorf("[rss_hub SyncJobTrigger] get subscribes error: %v", err)
+		logrus.WithContext(ctx).Errorf("[rsshub SyncJobTrigger] get subscribes error: %v", err)
 		return
 	}
 	for _, subscribe := range subscribes {

@@ -1,4 +1,4 @@
-package rss_pkg
+package rsshubDomain
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"net/http"
 )
 
+// RssDomain RssRepo定义
 type RssDomain interface {
 	// Subscribe 订阅Rss频道
 	Subscribe(ctx context.Context, gid int64, route string) (rv *RssChannelView, isChannelExisted,
@@ -55,14 +56,14 @@ func newRssDomain(dbPath string) (*rssDomain, error) {
 	repo := &rssDomain{
 		storage: &repoStorage{
 			db: sql.Sqlite{
-				DBPath: dbPath + "rss_hub.db",
+				DBPath: dbPath + "rsshub.db",
 			},
 		},
 		rssHubClient: &RssHubClient{Client: http.DefaultClient},
 	}
 	err := repo.storage.initDB()
 	if err != nil {
-		logrus.Errorf("[rss_hub NewRssDomain] open db error: %v", err)
+		logrus.Errorf("[rsshub NewRssDomain] open db error: %v", err)
 		return nil, err
 	}
 	// 启动同步任务
@@ -76,49 +77,49 @@ func (repo *rssDomain) Subscribe(ctx context.Context, gid int64, feedPath string
 	// 验证
 	feed, err := repo.rssHubClient.FetchFeed(rssHubMirrors[0], feedPath)
 	if err != nil {
-		logrus.WithContext(ctx).Errorf("[rss_hub Subscribe] add source error: %v", err)
+		logrus.WithContext(ctx).Errorf("[rsshub Subscribe] add source error: %v", err)
 		return
 	}
-	logrus.WithContext(ctx).Infof("[rss_hub Subscribe] try get source success: %v", len(feed.Title))
+	logrus.WithContext(ctx).Infof("[rsshub Subscribe] try get source success: %v", len(feed.Title))
 	// 新建source结构体
 	rv = convertFeedToRssChannelView(0, feedPath, feed)
 	rfExisted, err := repo.storage.GetSourceByRssHubFeedLink(ctx, feedPath)
 	if err != nil {
-		logrus.WithContext(ctx).Errorf("[rss_hub Subscribe] query source by feedPath error: %v", err)
+		logrus.WithContext(ctx).Errorf("[rsshub Subscribe] query source by feedPath error: %v", err)
 		return
 	}
 	// 如果已经存在
 	if rfExisted != nil {
-		logrus.WithContext(ctx).Infof("[rss_hub Subscribe] source existed: %v", rfExisted)
+		logrus.WithContext(ctx).Infof("[rsshub Subscribe] source existed: %v", rfExisted)
 		isChannelExisted = true
 	}
 	// 保存
 	err = repo.storage.UpsertSource(ctx, rv.Channel)
 	if err != nil {
-		logrus.WithContext(ctx).Errorf("[rss_hub Subscribe] save source error: %v", err)
+		logrus.WithContext(ctx).Errorf("[rsshub Subscribe] save source error: %v", err)
 		return
 	}
-	logrus.Infof("[rss_hub Subscribe] save/update source success %v", rv.Channel.Id)
+	logrus.Infof("[rsshub Subscribe] save/update source success %v", rv.Channel.Id)
 	// 添加群号到订阅
 	subscribe, err := repo.storage.GetSubscribeById(ctx, gid, rv.Channel.Id)
 	if err != nil {
-		logrus.WithContext(ctx).Errorf("[rss_hub Subscribe] query subscribe error: %v", err)
+		logrus.WithContext(ctx).Errorf("[rsshub Subscribe] query subscribe error: %v", err)
 		return
 	}
-	logrus.WithContext(ctx).Infof("[rss_hub Subscribe] query subscribe success: %v", subscribe)
+	logrus.WithContext(ctx).Infof("[rsshub Subscribe] query subscribe success: %v", subscribe)
 	// 如果已经存在，直接返回
 	if subscribe != nil {
 		isSubExisted = true
-		logrus.WithContext(ctx).Infof("[rss_hub Subscribe] subscribe existed: %v", subscribe)
+		logrus.WithContext(ctx).Infof("[rsshub Subscribe] subscribe existed: %v", subscribe)
 		return
 	}
 	// 如果不存在，保存
 	err = repo.storage.CreateSubscribe(ctx, gid, rv.Channel.Id)
 	if err != nil {
-		logrus.WithContext(ctx).Errorf("[rss_hub Subscribe] save subscribe error: %v", err)
+		logrus.WithContext(ctx).Errorf("[rsshub Subscribe] save subscribe error: %v", err)
 		return
 	}
-	logrus.WithContext(ctx).Infof("[rss_hub Subscribe] success: %v", len(rv.Contents))
+	logrus.WithContext(ctx).Infof("[rsshub Subscribe] success: %v", len(rv.Contents))
 	return
 }
 
@@ -126,18 +127,18 @@ func (repo *rssDomain) Subscribe(ctx context.Context, gid int64, feedPath string
 func (repo *rssDomain) Unsubscribe(ctx context.Context, gid int64, feedPath string) (err error) {
 	rf, ifExisted, err := repo.storage.GetIfExistedSubscribe(ctx, gid, feedPath)
 	if err != nil {
-		logrus.WithContext(ctx).Errorf("[rss_hub Subscribe] query sub by route error: %v", err)
+		logrus.WithContext(ctx).Errorf("[rsshub Subscribe] query sub by route error: %v", err)
 		return errors.New("数据库错误")
 	}
-	logrus.WithContext(ctx).Infof("[rss_hub Subscribe] query source by route success: %v", rf)
+	logrus.WithContext(ctx).Infof("[rsshub Subscribe] query source by route success: %v", rf)
 	// 如果不存在订阅关系，直接返回
 	if !ifExisted || rf == nil {
-		logrus.WithContext(ctx).Infof("[rss_hub Subscribe] source existed: %v", ifExisted)
+		logrus.WithContext(ctx).Infof("[rsshub Subscribe] source existed: %v", ifExisted)
 		return errors.New("频道不存在")
 	}
 	err = repo.storage.DeleteSubscribe(ctx, gid, rf.Id)
 	if err != nil {
-		logrus.WithContext(ctx).Errorf("[rss_hub Subscribe] delete source error: %v", err)
+		logrus.WithContext(ctx).Errorf("[rsshub Subscribe] delete source error: %v", err)
 		return errors.New("删除失败")
 	}
 	return
@@ -148,10 +149,10 @@ func (repo *rssDomain) GetSubscribedChannelsByGroupId(ctx context.Context, gid i
 	rv = make([]*RssChannelView, 0)
 	channels, err := repo.storage.GetSubscribedChannelsByGroupId(ctx, gid)
 	if err != nil {
-		logrus.WithContext(ctx).Errorf("[rss_hub GetSubscribedChannelsByGroupId] GetSubscribedChannelsByGroupId error: %v", err)
+		logrus.WithContext(ctx).Errorf("[rsshub GetSubscribedChannelsByGroupId] GetSubscribedChannelsByGroupId error: %v", err)
 		return
 	}
-	logrus.WithContext(ctx).Infof("[rss_hub GetSubscribedChannelsByGroupId] query subscribe success: %v", len(channels))
+	logrus.WithContext(ctx).Infof("[rsshub GetSubscribedChannelsByGroupId] query subscribe success: %v", len(channels))
 	for _, cn := range channels {
 		rv = append(rv, &RssChannelView{
 			Channel: cn,

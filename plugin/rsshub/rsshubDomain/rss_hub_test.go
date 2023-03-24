@@ -1,4 +1,4 @@
-package rss_pkg
+package rsshubDomain
 
 import (
 	"context"
