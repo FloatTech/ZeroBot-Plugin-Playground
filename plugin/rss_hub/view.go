@@ -2,7 +2,7 @@ package rss_hub
 
 import (
 	"fmt"
-	"github.com/FloatTech/ZeroBot-Plugin/plugin/rss_hub/rss_pkg"
+	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rss_hub/rss_pkg"
 	"github.com/wdvxdr1123/ZeroBot/message"
 	"time"
 )

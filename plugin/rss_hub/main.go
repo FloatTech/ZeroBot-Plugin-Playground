@@ -3,7 +3,7 @@ package rss_hub
 import (
 	"context"
 	"fmt"
-	"github.com/FloatTech/ZeroBot-Plugin/plugin/rss_hub/rss_pkg"
+	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rss_hub/rss_pkg"
 	"github.com/FloatTech/floatbox/ctxext"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
