@@ -24,6 +24,11 @@ func listPickups(ctx *zero.Ctx) {
 	ctx.Send(msg)
 }
 
+func pickupDetail(ctx *zero.Ctx) {
+	pickupId := ctx.State["args"].(string)
+	ctx.Send(pickupId)
+}
+
 func parseTime(timeInSeconds int64) string {
 	return time.Unix(timeInSeconds, 0).Format("2006-01-02")
 }

@@ -10,8 +10,9 @@ import (
 func init() {
 	engine := control.Register("fgopickup", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
-		Brief:            "例",
-		Help:             "- fgo未来视 fgo未来卡池",
+		Brief:            "Fate/Grand Order",
+		Help: "- fgo未来视\n" +
+			"- fgo卡池[id]",
 		// Banner: "",
 		PrivateDataFolder: "fgopickup",
 	})
@@ -22,4 +23,9 @@ func init() {
 		SetBlock(true).
 		Limit(ctxext.LimitByGroup).
 		Handle(listPickups)
+
+	engine.OnPrefix(`fgo卡池`).
+		SetBlock(true).
+		Limit(ctxext.LimitByGroup).
+		Handle(pickupDetail)
 }
