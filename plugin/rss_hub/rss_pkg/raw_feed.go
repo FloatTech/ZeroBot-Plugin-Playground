@@ -1,0 +1,92 @@
+package rss_pkg
+
+import (
+	"encoding/json"
+	"github.com/mmcdole/gofeed"
+	"github.com/sirupsen/logrus"
+	"net/http"
+	"time"
+)
+
+const (
+	acceptHeader = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+	userHeader   = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36 Edg/84.0.522.63"
+)
+
+// RssHubClient rss hub client (http)
+type RssHubClient struct {
+	*http.Client
+}
+
+// FetchFeed 获取rss feed信息
+func (c *RssHubClient) FetchFeed(domain, path string) (feed *gofeed.Feed, err error) {
+	req, err := http.NewRequest("GET", domain+path, nil)
+	if err != nil {
+		return
+	}
+	req.Header.Set("accept", acceptHeader)
+	req.Header.Set("user", userHeader)
+	resp, err := c.Do(req)
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	feed, err = gofeed.NewParser().Parse(resp.Body)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func convertFeedToRssChannelView(channelId int64, cPath string, feed *gofeed.Feed) (view *RssChannelView) {
+	var imgUrl string
+	if feed.Image != nil {
+		imgUrl = feed.Image.URL
+	}
+	view = &RssChannelView{
+		Channel: &RssFeedChannel{
+			Id:             channelId,
+			RssHubFeedPath: cPath,
+			Title:          feed.Title,
+			ChannelDesc:    feed.Description,
+			ImageUrl:       imgUrl,
+			Link:           feed.Link,
+			UpdatedParsed:  *(feed.UpdatedParsed),
+			Mtime:          time.Now(),
+		},
+		Contents: []*RssContent{},
+	}
+	//
+	for _, item := range feed.Items {
+		if item.Link == "" || item.Title == "" {
+			logrus.WithField("feed.Title", feed.Title).Warn("item link or title is empty")
+			continue
+		}
+		var thumbnail string
+		if item.Image != nil {
+			thumbnail = item.Image.URL
+		}
+		var publishedParsed = item.PublishedParsed
+		if publishedParsed == nil {
+			publishedParsed = &time.Time{}
+		}
+
+		aus, _ := json.Marshal(item.Authors)
+		view.Contents = append(view.Contents, &RssContent{
+			Id:               0,
+			HashId:           genHashForFeedItem(item.Link, item.GUID),
+			RssFeedChannelId: channelId,
+			Title:            item.Title,
+			Description:      item.Description,
+			Link:             item.Link,
+			Date:             *publishedParsed,
+			Author:           string(aus),
+			Thumbnail:        thumbnail,
+			Content:          item.Content,
+			Mtime:            time.Now(),
+		})
+	}
+	return
+}

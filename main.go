@@ -37,6 +37,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/qqci"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/qqclean"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/recall" // SGK2401
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rss_hub"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/steam"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/subweibo"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/tgyj"
