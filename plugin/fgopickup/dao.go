@@ -11,7 +11,7 @@ type dao struct {
 
 func (d *dao) listPickup() *[]pickup {
 	pickup := make([]pickup, 0)
-	unixTime := time.Now().Unix() * 1000
+	unixTime := time.Now().Unix()
 	err := d.DbEngine.Where("end_time >= ?", unixTime).Find(&pickup).Error
 	if err != nil {
 		logrus.Debugln(err)
