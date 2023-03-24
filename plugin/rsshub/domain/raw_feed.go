@@ -41,9 +41,9 @@ func (c *RssHubClient) FetchFeed(domain, path string) (feed *gofeed.Feed, err er
 }
 
 func convertFeedToRssChannelView(channelID int64, cPath string, feed *gofeed.Feed) (view *RssChannelView) {
-	var imgUrl string
+	var imgURL string
 	if feed.Image != nil {
-		imgUrl = feed.Image.URL
+		imgURL = feed.Image.URL
 	}
 	view = &RssChannelView{
 		Channel: &RssFeedChannel{
@@ -51,7 +51,7 @@ func convertFeedToRssChannelView(channelID int64, cPath string, feed *gofeed.Fee
 			RssHubFeedPath: cPath,
 			Title:          feed.Title,
 			ChannelDesc:    feed.Description,
-			ImageURL:       imgUrl,
+			ImageURL:       imgURL,
 			Link:           feed.Link,
 			UpdatedParsed:  *(feed.UpdatedParsed),
 			Mtime:          time.Now(),
