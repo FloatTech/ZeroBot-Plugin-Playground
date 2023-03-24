@@ -15,13 +15,11 @@ type RepoContent interface {
 // RepoSource RSS 订阅源存储接口
 type RepoSource interface {
 	// UpsertSource 添加一个订阅源
-	UpsertSource(ctx context.Context, rfc *RssFeedChannel) error
-	// GetSource 获取一个订阅源信息
-	GetSource(ctx context.Context, fID int64) (*RssFeedChannel, error)
+	UpsertSource(ctx context.Context, rfc *RssSource) error
 	// GetSources 获取所有订阅源信息
-	GetSources(ctx context.Context) ([]*RssFeedChannel, error)
+	GetSources(ctx context.Context) ([]*RssSource, error)
 	// GetSourceByRssHubFeedLink 通过 rssHub 的 feed 链接获取订阅源信息
-	GetSourceByRssHubFeedLink(ctx context.Context, url string) (*RssFeedChannel, error)
+	GetSourceByRssHubFeedLink(ctx context.Context, url string) (*RssSource, error)
 	// DeleteSource 删除一个订阅源
 	DeleteSource(ctx context.Context, fID int64) error
 }
@@ -29,7 +27,7 @@ type RepoSource interface {
 // RepoSubscribe RSS 订阅存储接口
 type RepoSubscribe interface {
 	// CreateSubscribe 添加一个订阅
-	CreateSubscribe(ctx context.Context, gid, rssFeedChannelID int64) error
+	CreateSubscribe(ctx context.Context, gid, rssSourceID int64) error
 	// DeleteSubscribe 删除一个订阅
 	DeleteSubscribe(ctx context.Context, gid int64, subscribeID int64) error
 	// GetSubscribeByID 获取一个订阅
@@ -45,5 +43,5 @@ type RepoMultiQuery interface {
 	// GetIfExistedSubscribe 判断一个群组是否已订阅了一个源
 	GetIfExistedSubscribe(ctx context.Context, gid int64, feedPath string) (*RssSubscribe, bool, error)
 	// GetSubscribedChannelsByGroupID 获取该群所有的订阅
-	GetSubscribedChannelsByGroupID(ctx context.Context, gid int64) ([]*RssFeedChannel, error)
+	GetSubscribedChannelsByGroupID(ctx context.Context, gid int64) ([]*RssSource, error)
 }

@@ -17,7 +17,6 @@ import (
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
-
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/asoularticle"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chatgpt"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chinesebqb"

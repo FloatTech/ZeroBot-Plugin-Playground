@@ -6,20 +6,21 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// SyncRssFeedNoNotice 同步所有频道
+// syncRss 同步所有频道
+// 返回：更新的频道&订阅信息 map[int64]*RssClientView
 // 1. 获取所有频道
 // 2. 遍历所有频道，检查频道是否更新
-// 3. 如果更新，获取更新的内容，但是返回的数据不分组
-func (repo *rssDomain) SyncRssFeedNoNotice(ctx context.Context) (updated map[int64]*RssChannelView, err error) {
-	updated = make(map[int64]*RssChannelView)
+// 3. 如果更新，获取更新的内容，但是返回的数据
+func (repo *rssDomain) syncRss(ctx context.Context) (updated map[int64]*RssClientView, err error) {
+	updated = make(map[int64]*RssClientView)
 	// 获取所有频道
-	channels, err := repo.storage.GetSources(ctx)
+	sources, err := repo.storage.GetSources(ctx)
 	if err != nil {
 		return
 	}
 	// 遍历所有源，获取每个channel对应的rss内容
-	rssChannelView := make([]*RssChannelView, 0)
-	for _, channel := range channels {
+	rssView := make([]*RssClientView, len(sources))
+	for i, channel := range sources {
 		var feed *gofeed.Feed
 		// 从site获取rss内容
 		feed, err = repo.rssHubClient.FetchFeed(rssHubMirrors[0], channel.RssHubFeedPath)
@@ -27,68 +28,76 @@ func (repo *rssDomain) SyncRssFeedNoNotice(ctx context.Context) (updated map[int
 			return nil, err
 		}
 		rv := convertFeedToRssChannelView(0, channel.RssHubFeedPath, feed)
-		rssChannelView = append(rssChannelView, rv)
+		rssView[i] = rv
 	}
 	// 检查频道是否更新
-	for _, cv := range rssChannelView {
+	for _, cv := range rssView {
 		var needUpdate bool
-		needUpdate, err = repo.processRssChannelUpdate(ctx, cv.Channel)
+		needUpdate, err = repo.checkChannelNeedUpdate(ctx, cv.Source)
 		if err != nil {
-			logrus.WithContext(ctx).Errorf("[rsshub SyncRssFeedNoNotice] process rss cv update error: %v", err)
+			logrus.WithContext(ctx).Errorf("[rsshub syncRss] checkChannelNeedUpdate error: %v", err)
 			err = nil
 			continue
 		}
-		logrus.WithContext(ctx).Infof("[rsshub SyncRssFeedNoNotice] cv %s, need update(real): %v", cv.Channel.RssHubFeedPath, needUpdate)
-		needUpdate = true
-		// 如果需要更新，更新content db
+		// 保存
+
+		logrus.WithContext(ctx).Infof("[rsshub syncRss] cv %s, need update(real): %v", cv.Source.RssHubFeedPath, needUpdate)
+		// 如果需要更新，更新channel 和 content
 		if needUpdate {
-			var updateChannelView = &RssChannelView{Channel: cv.Channel, Contents: []*RssContent{}}
-			for _, content := range cv.Contents {
-				content.RssFeedChannelID = cv.Channel.ID
-				var existed bool
-				existed, err = repo.processRssContentUpdate(ctx, content)
-				if err != nil {
-					logrus.WithContext(ctx).Errorf("[rsshub SyncRssFeedNoNotice] upsert content error: %v", err)
-					err = nil
-					continue
-				}
-				if !existed {
-					updateChannelView.Contents = append(updateChannelView.Contents, content)
-					logrus.WithContext(ctx).Infof("[rsshub SyncRssFeedNoNotice] cv %s, add new content: %v", cv.Channel.RssHubFeedPath, content.Title)
-				}
+			err = repo.storage.UpsertSource(ctx, cv.Source)
+			if err != nil {
+				logrus.WithContext(ctx).Errorf("[rsshub syncRss] upsert source error: %v", err)
+				continue
 			}
-			updated[updateChannelView.Channel.ID] = updateChannelView
-			logrus.WithContext(ctx).Infof("[rsshub SyncRssFeedNoNotice] cv %s, new contents: %v", cv.Channel.RssHubFeedPath, len(updateChannelView.Contents))
+			var updateChannelView = &RssClientView{Source: cv.Source, Contents: []*RssContent{}}
+			err = repo.processContentsUpdate(ctx, cv, err, updateChannelView)
+			updated[updateChannelView.Source.ID] = updateChannelView
+			logrus.WithContext(ctx).Debugf("[rsshub syncRss] cv %s, new contents: %v", cv.Source.RssHubFeedPath, len(updateChannelView.Contents))
 		}
 	}
 	return
 }
 
-func (repo *rssDomain) processRssChannelUpdate(ctx context.Context, channel *RssFeedChannel) (needUpdate bool, err error) {
-	var channelSrc *RssFeedChannel
+// checkChannelNeedUpdate 检查频道是否需要更新
+func (repo *rssDomain) checkChannelNeedUpdate(ctx context.Context, channel *RssSource) (needUpdate bool, err error) {
+	var channelSrc *RssSource
 	channelSrc, err = repo.storage.GetSourceByRssHubFeedLink(ctx, channel.RssHubFeedPath)
 	if err != nil {
 		return
 	}
 	if channelSrc == nil {
-		logrus.WithContext(ctx).Errorf("[rsshub SyncRssFeedNoNotice] channel not found: %v", channel.RssHubFeedPath)
+		logrus.WithContext(ctx).Errorf("[rsshub syncRss] channel not found: %v", channel.RssHubFeedPath)
 		return
 	}
 	channel.ID = channelSrc.ID
 	// 检查是否需要更新到db
 	if channelSrc.IfNeedUpdate(channel) {
 		needUpdate = true
-		// 保存
-		err = repo.storage.UpsertSource(ctx, channel)
-		if err != nil {
-			logrus.WithContext(ctx).Errorf("[rsshub SyncRssFeedNoNotice] upsert source error: %v", err)
-			return
-		}
 	}
 	return
 }
 
-func (repo *rssDomain) processRssContentUpdate(ctx context.Context, content *RssContent) (existed bool, err error) {
+// processContentsUpdate 处理内容(s)更新
+func (repo *rssDomain) processContentsUpdate(ctx context.Context, cv *RssClientView, err error, updateChannelView *RssClientView) error {
+	for _, content := range cv.Contents {
+		content.RssSourceID = cv.Source.ID
+		var existed bool
+		existed, err = repo.processContentItemUpdate(ctx, content)
+		if err != nil {
+			logrus.WithContext(ctx).Errorf("[rsshub syncRss] upsert content error: %v", err)
+			err = nil
+			continue
+		}
+		if !existed {
+			updateChannelView.Contents = append(updateChannelView.Contents, content)
+			logrus.WithContext(ctx).Infof("[rsshub syncRss] cv %s, add new content: %v", cv.Source.RssHubFeedPath, content.Title)
+		}
+	}
+	return err
+}
+
+// processContentItemUpdate 处理单个内容更新
+func (repo *rssDomain) processContentItemUpdate(ctx context.Context, content *RssContent) (existed bool, err error) {
 	existed, err = repo.storage.IsContentHashIDExist(ctx, content.HashID)
 	if err != nil {
 		return
@@ -100,50 +109,8 @@ func (repo *rssDomain) processRssContentUpdate(ctx context.Context, content *Rss
 	// 保存
 	err = repo.storage.UpsertContent(ctx, content)
 	if err != nil {
-		logrus.WithContext(ctx).Errorf("[rsshub SyncRssFeedNoNotice] upsert content error: %v", err)
+		logrus.WithContext(ctx).Errorf("[rsshub syncRss] upsert content error: %v", err)
 		return
 	}
 	return
 }
-
-// SyncJobTrigger 同步任务，按照群组订阅情况做好map切片
-func (repo *rssDomain) SyncJobTrigger(ctx context.Context) (groupView map[int64][]*RssChannelView, err error) {
-	groupView = make(map[int64][]*RssChannelView)
-	// 获取所有Rss频道
-	// 获取所有频道
-	updatedChannelView, err := repo.SyncRssFeedNoNotice(ctx)
-	if err != nil {
-		logrus.WithContext(ctx).Errorf("[rsshub SyncJobTrigger] sync rss feed error: %v", err)
-		return
-	}
-	logrus.WithContext(ctx).Infof("[rsshub SyncJobTrigger] updated channels: %v", len(updatedChannelView))
-	subscribes, err := repo.storage.GetSubscribes(ctx)
-	if err != nil {
-		logrus.WithContext(ctx).Errorf("[rsshub SyncJobTrigger] get subscribes error: %v", err)
-		return
-	}
-	for _, subscribe := range subscribes {
-		groupView[subscribe.GroupID] = append(groupView[subscribe.GroupID], updatedChannelView[subscribe.RssFeedChannelID])
-	}
-	return
-}
-
-//func (repo *rssDomain) processDiffChannel(ctx context.Context, channelSrc *RssFeedChannel, channelNew *RssFeedChannel) (err error) {
-//	// 检查频道是否更新
-//	if channelSrc.IfNeedUpdate(channelNew) {
-//		// 更新频道信息
-//		if err = repo.storage.UpsertSource(ctx, channelNew); err != nil {
-//			return
-//		}
-//
-//	}
-//	// 检查是否更新
-//	return
-//}
-//
-//func (repo *rssDomain) processDiffContent() {
-//	//if err = repo.storage.UpsertContent(ctx, rssItem); err != nil {
-//	//	return
-//	//}
-//	return
-//}

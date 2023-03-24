@@ -13,14 +13,12 @@ require (
 	github.com/FloatTech/zbpctrl v1.5.3-0.20230130095145-714ad318cd52
 	github.com/FloatTech/zbputils v1.6.2-0.20230217063720-e64cc4bde7c6
 	github.com/disintegration/imaging v1.6.2
-	github.com/fumiama/cron v1.3.0
 	github.com/fumiama/jieba v0.0.0-20221203025406-36c17a10b565
 	github.com/glebarez/sqlite v1.6.0
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/gorilla/websocket v1.5.0
 	github.com/guohuiyuan/go-fyzhq v0.0.0-20220807135412-25c16c843e5a
-	github.com/jinzhu/gorm v1.9.16
 	github.com/mmcdole/gofeed v1.2.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/playwright-community/playwright-go v0.2000.1
@@ -41,6 +39,7 @@ require (
 	github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/ericpauley/go-quantize v0.0.0-20200331213906-ae555eb2afa4 // indirect
+	github.com/fumiama/cron v1.3.0 // indirect
 	github.com/fumiama/go-base16384 v1.6.4 // indirect
 	github.com/fumiama/go-registry v0.2.5 // indirect
 	github.com/fumiama/go-simple-protobuf v0.1.0 // indirect

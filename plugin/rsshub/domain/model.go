@@ -18,9 +18,9 @@ func genHashForFeedItem(link, guid string) string {
 	return encoded
 }
 
-// RssChannelView 频道视图
-type RssChannelView struct {
-	Channel  *RssFeedChannel
+// RssClientView 频道视图
+type RssClientView struct {
+	Source   *RssSource
 	Contents []*RssContent
 }
 
@@ -29,17 +29,17 @@ type RssChannelView struct {
 // ======== DB ========[START]
 
 const (
-	tableNameRssFeedChannel = "rss_feed_channel"
-	tableNameRssFeedContent = "rss_feed_content"
-	tableNameRssSubscribe   = "rss_subscribe"
+	tableNameRssSource    = "rss_source"
+	tableNameRssContent   = "rss_content"
+	tableNameRssSubscribe = "rss_subscribe"
 )
 
-// RssFeedChannel 订阅的RSS频道
-type RssFeedChannel struct {
+// RssSource RSS频道
+type RssSource struct {
 	// Id 自增id
-	ID int64 `gorm:"primary_key;AUTO_INCREMENT"`
+	ID int64 `gorm:"column:id;primary_key;AUTO_INCREMENT"`
 	// RssHubFeedPath 频道路由 用于区分rss_hub 不同的频道 例如: `/bangumi/tv/calendar/today`
-	RssHubFeedPath string `gorm:"column:rss_hub_feed_path;unique;not null" json:"rss_hub_feed_path"`
+	RssHubFeedPath string `gorm:"column:rss_hub_feed_path;not null;unique;" json:"rss_hub_feed_path"`
 	// Title 频道标题
 	Title string `gorm:"column:title"        json:"title"`
 	// ChannelDesc 频道描述
@@ -57,12 +57,12 @@ type RssFeedChannel struct {
 }
 
 // TableName ...
-func (RssFeedChannel) TableName() string {
-	return tableNameRssFeedChannel
+func (RssSource) TableName() string {
+	return tableNameRssSource
 }
 
 // IfNeedUpdate ...
-func (r RssFeedChannel) IfNeedUpdate(cmp *RssFeedChannel) bool {
+func (r RssSource) IfNeedUpdate(cmp *RssSource) bool {
 	if r.Link != cmp.Link {
 		return false
 	}
@@ -72,16 +72,16 @@ func (r RssFeedChannel) IfNeedUpdate(cmp *RssFeedChannel) bool {
 // RssContent 订阅的RSS频道的推送信息
 type RssContent struct {
 	// Id 自增id
-	ID               int64     `gorm:"primary_key;AUTO_INCREMENT"`
-	HashID           string    `gorm:"column:hash_id;unique"        json:"hash_id"`
-	RssFeedChannelID int64     `gorm:"column:rss_feed_channel_id;not null"   json:"rss_feed_channel_id"`
-	Title            string    `gorm:"column:title"       json:"title"`
-	Description      string    `gorm:"column:description" json:"description"`
-	Link             string    `gorm:"column:link"        json:"link"`
-	Date             time.Time `gorm:"column:date"        json:"date"`
-	Author           string    `gorm:"column:author"      json:"author"`
-	Thumbnail        string    `gorm:"column:thumbnail"   json:"thumbnail"`
-	Content          string    `gorm:"column:content"     json:"content"`
+	ID          int64     `gorm:"column:id;primary_key;AUTO_INCREMENT"`
+	HashID      string    `gorm:"column:hash_id;unique"        json:"hash_id"`
+	RssSourceID int64     `gorm:"column:rss_source_id;not null"   json:"rss_source_id"`
+	Title       string    `gorm:"column:title"       json:"title"`
+	Description string    `gorm:"column:description" json:"description"`
+	Link        string    `gorm:"column:link"        json:"link"`
+	Date        time.Time `gorm:"column:date"        json:"date"`
+	Author      string    `gorm:"column:author"      json:"author"`
+	Thumbnail   string    `gorm:"column:thumbnail"   json:"thumbnail"`
+	Content     string    `gorm:"column:content"     json:"content"`
 	//// Ctime create time
 	//Ctime int64 `gorm:"column:ctime;default:current_timestamp"  json:"ctime"`
 	// Mtime update time
@@ -90,17 +90,17 @@ type RssContent struct {
 
 // TableName ...
 func (RssContent) TableName() string {
-	return tableNameRssFeedContent
+	return tableNameRssContent
 }
 
 // RssSubscribe 订阅关系表：群组-RSS频道
 type RssSubscribe struct {
 	// Id 自增id
-	ID int64 `gorm:"primary_key;AUTO_INCREMENT"`
+	ID int64 `gorm:"column:id;primary_key;AUTO_INCREMENT"`
 	// 订阅群组
-	GroupID int64 `gorm:"column:group_id;not null"`
+	GroupID int64 `gorm:"column:group_id;not null;uniqueIndex:uk_sid_gid"`
 	// 订阅频道
-	RssFeedChannelID int64 `gorm:"column:rss_feed_channel_id;not null"`
+	RssSourceID int64 `gorm:"column:rss_source_id;not null;uniqueIndex:uk_sid_gid"`
 	//// Ctime create time
 	//Ctime int64 `gorm:"column:ctime;default:current_timestamp"  json:"ctime"`
 	// Mtime update time

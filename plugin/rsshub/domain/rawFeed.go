@@ -3,7 +3,6 @@ package domain
 import (
 	"encoding/json"
 	"github.com/mmcdole/gofeed"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 )
@@ -40,13 +39,13 @@ func (c *RssHubClient) FetchFeed(domain, path string) (feed *gofeed.Feed, err er
 	return
 }
 
-func convertFeedToRssChannelView(channelID int64, cPath string, feed *gofeed.Feed) (view *RssChannelView) {
+func convertFeedToRssChannelView(channelID int64, cPath string, feed *gofeed.Feed) (view *RssClientView) {
 	var imgURL string
 	if feed.Image != nil {
 		imgURL = feed.Image.URL
 	}
-	view = &RssChannelView{
-		Channel: &RssFeedChannel{
+	view = &RssClientView{
+		Source: &RssSource{
 			ID:             channelID,
 			RssHubFeedPath: cPath,
 			Title:          feed.Title,
@@ -56,12 +55,12 @@ func convertFeedToRssChannelView(channelID int64, cPath string, feed *gofeed.Fee
 			UpdatedParsed:  *(feed.UpdatedParsed),
 			Mtime:          time.Now(),
 		},
+		// 不用定长，后面可能会过滤一些元素再append
 		Contents: []*RssContent{},
 	}
-	//
+	// convert feed items to rss content
 	for _, item := range feed.Items {
 		if item.Link == "" || item.Title == "" {
-			logrus.WithField("feed.Title", feed.Title).Warn("item link or title is empty")
 			continue
 		}
 		var thumbnail string
@@ -72,20 +71,19 @@ func convertFeedToRssChannelView(channelID int64, cPath string, feed *gofeed.Fee
 		if publishedParsed == nil {
 			publishedParsed = &time.Time{}
 		}
-
 		aus, _ := json.Marshal(item.Authors)
 		view.Contents = append(view.Contents, &RssContent{
-			ID:               0,
-			HashID:           genHashForFeedItem(item.Link, item.GUID),
-			RssFeedChannelID: channelID,
-			Title:            item.Title,
-			Description:      item.Description,
-			Link:             item.Link,
-			Date:             *publishedParsed,
-			Author:           string(aus),
-			Thumbnail:        thumbnail,
-			Content:          item.Content,
-			Mtime:            time.Now(),
+			ID:          0,
+			HashID:      genHashForFeedItem(item.Link, item.GUID),
+			RssSourceID: channelID,
+			Title:       item.Title,
+			Description: item.Description,
+			Link:        item.Link,
+			Date:        *publishedParsed,
+			Author:      string(aus),
+			Thumbnail:   thumbnail,
+			Content:     item.Content,
+			Mtime:       time.Now(),
 		})
 	}
 	return

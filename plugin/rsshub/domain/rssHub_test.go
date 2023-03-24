@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewRssDomain(t *testing.T) {
-	dm, err := newRssDomain("")
+	dm, err := newRssDomain("rsshub.db")
 	if err != nil {
 		t.Fatal(err)
 		return
@@ -19,7 +19,7 @@ func TestNewRssDomain(t *testing.T) {
 
 //var testRssHubChannelUrl = "https://rsshub.rssforever.com/bangumi/tv/calendar/today"
 
-var dm *rssDomain
+var dm, _ = newRssDomain("rsshub.db")
 
 func TestSub(t *testing.T) {
 	testCases := []struct {
@@ -42,8 +42,17 @@ func TestSub(t *testing.T) {
 			feedLink: "/go-weekly",
 			gid:      123,
 		},
+		{
+			name:     "test3",
+			feedLink: "/go-weekly",
+			gid:      321,
+		},
+		{
+			name:     "test3",
+			feedLink: "/go-weekly",
+			gid:      4123,
+		},
 	}
-	dm, _ = newRssDomain("")
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctx := context.Background()
@@ -70,7 +79,6 @@ func TestSub(t *testing.T) {
 }
 
 func TestSub_2(t *testing.T) {
-	dm, _ = newRssDomain("")
 	ctx := context.Background()
 	channel, ifExisted, ifSub, err := dm.Subscribe(ctx, 99, "/bangumi/tv/calendar/today")
 	if err != nil {
@@ -105,9 +113,7 @@ func TestSub_2(t *testing.T) {
 }
 
 func Test_SyncFeed(t *testing.T) {
-	//t.Run("test1", TestSub)
-	dm, _ = newRssDomain("")
-	feed, err := dm.SyncJobTrigger(context.Background())
+	feed, err := dm.Sync(context.Background())
 	if err != nil {
 		return
 	}
