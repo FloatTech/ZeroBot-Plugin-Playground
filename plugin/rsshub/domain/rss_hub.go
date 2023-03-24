@@ -15,8 +15,8 @@ type RssDomain interface {
 		isSubExisted bool, err error)
 	// Unsubscribe 取消订阅Rss频道
 	Unsubscribe(ctx context.Context, gid int64, route string) (err error)
-	// GetSubscribedChannelsByGroupId 获取群组订阅的Rss频道
-	GetSubscribedChannelsByGroupId(ctx context.Context, gid int64) (rv []*RssChannelView, err error)
+	// GetSubscribedChannelsByGroupID 获取群组订阅的Rss频道
+	GetSubscribedChannelsByGroupID(ctx context.Context, gid int64) (rv []*RssChannelView, err error)
 	//GetRssFeedChannel(ctx context.Context, id uint) (rv *RssChannelView, err error)
 	//GetRssFeedChannelList(ctx context.Context, gid int64) (rv []*RssChannelView, err error)
 	//DeleteRssFeedChannel(ctx context.Context, id uint) (err error)
@@ -101,7 +101,7 @@ func (repo *rssDomain) Subscribe(ctx context.Context, gid int64, feedPath string
 	}
 	logrus.Infof("[rsshub Subscribe] save/update source success %v", rv.Channel.ID)
 	// 添加群号到订阅
-	subscribe, err := repo.storage.GetSubscribeById(ctx, gid, rv.Channel.ID)
+	subscribe, err := repo.storage.GetSubscribeByID(ctx, gid, rv.Channel.ID)
 	if err != nil {
 		logrus.WithContext(ctx).Errorf("[rsshub Subscribe] query subscribe error: %v", err)
 		return
@@ -144,15 +144,15 @@ func (repo *rssDomain) Unsubscribe(ctx context.Context, gid int64, feedPath stri
 	return
 }
 
-// GetSubscribedChannelsByGroupId 获取群对应的订阅的频道信息
-func (repo *rssDomain) GetSubscribedChannelsByGroupId(ctx context.Context, gid int64) (rv []*RssChannelView, err error) {
+// GetSubscribedChannelsByGroupID 获取群对应的订阅的频道信息
+func (repo *rssDomain) GetSubscribedChannelsByGroupID(ctx context.Context, gid int64) (rv []*RssChannelView, err error) {
 	rv = make([]*RssChannelView, 0)
-	channels, err := repo.storage.GetSubscribedChannelsByGroupId(ctx, gid)
+	channels, err := repo.storage.GetSubscribedChannelsByGroupID(ctx, gid)
 	if err != nil {
-		logrus.WithContext(ctx).Errorf("[rsshub GetSubscribedChannelsByGroupId] GetSubscribedChannelsByGroupId error: %v", err)
+		logrus.WithContext(ctx).Errorf("[rsshub GetSubscribedChannelsByGroupID] GetSubscribedChannelsByGroupID error: %v", err)
 		return
 	}
-	logrus.WithContext(ctx).Infof("[rsshub GetSubscribedChannelsByGroupId] query subscribe success: %v", len(channels))
+	logrus.WithContext(ctx).Infof("[rsshub GetSubscribedChannelsByGroupID] query subscribe success: %v", len(channels))
 	for _, cn := range channels {
 		rv = append(rv, &RssChannelView{
 			Channel: cn,

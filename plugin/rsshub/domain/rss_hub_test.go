@@ -59,7 +59,7 @@ func TestSub(t *testing.T) {
 				return
 			}
 			t.Logf("[TEST] if exist: %+v,%+v", res, ext)
-			channels, err := dm.GetSubscribedChannelsByGroupId(ctx, 2)
+			channels, err := dm.GetSubscribedChannelsByGroupID(ctx, 2)
 			if err != nil {
 				t.Fatal(err)
 				return
@@ -84,7 +84,7 @@ func TestSub_2(t *testing.T) {
 		return
 	}
 	t.Logf("if exist: %+v,%+v", res, ext)
-	channels, err := dm.GetSubscribedChannelsByGroupId(ctx, 2)
+	channels, err := dm.GetSubscribedChannelsByGroupID(ctx, 2)
 	if err != nil {
 		t.Fatal(err)
 		return

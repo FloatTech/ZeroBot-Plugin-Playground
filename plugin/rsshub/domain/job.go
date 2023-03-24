@@ -89,7 +89,7 @@ func (repo *rssDomain) processRssChannelUpdate(ctx context.Context, channel *Rss
 }
 
 func (repo *rssDomain) processRssContentUpdate(ctx context.Context, content *RssContent) (existed bool, err error) {
-	existed, err = repo.storage.IsContentHashIDExist(ctx, content.HashId)
+	existed, err = repo.storage.IsContentHashIDExist(ctx, content.HashID)
 	if err != nil {
 		return
 	}
@@ -123,7 +123,7 @@ func (repo *rssDomain) SyncJobTrigger(ctx context.Context) (groupView map[int64]
 		return
 	}
 	for _, subscribe := range subscribes {
-		groupView[subscribe.GroupId] = append(groupView[subscribe.GroupId], updatedChannelView[subscribe.RssFeedChannelID])
+		groupView[subscribe.GroupID] = append(groupView[subscribe.GroupID], updatedChannelView[subscribe.RssFeedChannelID])
 	}
 	return
 }

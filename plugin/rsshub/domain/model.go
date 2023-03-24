@@ -44,8 +44,8 @@ type RssFeedChannel struct {
 	Title string `gorm:"column:title"        json:"title"`
 	// ChannelDesc 频道描述
 	ChannelDesc string `gorm:"column:channel_desc" json:"channel_desc"`
-	// ImageUrl 频道图片
-	ImageUrl string `gorm:"column:image_url"    json:"image_url"`
+	// ImageURL 频道图片
+	ImageURL string `gorm:"column:image_url"    json:"image_url"`
 	// Link 频道链接
 	Link string `gorm:"column:link"         json:"link"`
 	// UpdatedParsed RSS页面更新时间
@@ -73,7 +73,7 @@ func (r RssFeedChannel) IfNeedUpdate(cmp *RssFeedChannel) bool {
 type RssContent struct {
 	// Id 自增id
 	ID               int64     `gorm:"primary_key;AUTO_INCREMENT"`
-	HashId           string    `gorm:"column:hash_id;unique"        json:"hash_id"`
+	HashID           string    `gorm:"column:hash_id;unique"        json:"hash_id"`
 	RssFeedChannelID int64     `gorm:"column:rss_feed_channel_id;not null"   json:"rss_feed_channel_id"`
 	Title            string    `gorm:"column:title"       json:"title"`
 	Description      string    `gorm:"column:description" json:"description"`
@@ -98,7 +98,7 @@ type RssSubscribe struct {
 	// Id 自增id
 	ID int64 `gorm:"primary_key;AUTO_INCREMENT"`
 	// 订阅群组
-	GroupId int64 `gorm:"column:group_id;not null"`
+	GroupID int64 `gorm:"column:group_id;not null"`
 	// 订阅频道
 	RssFeedChannelID int64 `gorm:"column:rss_feed_channel_id;not null"`
 	//// Ctime create time

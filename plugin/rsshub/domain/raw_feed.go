@@ -40,18 +40,18 @@ func (c *RssHubClient) FetchFeed(domain, path string) (feed *gofeed.Feed, err er
 	return
 }
 
-func convertFeedToRssChannelView(channelId int64, cPath string, feed *gofeed.Feed) (view *RssChannelView) {
+func convertFeedToRssChannelView(channelID int64, cPath string, feed *gofeed.Feed) (view *RssChannelView) {
 	var imgUrl string
 	if feed.Image != nil {
 		imgUrl = feed.Image.URL
 	}
 	view = &RssChannelView{
 		Channel: &RssFeedChannel{
-			ID:             channelId,
+			ID:             channelID,
 			RssHubFeedPath: cPath,
 			Title:          feed.Title,
 			ChannelDesc:    feed.Description,
-			ImageUrl:       imgUrl,
+			ImageURL:       imgUrl,
 			Link:           feed.Link,
 			UpdatedParsed:  *(feed.UpdatedParsed),
 			Mtime:          time.Now(),
@@ -76,8 +76,8 @@ func convertFeedToRssChannelView(channelId int64, cPath string, feed *gofeed.Fee
 		aus, _ := json.Marshal(item.Authors)
 		view.Contents = append(view.Contents, &RssContent{
 			ID:               0,
-			HashId:           genHashForFeedItem(item.Link, item.GUID),
-			RssFeedChannelID: channelId,
+			HashID:           genHashForFeedItem(item.Link, item.GUID),
+			RssFeedChannelID: channelID,
 			Title:            item.Title,
 			Description:      item.Description,
 			Link:             item.Link,

@@ -115,7 +115,7 @@ func init() {
 		ctx.SendChain(msg...)
 	})
 	engine.OnFullMatch("RssHub订阅列表", zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
-		rv, err := rssRepo.GetSubscribedChannelsByGroupId(context.Background(), ctx.Event.GroupID)
+		rv, err := rssRepo.GetSubscribedChannelsByGroupID(context.Background(), ctx.Event.GroupID)
 		if err != nil {
 			ctx.SendChain(message.Text("RSS订阅姬：查询失败 ", err.Error()))
 			return

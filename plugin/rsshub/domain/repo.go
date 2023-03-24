@@ -32,8 +32,8 @@ type RepoSubscribe interface {
 	CreateSubscribe(ctx context.Context, gid, rssFeedChannelID int64) error
 	// DeleteSubscribe 删除一个订阅
 	DeleteSubscribe(ctx context.Context, gid int64, subscribeID int64) error
-	// GetSubscribeById 获取一个订阅
-	GetSubscribeById(ctx context.Context, gid int64, subscribeID int64) (*RssSubscribe, error)
+	// GetSubscribeByID 获取一个订阅
+	GetSubscribeByID(ctx context.Context, gid int64, subscribeID int64) (*RssSubscribe, error)
 	// GetSubscribes 获取全部订阅
 	GetSubscribes(ctx context.Context) ([]*RssSubscribe, error)
 }
@@ -44,6 +44,6 @@ type RepoMultiQuery interface {
 	GetSubscribesBySource(ctx context.Context, feedPath string) ([]*RssSubscribe, error)
 	// GetIfExistedSubscribe 判断一个群组是否已订阅了一个源
 	GetIfExistedSubscribe(ctx context.Context, gid int64, feedPath string) (*RssSubscribe, bool, error)
-	// GetSubscribedChannelsByGroupId 获取该群所有的订阅
-	GetSubscribedChannelsByGroupId(ctx context.Context, gid int64) ([]*RssFeedChannel, error)
+	// GetSubscribedChannelsByGroupID 获取该群所有的订阅
+	GetSubscribedChannelsByGroupID(ctx context.Context, gid int64) ([]*RssFeedChannel, error)
 }

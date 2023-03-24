@@ -36,7 +36,7 @@ func (s *repoStorage) GetSubscribesBySource(ctx context.Context, feedPath string
 func (s *repoStorage) GetIfExistedSubscribe(ctx context.Context, gid int64, feedPath string) (*RssSubscribe, bool, error) {
 	rs := RssSubscribe{}
 	err := s.orm.Model(&RssSubscribe{}).Joins(fmt.Sprintf("%s left join %s on %s.rss_feed_channel_id=%s.id", tableNameRssSubscribe, tableNameRssFeedChannel, tableNameRssSubscribe, tableNameRssFeedChannel)).
-		Where(&RssSubscribe{GroupId: gid}, &RssFeedChannel{RssHubFeedPath: feedPath}).Select("rss_subscribe.*").First(&rs).Error
+		Where(&RssSubscribe{GroupID: gid}, &RssFeedChannel{RssHubFeedPath: feedPath}).Select("rss_subscribe.*").First(&rs).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, false, nil
@@ -84,7 +84,7 @@ func (s *repoStorage) UpsertSource(ctx context.Context, source *RssFeedChannel) 
 	//	RssHubFeedPath: source.RssHubFeedPath,
 	//	Title:          source.Title,
 	//	ChannelDesc:    source.ChannelDesc,
-	//	ImageUrl:       source.ImageUrl,
+	//	ImageURL:       source.ImageURL,
 	//	Link:           source.Link,
 	//	UpdatedParsed:  source.UpdatedParsed,
 	//}
@@ -176,9 +176,9 @@ func (s *repoStorage) UpsertContent(ctx context.Context, content *RssContent) (e
 		err = errors.New("content is nil")
 		return
 	}
-	// check params.RssHubFeedPath and params.HashId
-	if content.RssFeedChannelID < 0 || content.HashId == "" || content.Title == "" {
-		err = errors.New("content.RssFeedChannelRoute or content.HashId is empty")
+	// check params.RssHubFeedPath and params.HashID
+	if content.RssFeedChannelID < 0 || content.HashID == "" || content.Title == "" {
+		err = errors.New("content.RssFeedChannelRoute or content.HashID is empty")
 		return
 	}
 	err = s.orm.Create(content).Omit("id").Error
@@ -217,7 +217,7 @@ func (s *repoStorage) CreateSubscribe(ctx context.Context, gid, rssFeedChannelID
 		err = errors.New("gid or rssFeedChannelId is empty")
 		return
 	}
-	err = s.orm.Create(&RssSubscribe{GroupId: gid, RssFeedChannelID: rssFeedChannelID}).Omit("id").Error
+	err = s.orm.Create(&RssSubscribe{GroupID: gid, RssFeedChannelID: rssFeedChannelID}).Omit("id").Error
 	if err != nil {
 		logrus.WithContext(ctx).Errorf("[rsshub] storage.CreateSubscribe: %v", err)
 		return
@@ -235,25 +235,25 @@ func (s *repoStorage) DeleteSubscribe(ctx context.Context, gid int64, subscribeI
 	return
 }
 
-// GetSubscribeById Impl
-func (s *repoStorage) GetSubscribeById(ctx context.Context, gid int64, subscribeID int64) (res *RssSubscribe, err error) {
+// GetSubscribeByID Impl
+func (s *repoStorage) GetSubscribeByID(ctx context.Context, gid int64, subscribeID int64) (res *RssSubscribe, err error) {
 	res = &RssSubscribe{}
-	err = s.orm.First(res, &RssSubscribe{GroupId: gid, RssFeedChannelID: subscribeID}).Error
+	err = s.orm.First(res, &RssSubscribe{GroupID: gid, RssFeedChannelID: subscribeID}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
-		logrus.WithContext(ctx).Errorf("[rsshub] storage.GetSubscribeById: %v", err)
+		logrus.WithContext(ctx).Errorf("[rsshub] storage.GetSubscribeByID: %v", err)
 		return nil, err
 	}
 	return
 }
 
-// GetSubscribedChannelsByGroupId Impl
-func (s *repoStorage) GetSubscribedChannelsByGroupId(ctx context.Context, gid int64) (res []*RssFeedChannel, err error) {
+// GetSubscribedChannelsByGroupID Impl
+func (s *repoStorage) GetSubscribedChannelsByGroupID(ctx context.Context, gid int64) (res []*RssFeedChannel, err error) {
 	res = make([]*RssFeedChannel, 0)
 	err = s.orm.Model(&RssFeedChannel{}).Joins(fmt.Sprintf("join %s on rss_feed_channel_id=%s.id", tableNameRssSubscribe, tableNameRssFeedChannel)).
-		Where(&RssSubscribe{GroupId: gid}).
+		Where(&RssSubscribe{GroupID: gid}).
 		Find(&res).
 		Error
 	if err != nil {
@@ -261,7 +261,7 @@ func (s *repoStorage) GetSubscribedChannelsByGroupId(ctx context.Context, gid in
 			err = nil
 			return
 		}
-		logrus.WithContext(ctx).Errorf("[rsshub] storage.GetSubscribedChannelsByGroupId: %v", err)
+		logrus.WithContext(ctx).Errorf("[rsshub] storage.GetSubscribedChannelsByGroupID: %v", err)
 		return
 	}
 	return

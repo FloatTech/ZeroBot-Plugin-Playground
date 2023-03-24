@@ -34,9 +34,9 @@ func formatRssFeedToTextMsg(view *domain.RssChannelView) (msg []string) {
 //}
 
 // fakeSenderForwardNode ...
-func fakeSenderForwardNode(userId int64, msgs ...message.MessageSegment) message.MessageSegment {
+func fakeSenderForwardNode(userID int64, msgs ...message.MessageSegment) message.MessageSegment {
 	return message.CustomNode(
 		"RssHub订阅姬",
-		userId,
+		userID,
 		msgs)
 }
