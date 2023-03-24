@@ -160,10 +160,10 @@ func (repo *rssDomain) GetSubscribedChannelsByGroupID(ctx context.Context, gid i
 	}
 	rv := make([]*RssClientView, len(channels))
 	logrus.WithContext(ctx).Infof("[rsshub GetSubscribedChannelsByGroupID] query subscribe success: %v", len(channels))
-	for _, cn := range channels {
-		rv = append(rv, &RssClientView{
+	for i, cn := range channels {
+		rv[i] = &RssClientView{
 			Source: cn,
-		})
+		}
 	}
 	return rv, nil
 }
