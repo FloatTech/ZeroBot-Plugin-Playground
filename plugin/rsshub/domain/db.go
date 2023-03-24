@@ -28,8 +28,18 @@ type repoStorage struct {
 // GetSubscribesBySource Impl
 func (s *repoStorage) GetSubscribesBySource(ctx context.Context, feedPath string) ([]*RssSubscribe, error) {
 	logrus.WithContext(ctx).Infof("[rsshub GetSubscribesBySource] feedPath: %s", feedPath)
-	//TODO implement me
-	panic("implement me")
+	//
+	rs := make([]*RssSubscribe, 0)
+	err := s.orm.Model(&RssSubscribe{}).Joins(fmt.Sprintf("%s left join %s on %s.rss_feed_channel_id=%s.id", tableNameRssSubscribe, tableNameRssFeedChannel, tableNameRssSubscribe, tableNameRssFeedChannel)).
+		Where(&RssFeedChannel{RssHubFeedPath: feedPath}).Select("rss_subscribe.*").Find(&rs).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		logrus.WithContext(ctx).Errorf("[rsshub GetSubscribesBySource] error: %v", err)
+		return nil, err
+	}
+	return rs, nil
 }
 
 // GetIfExistedSubscribe Impl

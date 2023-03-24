@@ -141,6 +141,17 @@ func (repo *rssDomain) Unsubscribe(ctx context.Context, gid int64, feedPath stri
 		logrus.WithContext(ctx).Errorf("[rsshub Subscribe] delete source error: %v", err)
 		return errors.New("删除失败")
 	}
+	subscribes, err := repo.storage.GetSubscribesBySource(ctx, feedPath)
+	if err != nil {
+		return
+	}
+	// 没有群订阅的时候，把频道删除
+	if len(subscribes) == 0 {
+		err = repo.storage.DeleteSource(ctx, rf.RssFeedChannelID)
+		if err != nil {
+			return errors.New("清除频道信息失败")
+		}
+	}
 	return
 }
 
