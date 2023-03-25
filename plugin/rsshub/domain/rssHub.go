@@ -72,7 +72,7 @@ func (repo *rssDomain) Subscribe(ctx context.Context, gid int64, feedPath string
 	}
 	logrus.WithContext(ctx).Infof("[rsshub Subscribe] try get source success: %v", len(feed.Title))
 	// 新建source结构体
-	rv = convertFeedToRssChannelView(0, feedPath, feed)
+	rv = convertFeedToRssView(0, feedPath, feed)
 	feedChannel, err := repo.storage.GetSourceByRssHubFeedLink(ctx, feedPath)
 	if err != nil {
 		logrus.WithContext(ctx).Errorf("[rsshub Subscribe] query source by feedPath error: %v", err)

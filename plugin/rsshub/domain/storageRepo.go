@@ -71,7 +71,8 @@ func (s *repoStorage) initDB() (err error) {
 // UpsertSource Impl
 func (s *repoStorage) UpsertSource(ctx context.Context, source *RssSource) (err error) {
 	// Update columns to default value on `id` conflict
-	err = s.orm.Take(source, "rss_hub_feed_path = ?", source.RssHubFeedPath).Error
+	querySource := &RssSource{RssHubFeedPath: source.RssHubFeedPath}
+	err = s.orm.Take(querySource, "rss_hub_feed_path = ?", querySource.RssHubFeedPath).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			err = s.orm.Create(source).Omit("id").Error
@@ -82,7 +83,8 @@ func (s *repoStorage) UpsertSource(ctx context.Context, source *RssSource) (err 
 		}
 		return
 	}
-	err = s.orm.Model(source).Updates(source).Omit("id").Error
+	logrus.WithContext(ctx).Infof("[rsshub] update source: %+v", source.UpdatedParsed)
+	err = s.orm.Updates(source).Where(&RssSource{ID: source.ID}).Error
 	if err != nil {
 		logrus.WithContext(ctx).Errorf("[rsshub] update source error: %v", err)
 		return

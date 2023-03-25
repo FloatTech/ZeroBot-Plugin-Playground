@@ -27,21 +27,21 @@ func (repo *rssDomain) syncRss(ctx context.Context) (updated map[int64]*RssClien
 		if err != nil {
 			return nil, err
 		}
-		rv := convertFeedToRssChannelView(0, channel.RssHubFeedPath, feed)
+		rv := convertFeedToRssView(0, channel.RssHubFeedPath, feed)
 		rssView[i] = rv
 	}
 	// 检查频道是否更新
 	for _, cv := range rssView {
 		var needUpdate bool
-		needUpdate, err = repo.checkChannelNeedUpdate(ctx, cv.Source)
+		needUpdate, err = repo.checkSourceNeedUpdate(ctx, cv.Source)
 		if err != nil {
-			logrus.WithContext(ctx).Errorf("[rsshub syncRss] checkChannelNeedUpdate error: %v", err)
+			logrus.WithContext(ctx).Errorf("[rsshub syncRss] checkSourceNeedUpdate error: %v", err)
 			err = nil
 			continue
 		}
 		// 保存
 
-		logrus.WithContext(ctx).Infof("[rsshub syncRss] cv %s, need update(real): %v", cv.Source.RssHubFeedPath, needUpdate)
+		logrus.WithContext(ctx).Infof("[rsshub syncRss] cv %+v, need update(real): %v", cv.Source, needUpdate)
 		// 如果需要更新，更新channel 和 content
 		if needUpdate {
 			err = repo.storage.UpsertSource(ctx, cv.Source)
@@ -58,20 +58,20 @@ func (repo *rssDomain) syncRss(ctx context.Context) (updated map[int64]*RssClien
 	return
 }
 
-// checkChannelNeedUpdate 检查频道是否需要更新
-func (repo *rssDomain) checkChannelNeedUpdate(ctx context.Context, channel *RssSource) (needUpdate bool, err error) {
-	var channelSrc *RssSource
-	channelSrc, err = repo.storage.GetSourceByRssHubFeedLink(ctx, channel.RssHubFeedPath)
+// checkSourceNeedUpdate 检查频道是否需要更新
+func (repo *rssDomain) checkSourceNeedUpdate(ctx context.Context, source *RssSource) (needUpdate bool, err error) {
+	var sourceInDB *RssSource
+	sourceInDB, err = repo.storage.GetSourceByRssHubFeedLink(ctx, source.RssHubFeedPath)
 	if err != nil {
 		return
 	}
-	if channelSrc == nil {
-		logrus.WithContext(ctx).Errorf("[rsshub syncRss] channel not found: %v", channel.RssHubFeedPath)
+	if sourceInDB == nil {
+		logrus.WithContext(ctx).Errorf("[rsshub syncRss] source not found: %v", source.RssHubFeedPath)
 		return
 	}
-	channel.ID = channelSrc.ID
+	source.ID = sourceInDB.ID
 	// 检查是否需要更新到db
-	if channelSrc.IfNeedUpdate(channel) {
+	if sourceInDB.IfNeedUpdate(source) {
 		needUpdate = true
 	}
 	return

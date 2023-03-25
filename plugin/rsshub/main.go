@@ -38,8 +38,9 @@ var (
 		Brief:            "RssHub订阅姬",
 		// 详细帮助
 		Help: "RssHub订阅姬desu~ 支持的详细订阅列表可见 https://rsshub.netlify.app/ \n" +
-			"- 添加RssHub订阅[RssHub路由] \n" +
-			"- 删除RssHub订阅[RssHub路由] \n" +
+			"- 添加RssHub订阅-RssHub路由 \n" +
+			"- 删除RssHub订阅-RssHub路由 \n" +
+			"例：添加RssHub订阅-/bangumi/tv/calendar/today\n" +
 			"- 查看RssHub订阅列表 \n" +
 			"- RssHub同步 \n" +
 			"Tips: 需要配合job一起使用, 全局只需要设置一个, 无视响应状态推送, 下为例子\n" +
@@ -58,7 +59,7 @@ var (
 
 // init 命令路由
 func init() {
-	engine.OnCommand("RssHub同步", getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnFullMatch("RssHub同步", zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		m, ok := control.Lookup("RssHub")
 		if !ok {
 			logrus.Warn("RssHub插件未启用")
@@ -78,7 +79,7 @@ func init() {
 		sendRssUpdateMsg(ctx, groupToFeedsMap, m)
 	})
 	// 添加订阅
-	engine.OnRegex(`^添加RssHub订阅(.+)$`, zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnRegex(`^添加RssHub订阅-(.+)$`, zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		routeStr := ctx.State["regex_matched"].([]string)[1]
 		rv, _, isSubExisted, err := rssRepo.Subscribe(context.Background(), ctx.Event.GroupID, routeStr)
 		if err != nil {
@@ -102,7 +103,7 @@ func init() {
 		}
 		//ctx.SendChain(msg...)
 	})
-	engine.OnRegex(`^删除RssHub订阅(.+)$`, zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnRegex(`^删除RssHub订阅-(.+)$`, zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		routeStr := ctx.State["regex_matched"].([]string)[1]
 		err := rssRepo.Unsubscribe(context.Background(), ctx.Event.GroupID, routeStr)
 		if err != nil {
@@ -114,7 +115,7 @@ func init() {
 		msg = append(msg, message.Text(fmt.Sprintf("RSS订阅姬：删除%s成功", routeStr)))
 		ctx.SendChain(msg...)
 	})
-	engine.OnFullMatch("RssHub订阅列表", zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnFullMatch("查看RssHub订阅列表", zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		rv, err := rssRepo.GetSubscribedChannelsByGroupID(context.Background(), ctx.Event.GroupID)
 		if err != nil {
 			ctx.SendChain(message.Text("RSS订阅姬：查询失败 ", err.Error()))

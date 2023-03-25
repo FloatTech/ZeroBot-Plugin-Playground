@@ -39,7 +39,7 @@ func (c *RssHubClient) FetchFeed(domain, path string) (feed *gofeed.Feed, err er
 	return
 }
 
-func convertFeedToRssChannelView(channelID int64, cPath string, feed *gofeed.Feed) (view *RssClientView) {
+func convertFeedToRssView(channelID int64, cPath string, feed *gofeed.Feed) (view *RssClientView) {
 	var imgURL string
 	if feed.Image != nil {
 		imgURL = feed.Image.URL

@@ -115,6 +115,7 @@ func TestSub_2(t *testing.T) {
 func Test_SyncFeed(t *testing.T) {
 	feed, err := dm.Sync(context.Background())
 	if err != nil {
+		t.Fatal(err)
 		return
 	}
 	rs, _ := json.Marshal(feed)
