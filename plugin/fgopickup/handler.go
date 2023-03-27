@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// 列出所有的卡池
 func listPickups(ctx *zero.Ctx) {
 	service := service{}
 	pickups := service.getPickups()
@@ -19,6 +20,7 @@ func listPickups(ctx *zero.Ctx) {
 	ctx.Send(msg)
 }
 
+// 以卡池id获取某一个卡池的up从者们
 func pickupDetail(ctx *zero.Ctx) {
 	pickupId, err := strconv.Atoi(ctx.State["args"].(string))
 	if err != nil {
