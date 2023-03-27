@@ -22,13 +22,13 @@ func listPickups(ctx *zero.Ctx) {
 
 // 以卡池id获取某一个卡池的up从者们
 func pickupDetail(ctx *zero.Ctx) {
-	pickupId, err := strconv.Atoi(ctx.State["args"].(string))
+	pickupID, err := strconv.Atoi(ctx.State["args"].(string))
 	if err != nil {
 		ctx.Send("参数错误！")
 		return
 	}
 	service := service{}
-	detail := service.getPickupDetail(pickupId)
+	detail := service.getPickupDetail(pickupID)
 	servants := detail.Servants
 
 	msg := make(message.Message, len(servants)+1)
