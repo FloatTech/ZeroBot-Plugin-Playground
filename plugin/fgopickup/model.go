@@ -19,3 +19,8 @@ type servant struct {
 	Name   string `gorm:"column:name"`
 	Avatar string `gorm:"column:avatar"`
 }
+
+type pickupDetailRes struct {
+	Pickup   pickup
+	Servants []servant
+}
