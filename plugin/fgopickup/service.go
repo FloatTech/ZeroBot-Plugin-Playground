@@ -4,7 +4,7 @@ type service struct {
 }
 
 func (s *service) getPickups() []pickup {
-	dao := dao{DbEngine: getOrmEngine()}
+	dao := dao{DBEngine: getOrmEngine()}
 	list := dao.listPickup()
 	return *list
 }

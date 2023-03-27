@@ -1,3 +1,4 @@
+// Package fgopickup FGO卡池相关插件
 package fgopickup
 
 import (

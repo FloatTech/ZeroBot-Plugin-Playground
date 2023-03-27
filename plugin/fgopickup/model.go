@@ -1,7 +1,7 @@
 package fgopickup
 
 type pickup struct {
-	Id        int    `gorm:"primary_key;AUTO_INCREMENT"`
+	ID        int    `gorm:"primary_key;AUTO_INCREMENT"`
 	Name      string `gorm:"column:name"`
 	StartTime int64  `gorm:"column:start_time"`
 	EndTime   int64  `gorm:"column:end_time"`
@@ -9,13 +9,13 @@ type pickup struct {
 }
 
 type pickupServant struct {
-	Id        int `gorm:"primary_key;AUTO_INCREMENT"`
-	PickupId  int `gorm:"column:pickup_id"`
-	ServantId int `gorm:"column:servant_id"`
+	ID        int `gorm:"primary_key;AUTO_INCREMENT"`
+	PickupID  int `gorm:"column:pickup_id"`
+	ServantID int `gorm:"column:servant_id"`
 }
 
 type servant struct {
-	Id     int    `gorm:"primary_key;AUTO_INCREMENT"`
+	ID     int    `gorm:"primary_key;AUTO_INCREMENT"`
 	Name   string `gorm:"column:name"`
 	Avatar string `gorm:"column:avatar"`
 }

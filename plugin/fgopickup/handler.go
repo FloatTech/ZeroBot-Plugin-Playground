@@ -12,21 +12,21 @@ func listPickups(ctx *zero.Ctx) {
 	service := service{}
 	pickups := service.getPickups()
 
-	msg := message.Message{}
-	for _, pickup := range pickups {
-		id := message.Text("id:" + strconv.Itoa(pickup.Id) + "\n")
+	msg := make(message.Message, len(pickups))
+	for i, pickup := range pickups {
+		id := message.Text("id:", strconv.Itoa(pickup.ID), "\n")
 		banner := message.Image(pickup.Banner)
-		name := message.Text("\n" + pickup.Name)
-		date := message.Text("\n" +
-			parseTime(pickup.StartTime) + "~" + parseTime(pickup.EndTime))
-		msg = append(msg, ctxext.FakeSenderForwardNode(ctx, id, banner, name, date))
+		name := message.Text("\n", pickup.Name)
+		date := message.Text("\n",
+			parseTime(pickup.StartTime), "~", parseTime(pickup.EndTime))
+		msg[i] = ctxext.FakeSenderForwardNode(ctx, id, banner, name, date)
 	}
 	ctx.Send(msg)
 }
 
 func pickupDetail(ctx *zero.Ctx) {
-	pickupId := ctx.State["args"].(string)
-	ctx.Send(pickupId)
+	pickupID := ctx.State["args"].(string)
+	ctx.Send(pickupID)
 }
 
 func parseTime(timeInSeconds int64) string {

@@ -6,13 +6,13 @@ import (
 )
 
 type dao struct {
-	DbEngine *orm
+	DBEngine *orm
 }
 
 func (d *dao) listPickup() *[]pickup {
 	pickup := make([]pickup, 0)
 	unixTime := time.Now().Unix()
-	err := d.DbEngine.Where("end_time >= ?", unixTime).Find(&pickup).Error
+	err := d.DBEngine.Where("end_time >= ?", unixTime).Find(&pickup).Error
 	if err != nil {
 		logrus.Debugln(err)
 	}

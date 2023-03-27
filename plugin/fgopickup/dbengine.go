@@ -1,7 +1,8 @@
 package fgopickup
 
 import (
-	"github.com/jinzhu/gorm"
+	"github.com/glebarez/sqlite"
+	"gorm.io/gorm"
 	"os"
 )
 
@@ -29,11 +30,11 @@ func initialize(dbpath string) *gorm.DB {
 			}
 		}(f)
 	}
-	gdb, err := gorm.Open("sqlite3", dbpath)
+	gdb, err := gorm.Open(sqlite.Open(dbpath))
 	if err != nil {
 		panic(err)
 	}
-	gdb.AutoMigrate(&pickup{}, &pickupServant{}, &servant{})
+	//gdb.AutoMigrate(&pickup{}, &pickupServant{}, &servant{})
 	orm := new(orm)
 	orm.DB = gdb
 	_dbEngine = orm
