@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/FloatTech/floatbox/process"
@@ -38,7 +40,6 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/qqclean"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/recall" // SGK2401
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/steam"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/subweibo"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/tgyj"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vote"
@@ -146,7 +147,9 @@ func init() {
 	}
 }
 func main() {
-	rand.Seed(time.Now().Unix()) // 全局 seed, 插件无需再 seed
+	if !strings.Contains(runtime.Version(), "go1.2") { // go1.20之前版本需要全局 seed，其他插件无需再 seed
+		rand.Seed(time.Now().UnixNano()) //nolint: staticcheck
+	}
 
 	zero.OnCommand("hello").
 		Handle(func(ctx *zero.Ctx) {
