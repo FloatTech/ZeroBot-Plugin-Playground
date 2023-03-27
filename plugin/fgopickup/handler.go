@@ -25,8 +25,8 @@ func listPickups(ctx *zero.Ctx) {
 }
 
 func pickupDetail(ctx *zero.Ctx) {
-	pickupID := ctx.State["args"].(string)
-	ctx.Send(pickupID)
+	//pickupID := ctx.State["args"].(string)
+	//ctx.Send(pickupID)
 }
 
 func parseTime(timeInSeconds int64) string {
