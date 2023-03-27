@@ -35,7 +35,7 @@ func initialize(dbpath string) *gorm.DB {
 	if err != nil {
 		panic(err)
 	}
-	//gdb.AutoMigrate(&pickup{}, &pickupServant{}, &servant{})
+	_ = gdb.AutoMigrate(&pickup{}, &pickupServant{}, &servant{})
 	orm := new(orm)
 	orm.DB = gdb
 	_dbEngine = orm

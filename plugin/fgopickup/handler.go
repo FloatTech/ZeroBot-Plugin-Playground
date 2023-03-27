@@ -1,6 +1,7 @@
 package fgopickup
 
 import (
+	"fmt"
 	"github.com/FloatTech/zbputils/ctxext"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
@@ -25,6 +26,7 @@ func listPickups(ctx *zero.Ctx) {
 }
 
 func pickupDetail(ctx *zero.Ctx) {
+	fmt.Println(ctx.State["args"].(string))
 	//pickupID := ctx.State["args"].(string)
 	//ctx.Send(pickupID)
 }
