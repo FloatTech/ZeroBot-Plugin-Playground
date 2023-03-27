@@ -19,18 +19,18 @@ func (d *dao) listPickup() *[]pickup {
 	return &pickup
 }
 
-func (d *dao) selectPickup(pickupId int) pickup {
+func (d *dao) selectPickup(pickupID int) pickup {
 	pickup := pickup{}
-	err := d.DBEngine.First(&pickup, pickupId).Error
+	err := d.DBEngine.First(&pickup, pickupID).Error
 	if err != nil {
 		logrus.Debugln(err)
 	}
 	return pickup
 }
 
-func (d *dao) selectPickupServantIds(pickupId int) []int {
+func (d *dao) selectPickupServantIds(pickupID int) []int {
 	ids := make([]int, 0)
-	err := d.DBEngine.Model(pickupServant{}).Select("servant_id").Where("pickup_id = ?", pickupId).Find(&ids).Error
+	err := d.DBEngine.Model(pickupServant{}).Select("servant_id").Where("pickup_id = ?", pickupID).Find(&ids).Error
 	if err != nil {
 		logrus.Debugln(err)
 	}

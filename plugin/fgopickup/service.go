@@ -9,10 +9,10 @@ func (s *service) getPickups() *[]pickup {
 	return list
 }
 
-func (s *service) getPickupDetail(pickupId int) pickupDetailRes {
+func (s *service) getPickupDetail(pickupID int) pickupDetailRes {
 	dao := dao{DBEngine: getOrmEngine()}
-	pickup := dao.selectPickup(pickupId)
-	servantIds := dao.selectPickupServantIds(pickupId)
+	pickup := dao.selectPickup(pickupID)
+	servantIds := dao.selectPickupServantIds(pickupID)
 	servants := dao.selectServantsByIds(servantIds)
 	return pickupDetailRes{
 		Pickup:   pickup,
