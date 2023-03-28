@@ -29,4 +29,9 @@ func init() {
 		SetBlock(true).
 		Limit(ctxext.LimitByGroup).
 		Handle(pickupDetail)
+
+	engine.OnPrefix(`fgo卡池天数`).
+		SetBlock(true).
+		Limit(ctxext.LimitByGroup).
+		Handle(getPickupTimeGap)
 }

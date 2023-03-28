@@ -1,21 +1,34 @@
 package fgopickup
 
+import "fmt"
+
 type service struct {
 }
 
-func (s *service) getPickups() *[]pickup {
+func (s *service) getPickups() (*[]pickup, error) {
 	dao := dao{DBEngine: getOrmEngine()}
-	list := dao.listPickup()
-	return list
+	list, err := dao.listPickup()
+	return list, err
 }
 
-func (s *service) getPickupDetail(pickupID int) pickupDetailRes {
+func (s *service) getPickupDetail(pickupID int) (pickupDetailRes, error) {
 	dao := dao{DBEngine: getOrmEngine()}
-	pickup := dao.selectPickup(pickupID)
-	servantIds := dao.selectPickupServantIds(pickupID)
-	servants := dao.selectServantsByIds(servantIds)
+	pickup, err := dao.selectPickup(pickupID)
+	servantIds, err := dao.selectPickupServantIds(pickupID)
+	servants, err := dao.selectServantsByIds(servantIds)
 	return pickupDetailRes{
 		Pickup:   pickup,
 		Servants: *servants,
-	}
+	}, err
+}
+
+func (s *service) getPickup(pickupID int) (pickup, error) {
+	dao := dao{DBEngine: getOrmEngine()}
+	pickup, err := dao.selectPickup(pickupID)
+	return pickup, err
+}
+
+func (s *service) getPickupTimeGap(id int) int {
+	fmt.Println(id)
+	return 0
 }
