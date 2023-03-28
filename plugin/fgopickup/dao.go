@@ -9,8 +9,6 @@ type dao struct {
 	DBEngine *orm
 }
 
-var PAGE_SIZE int = 50
-
 func (d *dao) listPickup() (*[]pickup, error) {
 	pickup := make([]pickup, 0)
 	unixTime := time.Now().Unix()
@@ -49,8 +47,9 @@ func (d *dao) selectServantsByIds(ids []int) (*[]servant, error) {
 }
 
 func (d *dao) listServants(page int) (*[]servant, error) {
+	pageSize := 50
 	servants := make([]servant, 0)
-	err := d.DBEngine.Offset(PAGE_SIZE * (page - 1)).Limit(PAGE_SIZE).Find(&servants).Error
+	err := d.DBEngine.Offset(pageSize * (page - 1)).Limit(pageSize).Find(&servants).Error
 	if err != nil {
 		logrus.Debugln(err)
 	}
