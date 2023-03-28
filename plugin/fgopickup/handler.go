@@ -25,7 +25,7 @@ func listPickups(ctx *zero.Ctx) {
 	ctx.Send(msg)
 }
 
-// 以卡池id获取某一个卡池的up从者们
+// 以卡池id获取某一个卡池的详情
 func pickupDetail(ctx *zero.Ctx) {
 	pickupID, err := strconv.Atoi(ctx.State["args"].(string))
 	if err != nil {

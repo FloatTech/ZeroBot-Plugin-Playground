@@ -31,12 +31,6 @@ func (s *service) getPickupDetail(pickupID int) (pickupDetailRes, error) {
 	return res, err
 }
 
-func (s *service) getPickup(pickupID int) (pickup, error) {
-	dao := dao{DBEngine: getOrmEngine()}
-	pickup, err := dao.selectPickup(pickupID)
-	return pickup, err
-}
-
 func (s *service) getPickupTimeGap(pickupID int) (int, error) {
 	dao := dao{DBEngine: getOrmEngine()}
 	pickup, err := dao.selectPickup(pickupID)
