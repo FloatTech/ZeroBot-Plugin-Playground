@@ -67,7 +67,8 @@ func (d *dao) selectPickupIDsByServantID(id int) ([]int, error) {
 
 func (d *dao) selectPickupsByIDs(ids []int) (*[]pickup, error) {
 	pickups := make([]pickup, 0)
-	err := d.DBEngine.Find(&pickups, ids).Error
+	unixTime := time.Now().Unix()
+	err := d.DBEngine.Where("end_time >= ?", unixTime).Find(&pickups, ids).Error
 	if err != nil {
 		logrus.Debugln(err)
 	}
