@@ -18,11 +18,11 @@ func (s *service) getPickupDetail(pickupID int) (pickupDetailRes, error) {
 	if err != nil {
 		return res, err
 	}
-	servantIds, err := dao.selectPickupServantIds(pickupID)
+	servantIds, err := dao.selectServantIDsByPickupID(pickupID)
 	if err != nil {
 		return res, err
 	}
-	servants, err := dao.selectServantsByIds(servantIds)
+	servants, err := dao.selectServantsByIDs(servantIds)
 	if err != nil {
 		return res, err
 	}
@@ -53,4 +53,24 @@ func getDiffDaysBySeconds(start, end int64) int {
 func (s *service) listServants(page int) (*[]servant, error) {
 	dao := dao{DBEngine: getOrmEngine()}
 	return dao.listServants(page)
+}
+
+func (s *service) getServantPickups(id int) (servantPickupsRes, error) {
+	res := servantPickupsRes{}
+	dao := dao{DBEngine: getOrmEngine()}
+	servant, err := dao.selectServant(id)
+	if err != nil {
+		return res, err
+	}
+	res.ServantName = servant.Name
+	pickupIDs, err := dao.selectPickupIDsByServantID(id)
+	if err != nil || len(pickupIDs) == 0 {
+		return res, err
+	}
+	pickups, err := dao.selectPickupsByIDs(pickupIDs)
+	if err != nil {
+		return res, err
+	}
+	res.Pickup = *pickups
+	return res, nil
 }

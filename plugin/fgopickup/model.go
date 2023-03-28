@@ -24,3 +24,8 @@ type pickupDetailRes struct {
 	Pickup   pickup
 	Servants []servant
 }
+
+type servantPickupsRes struct {
+	ServantName string
+	Pickup      []pickup
+}
