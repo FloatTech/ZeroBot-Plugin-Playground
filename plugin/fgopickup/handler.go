@@ -43,12 +43,12 @@ func pickupDetail(ctx *zero.Ctx) {
 }
 
 func getMsgOfSinglePickup(ctx *zero.Ctx, pickup pickup) message.MessageSegment {
-	id := message.Text("id:", strconv.Itoa(pickup.ID), "\n")
 	banner := message.Image(pickup.Banner)
-	name := message.Text("\n", pickup.Name)
+	id := message.Text("\n", strconv.Itoa(pickup.ID), ". ")
+	name := message.Text(pickup.Name)
 	date := message.Text("\n",
 		parseTime(pickup.StartTime), "~", parseTime(pickup.EndTime))
-	return ctxext.FakeSenderForwardNode(ctx, id, banner, name, date)
+	return ctxext.FakeSenderForwardNode(ctx, banner, id, name, date)
 }
 
 func parseTime(timeInSeconds int64) string {
