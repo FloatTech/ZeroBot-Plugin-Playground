@@ -2,9 +2,10 @@ package domain
 
 import (
 	"encoding/json"
-	"github.com/mmcdole/gofeed"
 	"net/http"
 	"time"
+
+	"github.com/mmcdole/gofeed"
 )
 
 const (
