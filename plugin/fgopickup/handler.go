@@ -32,6 +32,7 @@ func pickupDetail(ctx *zero.Ctx) {
 		ctx.Send("参数错误！")
 		return
 	}
+
 	service := service{}
 	detail, err := service.getPickupDetail(pickupID)
 	if err != nil {
@@ -40,38 +41,22 @@ func pickupDetail(ctx *zero.Ctx) {
 	}
 	servants := detail.Servants
 
-	msg := make(message.Message, len(servants)+1)
-	msg[0] = getMsgOfSinglePickup(ctx, detail.Pickup)
-
-	for i, servant := range servants {
-		avatar := message.Image(servant.Avatar)
-		name := message.Text(servant.Name)
-		msg[i+1] = ctxext.FakeSenderForwardNode(ctx, avatar, name)
-	}
-	ctx.Send(msg)
-}
-
-// 获取卡池距今天数
-func getPickupTimeGap(ctx *zero.Ctx) {
-	pickupID, err := strconv.Atoi(ctx.State["args"].(string))
-	if err != nil {
-		ctx.Send("参数错误！")
-		return
-	}
-	service := service{}
-	pickup, err := service.getPickup(pickupID)
+	days, err := service.getPickupTimeGap(pickupID)
 	if err != nil {
 		errorHandle(ctx)
 		return
 	}
-	days := service.getPickupTimeGap(pickupID)
 
-	singlePickupMsg := getMsgOfSinglePickup(ctx, pickup)
+	msg := make(message.Message, len(servants)+3)
+	msg[0] = getMsgOfSinglePickup(ctx, detail.Pickup)
+	msg[1] = ctxext.FakeSenderForwardNode(ctx, message.Text("距今还有", days, "天"))
+	msg[2] = ctxext.FakeSenderForwardNode(ctx, message.Text("以下为UP从者"))
 
-	msg := make(message.Message, 2)
-	msg[0] = singlePickupMsg
-	msg[1] = message.Text("距今还有", days, "天")
-
+	for i, servant := range servants {
+		avatar := message.Image(servant.Avatar)
+		name := message.Text(servant.Name)
+		msg[i+3] = ctxext.FakeSenderForwardNode(ctx, avatar, name)
+	}
 	ctx.Send(msg)
 }
 
@@ -89,5 +74,5 @@ func parseTime(timeInSeconds int64) string {
 }
 
 func errorHandle(ctx *zero.Ctx) {
-	ctx.Send("查询出错")
+	ctx.Send("查询出错，数据不存在！")
 }
