@@ -43,10 +43,14 @@ func (s *service) getPickupTimeGap(pickupID int) (int, error) {
 func getDiffDays(start, end time.Time) int {
 	start = time.Date(start.Year(), start.Month(), start.Day(), 0, 0, 0, 0, time.Local)
 	end = time.Date(end.Year(), end.Month(), end.Day(), 0, 0, 0, 0, time.Local)
-
 	return int(end.Sub(start).Hours() / 24)
 }
 
 func getDiffDaysBySeconds(start, end int64) int {
 	return getDiffDays(time.Unix(start, 0), time.Unix(end, 0))
+}
+
+func (s *service) listServants(page int) (*[]servant, error) {
+	dao := dao{DBEngine: getOrmEngine()}
+	return dao.listServants(page)
 }

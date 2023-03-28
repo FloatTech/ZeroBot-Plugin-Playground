@@ -8,6 +8,10 @@ import (
 	"time"
 )
 
+func errorHandle(ctx *zero.Ctx) {
+	ctx.Send("查询出错！")
+}
+
 // 列出所有的卡池
 func listPickups(ctx *zero.Ctx) {
 	service := service{}
@@ -73,6 +77,22 @@ func parseTime(timeInSeconds int64) string {
 	return time.Unix(timeInSeconds, 0).Format("2006-01-02")
 }
 
-func errorHandle(ctx *zero.Ctx) {
-	ctx.Send("查询出错，数据不存在！")
+func getServantList(ctx *zero.Ctx) {
+	page, err := strconv.Atoi(ctx.State["args"].(string))
+	if err != nil {
+		page = 0
+	}
+	service := service{}
+	servants, err := service.listServants(page)
+	if err != nil || len(*servants) == 0 {
+		errorHandle(ctx)
+		return
+	}
+	msg := make(message.Message, len(*servants))
+	for i, servant := range *servants {
+		avatar := message.Image(servant.Avatar)
+		desc := message.Text("\n", servant.ID, ". ", servant.Name)
+		msg[i] = ctxext.FakeSenderForwardNode(ctx, avatar, desc)
+	}
+	ctx.Send(msg)
 }
