@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub/domain"
+	"github.com/FloatTech/floatbox/binary"
 	"github.com/FloatTech/floatbox/ctxext"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
@@ -32,14 +33,14 @@ var (
 
 var (
 	// 注册插件
-	engine = control.Register("RssHub", &ctrl.Options[*zero.Ctx]{
+	engine = control.Register("rsshub", &ctrl.Options[*zero.Ctx]{
 		// 默认不启动
 		DisableOnDefault: false,
 		Brief:            "RssHub订阅姬",
 		// 详细帮助
 		Help: "RssHub订阅姬desu~ 支持的详细订阅列表可见 https://rsshub.netlify.app/ \n" +
-			"- 添加RssHub订阅-RssHub路由 \n" +
-			"- 删除RssHub订阅-RssHub路由 \n" +
+			"- 添加RssHub订阅-rsshub路由 \n" +
+			"- 删除RssHub订阅-rsshub路由 \n" +
 			"例：添加RssHub订阅-/bangumi/tv/calendar/today\n" +
 			"- 查看RssHub订阅列表 \n" +
 			"- RssHub同步 \n" +
@@ -59,27 +60,22 @@ var (
 
 // init 命令路由
 func init() {
-	engine.OnFullMatch("RssHub同步", zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
-		m, ok := control.Lookup("RssHub")
-		if !ok {
-			logrus.Warn("RssHub插件未启用")
-			return
-		}
+	engine.OnFullMatch("rsshub同步", zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		// 群组-频道推送视图  map[群组]推送内容数组
 		groupToFeedsMap, err := rssRepo.Sync(context.Background())
 		if err != nil {
-			ctx.SendChain(message.Text("RSS订阅姬：同步任务失败 ", err.Error()))
+			ctx.SendChain(message.Text("RSS订阅姬：同步任务失败 ", err))
 			return
 		}
 		// 没有更新的[群组-频道推送视图]则不推送
 		if len(groupToFeedsMap) == 0 {
-			logrus.Info("RssHub未发现更新")
+			logrus.Info("rsshub未发现更新")
 			return
 		}
-		sendRssUpdateMsg(ctx, groupToFeedsMap, m)
+		sendRssUpdateMsg(ctx, groupToFeedsMap)
 	})
 	// 添加订阅
-	engine.OnRegex(`^添加RssHub订阅-(.+)$`, zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnRegex(`^添加rsshub订阅-(.+)$`, zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		routeStr := ctx.State["regex_matched"].([]string)[1]
 		rv, _, isSubExisted, err := rssRepo.Subscribe(context.Background(), ctx.Event.GroupID, routeStr)
 		if err != nil {
@@ -103,7 +99,7 @@ func init() {
 		}
 		//ctx.SendChain(msg...)
 	})
-	engine.OnRegex(`^删除RssHub订阅-(.+)$`, zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnRegex(`^删除rsshub订阅-(.+)$`, zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		routeStr := ctx.State["regex_matched"].([]string)[1]
 		err := rssRepo.Unsubscribe(context.Background(), ctx.Event.GroupID, routeStr)
 		if err != nil {
@@ -115,7 +111,7 @@ func init() {
 		msg = append(msg, message.Text(fmt.Sprintf("RSS订阅姬：删除%s成功", routeStr)))
 		ctx.SendChain(msg...)
 	})
-	engine.OnFullMatch("查看RssHub订阅列表", zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnFullMatch("查看rsshub订阅列表", zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		rv, err := rssRepo.GetSubscribedChannelsByGroupID(context.Background(), ctx.Event.GroupID)
 		if err != nil {
 			ctx.SendChain(message.Text("RSS订阅姬：查询失败 ", err.Error()))
@@ -132,18 +128,16 @@ func init() {
 }
 
 // sendRssUpdateMsg 发送Rss更新消息
-func sendRssUpdateMsg(ctx *zero.Ctx, groupToFeedsMap map[int64][]*domain.RssClientView, m *ctrl.Control[*zero.Ctx]) {
+func sendRssUpdateMsg(ctx *zero.Ctx, groupToFeedsMap map[int64][]*domain.RssClientView) {
 	for groupID, views := range groupToFeedsMap {
 		logrus.Infof("RssHub插件在群 %d 触发推送检查", groupID)
-		if !m.IsEnabledIn(groupID) {
-			continue
-		}
 		for _, view := range views {
 			if len(view.Contents) == 0 {
 				continue
 			}
-			msg := createRssUpdateMsg(ctx, view)
-			if len(msg) == 0 {
+			msg, err := createRssUpdateMsg(ctx, view)
+			if len(msg) == 0 || err != nil {
+				ctx.SendPrivateMessage(zero.BotConfig.SuperUsers[0], message.Text("RssHub推送错误", err))
 				continue
 			}
 			logrus.Infof("RssHub插件在群 %d 开始推送 %s", groupID, view.Source.Title)
@@ -156,11 +150,18 @@ func sendRssUpdateMsg(ctx *zero.Ctx, groupToFeedsMap map[int64][]*domain.RssClie
 }
 
 // createRssUpdateMsg 创建Rss更新消息
-func createRssUpdateMsg(ctx *zero.Ctx, view *domain.RssClientView) message.Message {
-	msgSlice := formatRssToTextMsg(view)
-	msg := make(message.Message, len(msgSlice))
-	for i, text := range msgSlice {
-		msg[i] = fakeSenderForwardNode(ctx.Event.SelfID, message.Text(text))
+func createRssUpdateMsg(ctx *zero.Ctx, view *domain.RssClientView) (message.Message, error) {
+	//msgSlice := formatRssToTextMsg(view)
+	//msg := make(message.Message, len(msgSlice))
+	//for i, text := range msgSlice {
+	//	msg[i] = fakeSenderForwardNode(ctx.Event.SelfID, message.Text(text))
+	//}
+	pic, err := formatRssToPicMsg(view)
+	if err != nil {
+		return nil, err
 	}
-	return msg
+	msg := make(message.Message, 2)
+	msg[0] = message.Image("base64://" + binary.BytesToString(pic))
+	msg[1] = message.Text(ctx.Event.SelfID, message.Text(view.Source.Link))
+	return msg, nil
 }
