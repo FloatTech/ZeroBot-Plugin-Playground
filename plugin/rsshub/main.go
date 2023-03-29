@@ -4,7 +4,7 @@ package rsshub
 import (
 	"context"
 	"fmt"
-	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub/domain"
+
 	"github.com/FloatTech/floatbox/ctxext"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
@@ -12,6 +12,8 @@ import (
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
+
+	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub/domain"
 )
 
 // 初始化 repo
@@ -97,11 +99,11 @@ func init() {
 		for _, rm := range rawMsgSlice {
 			msg = append(msg, fakeSenderForwardNode(ctx.Event.SelfID, message.Text(rm)))
 		}
-		//m := message.Message{zbpCtxExt.FakeSenderForwardNode(ctx, msg...)}
+		// m := message.Message{zbpCtxExt.FakeSenderForwardNode(ctx, msg...)}
 		if id := ctx.Send(msg).ID(); id == 0 {
 			ctx.SendChain(message.Text("ERROR: 可能被风控了"))
 		}
-		//ctx.SendChain(msg...)
+		// ctx.SendChain(msg...)
 	})
 	engine.OnRegex(`^删除RssHub订阅-(.+)$`, zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		routeStr := ctx.State["regex_matched"].([]string)[1]
