@@ -1,7 +1,6 @@
 package fgopickup
 
 import (
-	"fmt"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 	"os"
@@ -24,12 +23,7 @@ func initialize(dbpath string) *gorm.DB {
 		if err != nil {
 			return nil
 		}
-		defer func(f *os.File) {
-			err := f.Close()
-			if err != nil {
-				fmt.Println(err)
-			}
-		}(f)
+		defer f.Close()
 	}
 	gdb, err := gorm.Open(sqlite.Open(dbpath))
 	if err != nil {

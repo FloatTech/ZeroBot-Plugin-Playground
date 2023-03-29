@@ -8,23 +8,19 @@ import (
 	"time"
 )
 
-func handleError(ctx *zero.Ctx) {
-	ctx.Send("查询出错！")
-}
-
 // 列出所有的卡池
 func listPickups(ctx *zero.Ctx) {
 	service := service{}
 	pickups, err := service.getPickups()
 
 	if err != nil {
-		handleError(ctx)
+		ctx.Send("查询出错！")
 		return
 	}
 
 	msg := make(message.Message, len(*pickups))
 	for i, pickup := range *pickups {
-		msg[i] = getMsgOfSinglePickup(ctx, pickup)
+		msg[i] = ctxext.FakeSenderForwardNode(ctx, getMsgOfSinglePickup(pickup)...)
 	}
 	ctx.Send(msg)
 }
@@ -32,7 +28,7 @@ func listPickups(ctx *zero.Ctx) {
 // 以卡池id获取某一个卡池的详情
 func pickupDetail(ctx *zero.Ctx) {
 	pickupID, err := strconv.Atoi(ctx.State["args"].(string))
-	if err != nil {
+	if err != nil || pickupID <= 0 {
 		ctx.Send("参数错误！")
 		return
 	}
@@ -40,26 +36,25 @@ func pickupDetail(ctx *zero.Ctx) {
 	service := service{}
 	detail, err := service.getPickupDetail(pickupID)
 	if err != nil {
-		handleError(ctx)
+		ctx.Send("查询出错！")
 		return
 	}
 	servants := detail.Servants
 
 	days, err := service.getPickupTimeGap(pickupID)
 	if err != nil {
-		handleError(ctx)
+		ctx.Send("查询出错！")
 		return
 	}
 
 	msg := make(message.Message, len(servants)+3)
-	msg[0] = getMsgOfSinglePickup(ctx, detail.Pickup)
-	msg[1] = ctxext.FakeSenderForwardNode(ctx, message.Text("距今还有", days, "天"))
-	msg[2] = ctxext.FakeSenderForwardNode(ctx, message.Text("以下为UP从者"))
+	msg[0] = ctxext.FakeSenderForwardNode(ctx, getMsgOfSinglePickup(detail.Pickup)...)
+	msg[1] = ctxext.FakeSenderForwardNode(ctx, message.Text("距今还有", days, "天. ", "以下为UP从者"))
 
 	for i, servant := range servants {
 		avatar := message.Image(servant.Avatar)
-		name := message.Text(servant.Name)
-		msg[i+3] = ctxext.FakeSenderForwardNode(ctx, avatar, name)
+		name := message.Text("\n", servant.Name)
+		msg[i+2] = ctxext.FakeSenderForwardNode(ctx, avatar, name)
 	}
 	ctx.Send(msg)
 }
@@ -74,25 +69,25 @@ func getServantPickups(ctx *zero.Ctx) {
 	service := service{}
 	res, err := service.getServantPickups(servantID)
 	if err != nil {
-		handleError(ctx)
+		ctx.Send("查询出错！")
 		return
 	}
 
 	msg := make(message.Message, len(res.Pickup)+1)
 	msg[0] = ctxext.FakeSenderForwardNode(ctx, message.Text("从者:<", res.ServantName, ">未来卡池如下"))
 	for i, pickup := range res.Pickup {
-		msg[i+1] = getMsgOfSinglePickup(ctx, pickup)
+		msg[i+1] = ctxext.FakeSenderForwardNode(ctx, getMsgOfSinglePickup(pickup)...)
 	}
 	ctx.Send(msg)
 }
 
-func getMsgOfSinglePickup(ctx *zero.Ctx, pickup pickup) message.MessageSegment {
+func getMsgOfSinglePickup(pickup pickup) message.Message {
 	banner := message.Image(pickup.Banner)
 	id := message.Text("\n", strconv.Itoa(pickup.ID), ". ")
 	name := message.Text(pickup.Name)
 	date := message.Text("\n",
 		parseTime(pickup.StartTime), "~", parseTime(pickup.EndTime))
-	return ctxext.FakeSenderForwardNode(ctx, banner, id, name, date)
+	return message.Message{banner, id, name, date}
 }
 
 func parseTime(timeInSeconds int64) string {
@@ -101,13 +96,10 @@ func parseTime(timeInSeconds int64) string {
 
 func getServantList(ctx *zero.Ctx) {
 	page, err := strconv.Atoi(ctx.State["args"].(string))
-	if err != nil {
-		page = 0
-	}
 	service := service{}
 	servants, err := service.listServants(page)
 	if err != nil || len(*servants) == 0 {
-		handleError(ctx)
+		ctx.Send("查询出错！")
 		return
 	}
 	msg := make(message.Message, len(*servants))
