@@ -95,7 +95,7 @@ func parseTime(timeInSeconds int64) string {
 }
 
 func getServantList(ctx *zero.Ctx) {
-	page, err := strconv.Atoi(ctx.State["args"].(string))
+	page, _ := strconv.Atoi(ctx.State["args"].(string))
 	service := service{}
 	servants, err := service.listServants(page)
 	if err != nil || len(*servants) == 0 {
