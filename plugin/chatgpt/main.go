@@ -115,6 +115,7 @@ func init() {
 				ctx.SendChain(message.Text("设置失败: ", err))
 				return
 			}
+			ctx.SendChain(message.Text("设置成功"))
 			for _, v := range ctx.GetThisGroupMemberListNoCache().Array() {
 				cache.Delete(
 					sessionKey{
@@ -122,7 +123,7 @@ func init() {
 						user:  v.Get("user_id").Int(),
 					})
 			}
-			ctx.SendChain(message.Text("设置成功"))
+			ctx.SendChain(message.Text("本群记忆清除成功"))
 		})
 	engine.OnFullMatch("删除本群预设", getdb).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
@@ -135,6 +136,7 @@ func init() {
 				ctx.SendChain(message.Text("删除失败: ", err))
 				return
 			}
+			ctx.SendChain(message.Text("删除成功"))
 			for _, v := range ctx.GetThisGroupMemberListNoCache().Array() {
 				cache.Delete(
 					sessionKey{
@@ -142,7 +144,7 @@ func init() {
 						user:  v.Get("user_id").Int(),
 					})
 			}
-			ctx.SendChain(message.Text("删除成功"))
+			ctx.SendChain(message.Text("本群记忆清除成功"))
 		})
 	engine.OnFullMatch("查看预设列表", getdb).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
