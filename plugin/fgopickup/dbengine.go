@@ -1,9 +1,10 @@
 package fgopickup
 
 import (
+	"os"
+
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
-	"os"
 )
 
 var _dbEngine *orm
