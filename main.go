@@ -1,4 +1,4 @@
-// Package main ZeroBot-Plugin-Plugin main file
+// Package main ZeroBot-Plugin-Playground main file
 package main
 
 import (
