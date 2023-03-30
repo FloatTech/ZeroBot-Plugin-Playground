@@ -3,10 +3,11 @@ package scorebeta
 
 import (
 	"fmt"
-	"github.com/FloatTech/gg"
-	"github.com/FloatTech/imgfactory"
 	"image"
 	"net/http"
+
+	"github.com/FloatTech/gg"
+	"github.com/FloatTech/imgfactory"
 )
 
 var exampleName = "name"
