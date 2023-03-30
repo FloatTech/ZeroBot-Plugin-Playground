@@ -1,12 +1,10 @@
 package fgopickup
 
 import (
-	"sync"
 	"time"
 )
 
 type dao struct {
-	sync.Mutex
 	DBEngine *orm
 }
 

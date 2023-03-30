@@ -14,7 +14,7 @@ func listPickups(ctx *zero.Ctx) {
 	pickups, err := service.getPickups()
 
 	if err != nil {
-		ctx.Send("查询出错！")
+		ctx.SendChain(message.Text("ERROR: ", err, " 解释: 查询出错！"))
 		return
 	}
 
@@ -36,14 +36,14 @@ func pickupDetail(ctx *zero.Ctx) {
 	service := service{}
 	detail, err := service.getPickupDetail(pickupID)
 	if err != nil {
-		ctx.Send("查询出错！")
+		ctx.SendChain(message.Text("ERROR: ", err, " 解释: 查询出错！"))
 		return
 	}
 	servants := detail.Servants
 
 	days, err := service.getPickupTimeGap(pickupID)
 	if err != nil {
-		ctx.Send("查询出错！")
+		ctx.SendChain(message.Text("ERROR: ", err, " 解释: 查询出错！"))
 		return
 	}
 
@@ -69,7 +69,7 @@ func getServantPickups(ctx *zero.Ctx) {
 	service := service{}
 	res, err := service.getServantPickups(servantID)
 	if err != nil {
-		ctx.Send("查询出错！")
+		ctx.SendChain(message.Text("ERROR: ", err, " 解释: 查询出错！"))
 		return
 	}
 
@@ -99,7 +99,7 @@ func getServantList(ctx *zero.Ctx) {
 	service := service{}
 	servants, err := service.listServants(page)
 	if err != nil || len(*servants) == 0 {
-		ctx.Send("查询出错！")
+		ctx.SendChain(message.Text("ERROR: ", err, " 解释: 查询出错！"))
 		return
 	}
 	msg := make(message.Message, len(*servants))
