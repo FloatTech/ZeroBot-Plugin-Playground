@@ -3,7 +3,7 @@ name: 最新版
 on: [push, pull_request]
 
 env:
-  BINARY_PREFIX: "zbp_"
+  BINARY_PREFIX: "zbppg_"
   BINARY_SUFFIX: ""
   PR_PROMPT: "::warning:: Build artifact will not be uploaded due to the workflow is trigged by pull request."
   LD_FLAGS: "-w -s"
@@ -28,7 +28,7 @@ jobs:
       - name: Setup Go environment
         uses: actions/setup-go@master
         with:
-          go-version: 1.19
+          go-version: '1.20'
       - name: Cache downloaded module
         uses: actions/cache@master
         with:
