@@ -154,11 +154,15 @@ func sendRssUpdateMsg(ctx *zero.Ctx, groupToFeedsMap map[int64][]*domain.RssClie
 
 // createRssUpdateMsg 创建Rss更新消息
 func createRssUpdateMsg(ctx *zero.Ctx, view *domain.RssClientView) (message.Message, error) {
-	msgSlice, _ := formatRssToMsg(view)
+	msgSlice, err := formatRssToMsg(view)
+	if err != nil {
+		return nil, err
+	}
 	msg := make(message.Message, len(msgSlice))
 	for i, item := range msgSlice {
 		msg[i] = fakeSenderForwardNode(ctx.Event.SelfID, item...)
 	}
+
 	//msg:= formatRssToTextMsg(view)
 	//if err != nil {
 	//	return nil, err

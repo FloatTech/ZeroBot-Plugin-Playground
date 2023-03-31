@@ -52,7 +52,6 @@ func formatRssToMsg(view *domain.RssClientView) ([]message.Message, error) {
 		content, err = text.RenderToBase64(contentStr, text.SakuraFontFile, 800, 40)
 		if err != nil {
 			logrus.WithError(err).Error("RssHub订阅姬渲染图片失败")
-			err = nil
 			continue
 		}
 		itemMessage = append(itemMessage, message.Image("base64://"+binary.BytesToString(content)), message.Text(fmt.Sprintf("\n%s", item.Link)))
@@ -62,22 +61,22 @@ func formatRssToMsg(view *domain.RssClientView) ([]message.Message, error) {
 }
 
 // formatRssToPicMsg 格式化RssClientView为图片消息
-func formatRssToPicMsg(view *domain.RssClientView) (content []byte, err error) {
-	msg := fmt.Sprintf("【%s】更新时间:%v\n", view.Source.Title, view.Source.UpdatedParsed.Format(time.ANSIC))
-	// rssItem信息
-	for _, item := range view.Contents {
-		contentStr := fmt.Sprintf("标题：%s\n链接：%s\n", item.Title, item.Link)
-		if !item.Date.IsZero() {
-			contentStr += fmt.Sprintf("更新时间：%v\n", item.Date.Format(time.ANSIC))
-		}
-		msg += contentStr
-	}
-	content, err = text.RenderToBase64(msg, text.FontFile, 800, 20)
-	if err != nil {
-		return
-	}
-	return
-}
+//func formatRssToPicMsg(view *domain.RssClientView) (content []byte, err error) {
+//	msg := fmt.Sprintf("【%s】更新时间:%v\n", view.Source.Title, view.Source.UpdatedParsed.Format(time.ANSIC))
+//	// rssItem信息
+//	for _, item := range view.Contents {
+//		contentStr := fmt.Sprintf("标题：%s\n链接：%s\n", item.Title, item.Link)
+//		if !item.Date.IsZero() {
+//			contentStr += fmt.Sprintf("更新时间：%v\n", item.Date.Format(time.ANSIC))
+//		}
+//		msg += contentStr
+//	}
+//	content, err = text.RenderToBase64(msg, text.FontFile, 800, 20)
+//	if err != nil {
+//		return
+//	}
+//	return
+//}
 
 // fakeSenderForwardNode 伪造一个发送者为RssHub订阅姬的消息节点，传入userID是为了减少ws io
 func fakeSenderForwardNode(userID int64, msgs ...message.MessageSegment) message.MessageSegment {
