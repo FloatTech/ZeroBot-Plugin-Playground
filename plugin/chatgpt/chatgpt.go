@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -14,6 +15,16 @@ const (
 	proxyURL           = "https://openai.geekr.cool/v1/"
 	modelGPT3Dot5Turbo = "gpt-3.5-turbo"
 )
+
+type chatkeymessage struct {
+	Code           int     `json:"code"`
+	Msg            string  `json:"msg"`
+	TotalGranted   float64 `json:"total_granted"`
+	TotalUsed      float64 `json:"total_used"`
+	TotalAvailable float64 `json:"total_available"`
+	EffectiveAt    int64   `json:"effective_at"`
+	ExpiresAt      int64   `json:"expires_at"`
+}
 
 // chatGPTResponseBody 响应体
 type chatGPTResponseBody struct {
@@ -56,7 +67,7 @@ var client = &http.Client{
 	Transport: &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 	},
-	Timeout: 5 * time.Minute,
+	Timeout: time.Minute,
 }
 
 // completions gtp3.5文本模型回复
@@ -94,7 +105,7 @@ func completions(messages []chatMessage, apiKey string) (*chatGPTResponseBody, e
 	defer res.Body.Close()
 
 	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusBadRequest {
-		return nil, errors.New("response error")
+		return nil, errors.New("response error" + strconv.Itoa(res.StatusCode))
 	}
 
 	v := new(chatGPTResponseBody)
