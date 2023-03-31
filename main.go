@@ -1,4 +1,4 @@
-// Package main ZeroBot-Plugin-Plugin main file
+// Package main ZeroBot-Plugin-Playground main file
 package main
 
 import (
@@ -30,6 +30,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/hitokoto"
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/draw" // 服务详情
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fgopickup"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/moegozh"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/movies"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/ottoshout"
@@ -147,7 +148,7 @@ func init() {
 }
 func main() {
 	if !strings.Contains(runtime.Version(), "go1.2") { // go1.20之前版本需要全局 seed，其他插件无需再 seed
-		rand.Seed(time.Now().UnixNano())
+		rand.Seed(time.Now().UnixNano()) 
 	}
 
 	zero.OnCommand("hello").
