@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+
 	"github.com/mmcdole/gofeed"
 	"github.com/sirupsen/logrus"
 )
