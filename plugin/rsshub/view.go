@@ -2,12 +2,14 @@ package rsshub
 
 import (
 	"fmt"
-	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub/domain"
+	"time"
+
 	"github.com/FloatTech/floatbox/binary"
 	"github.com/FloatTech/zbputils/img/text"
 	"github.com/sirupsen/logrus"
 	"github.com/wdvxdr1123/ZeroBot/message"
-	"time"
+
+	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub/domain"
 )
 
 const (
@@ -61,7 +63,7 @@ func formatRssToMsg(view *domain.RssClientView) ([]message.Message, error) {
 }
 
 // formatRssToPicMsg 格式化RssClientView为图片消息
-//func formatRssToPicMsg(view *domain.RssClientView) (content []byte, err error) {
+// func formatRssToPicMsg(view *domain.RssClientView) (content []byte, err error) {
 //	msg := fmt.Sprintf("【%s】更新时间:%v\n", view.Source.Title, view.Source.UpdatedParsed.Format(time.ANSIC))
 //	// rssItem信息
 //	for _, item := range view.Contents {
