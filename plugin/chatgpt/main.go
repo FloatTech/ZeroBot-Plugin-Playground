@@ -127,7 +127,12 @@ func init() {
 					gid = -ctx.Event.UserID
 				}
 			} else {
-				gid = -1 //全局为-1的群号
+				if zero.SuperUserPermission(ctx) {
+					gid = -1 //全局为-1的群号
+				} else {
+					ctx.SendChain(message.Text("权限不足"))
+					return
+				}
 			}
 			err := db.changemode(gid, modename)
 			if err != nil {
