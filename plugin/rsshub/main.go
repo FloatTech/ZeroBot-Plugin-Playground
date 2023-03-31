@@ -4,7 +4,7 @@ package rsshub
 import (
 	"context"
 	"fmt"
-	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub/domain"
+
 	"github.com/FloatTech/floatbox/ctxext"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
@@ -12,6 +12,8 @@ import (
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
+
+	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub/domain"
 )
 
 // 初始化 repo
@@ -155,7 +157,7 @@ func createRssUpdateMsg(ctx *zero.Ctx, view *domain.RssClientView) (message.Mess
 	}
 	// 发送文字版
 	//msg:= formatRssToTextMsg(view)
-	//if err != nil {
+	// if err != nil {
 	//	return nil, err
 	//}
 	//msg := make(message.Message, 2)
