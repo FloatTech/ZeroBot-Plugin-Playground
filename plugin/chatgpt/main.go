@@ -127,7 +127,7 @@ func init() {
 					gid = -ctx.Event.UserID
 				}
 			} else {
-				gid = -1 //全局为-1的群号
+				gid = -1 // 全局为-1的群号
 			}
 			err := db.changemode(gid, modename)
 			if err != nil {
