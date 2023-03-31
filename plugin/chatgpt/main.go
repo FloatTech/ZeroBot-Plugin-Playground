@@ -134,6 +134,13 @@ func init() {
 				ctx.SendChain(message.Text("设置失败: ", err))
 				return
 			}
+			for _, v := range ctx.GetThisGroupMemberListNoCache().Array() {
+				cache.Delete(
+					sessionKey{
+						group: ctx.Event.GroupID,
+						user:  v.Get("user_id").Int(),
+					})
+			}
 			ctx.SendChain(message.Text("设置成功"))
 			for _, v := range ctx.GetThisGroupMemberListNoCache().Array() {
 				cache.Delete(
@@ -155,6 +162,7 @@ func init() {
 				ctx.SendChain(message.Text("删除失败: ", err))
 				return
 			}
+
 			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("删除成功"))
 			for _, v := range ctx.GetThisGroupMemberListNoCache().Array() {
 				cache.Delete(
