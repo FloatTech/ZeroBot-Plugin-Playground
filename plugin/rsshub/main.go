@@ -160,7 +160,7 @@ func createRssUpdateMsg(ctx *zero.Ctx, view *domain.RssClientView) (message.Mess
 	// if err != nil {
 	//	return nil, err
 	//}
-	//msg := make(message.Message, 2)
+	// msg := make(message.Message, 2)
 	//msg[0] = message.Image("base64://" + binary.BytesToString(pic))
 	//msg[1] = message.Text(ctx.Event.SelfID, message.Text(view.Source.Link))
 	return msg, nil
