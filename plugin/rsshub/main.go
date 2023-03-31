@@ -86,21 +86,15 @@ func init() {
 		} else {
 			ctx.SendChain(message.Text("RSS订阅姬：添加成功"))
 		}
-		// 添加成功，发送订阅源信息
+		// 添加成功，发送订阅源快照
 		msg, err := createRssUpdateMsg(ctx, rv)
 		if len(msg) == 0 || err != nil {
 			ctx.SendPrivateMessage(zero.BotConfig.SuperUsers[0], message.Text("RssHub推送错误", err))
 			return
 		}
-		//rawMsgSlice :=
-		//for _, rm := range rawMsgSlice {
-		//	msg = append(msg, fakeSenderForwardNode(ctx.Event.SelfID, message.Text(rm)))
-		//}
-		//m := message.Message{zbpCtxExt.FakeSenderForwardNode(ctx, msg...)}
 		if id := ctx.Send(msg).ID(); id == 0 {
-			ctx.SendChain(message.Text("ERROR: 可能被风控了"))
+			ctx.SendChain(message.Text("ERROR: 发送失败订阅源快照，可能被风控了"))
 		}
-		//ctx.SendChain(msg...)
 	})
 	engine.OnRegex(`^删除rsshub订阅-(.+)$`, zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		routeStr := ctx.State["regex_matched"].([]string)[1]
@@ -109,10 +103,7 @@ func init() {
 			ctx.SendChain(message.Text("RSS订阅姬：删除失败 ", err.Error()))
 			return
 		}
-		// 添加成功，发送订阅源信息
-		var msg []message.MessageSegment
-		msg = append(msg, message.Text(fmt.Sprintf("RSS订阅姬：删除%s成功", routeStr)))
-		ctx.SendChain(msg...)
+		ctx.SendChain(message.Text(fmt.Sprintf("RSS订阅姬：删除%s成功", routeStr)))
 	})
 	engine.OnFullMatch("查看rsshub订阅列表", zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		rv, err := rssRepo.GetSubscribedChannelsByGroupID(context.Background(), ctx.Event.GroupID)
@@ -162,7 +153,7 @@ func createRssUpdateMsg(ctx *zero.Ctx, view *domain.RssClientView) (message.Mess
 	for i, item := range msgSlice {
 		msg[i] = fakeSenderForwardNode(ctx.Event.SelfID, item...)
 	}
-
+	// 发送文字版
 	//msg:= formatRssToTextMsg(view)
 	//if err != nil {
 	//	return nil, err
