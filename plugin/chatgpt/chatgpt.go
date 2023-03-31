@@ -67,7 +67,7 @@ var client = &http.Client{
 	Transport: &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 	},
-	Timeout: time.Minute,
+	Timeout: time.Minute * 5,
 }
 
 // completions gtp3.5文本模型回复
