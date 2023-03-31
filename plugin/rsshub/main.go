@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub/domain"
-	"github.com/FloatTech/floatbox/binary"
 	"github.com/FloatTech/floatbox/ctxext"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
@@ -88,11 +87,15 @@ func init() {
 			ctx.SendChain(message.Text("RSS订阅姬：添加成功"))
 		}
 		// 添加成功，发送订阅源信息
-		msg := make(message.Message, 0)
-		rawMsgSlice := formatRssToTextMsg(rv)
-		for _, rm := range rawMsgSlice {
-			msg = append(msg, fakeSenderForwardNode(ctx.Event.SelfID, message.Text(rm)))
+		msg, err := createRssUpdateMsg(ctx, rv)
+		if len(msg) == 0 || err != nil {
+			ctx.SendPrivateMessage(zero.BotConfig.SuperUsers[0], message.Text("RssHub推送错误", err))
+			return
 		}
+		//rawMsgSlice :=
+		//for _, rm := range rawMsgSlice {
+		//	msg = append(msg, fakeSenderForwardNode(ctx.Event.SelfID, message.Text(rm)))
+		//}
 		//m := message.Message{zbpCtxExt.FakeSenderForwardNode(ctx, msg...)}
 		if id := ctx.Send(msg).ID(); id == 0 {
 			ctx.SendChain(message.Text("ERROR: 可能被风控了"))
@@ -118,7 +121,7 @@ func init() {
 			return
 		}
 		// 添加成功，发送订阅源信息
-		var msg []message.MessageSegment
+		var msg message.Message
 		msg = append(msg, message.Text("RSS订阅姬：当前订阅列表"))
 		for _, v := range rv {
 			msg = append(msg, message.Text(formatRssToTextMsg(v)))
@@ -132,18 +135,18 @@ func sendRssUpdateMsg(ctx *zero.Ctx, groupToFeedsMap map[int64][]*domain.RssClie
 	for groupID, views := range groupToFeedsMap {
 		logrus.Infof("RssHub插件在群 %d 触发推送检查", groupID)
 		for _, view := range views {
-			if len(view.Contents) == 0 {
+			if view == nil || len(view.Contents) == 0 {
 				continue
 			}
 			msg, err := createRssUpdateMsg(ctx, view)
 			if len(msg) == 0 || err != nil {
-				ctx.SendPrivateMessage(zero.BotConfig.SuperUsers[0], message.Text("RssHub推送错误", err))
+				ctx.SendPrivateMessage(zero.BotConfig.SuperUsers[0], message.Text(rssHubPushErrMsg, err))
 				continue
 			}
 			logrus.Infof("RssHub插件在群 %d 开始推送 %s", groupID, view.Source.Title)
-			ctx.SendGroupMessage(groupID, message.Text(view.Source.Title+"\n[RSS订阅姬定时推送]\n"))
+			ctx.SendGroupMessage(groupID, message.Text(view.Source.Title+"\n[RSS订阅姬定时推送]"))
 			if res := ctx.SendGroupForwardMessage(groupID, msg); !res.Exists() {
-				ctx.SendPrivateMessage(zero.BotConfig.SuperUsers[0], message.Text("RssHub推送错误"))
+				ctx.SendPrivateMessage(zero.BotConfig.SuperUsers[0], message.Text(rssHubPushErrMsg))
 			}
 		}
 	}
@@ -151,17 +154,17 @@ func sendRssUpdateMsg(ctx *zero.Ctx, groupToFeedsMap map[int64][]*domain.RssClie
 
 // createRssUpdateMsg 创建Rss更新消息
 func createRssUpdateMsg(ctx *zero.Ctx, view *domain.RssClientView) (message.Message, error) {
-	//msgSlice := formatRssToTextMsg(view)
-	//msg := make(message.Message, len(msgSlice))
-	//for i, text := range msgSlice {
-	//	msg[i] = fakeSenderForwardNode(ctx.Event.SelfID, message.Text(text))
-	//}
-	pic, err := formatRssToPicMsg(view)
-	if err != nil {
-		return nil, err
+	msgSlice, _ := formatRssToMsg(view)
+	msg := make(message.Message, len(msgSlice))
+	for i, item := range msgSlice {
+		msg[i] = fakeSenderForwardNode(ctx.Event.SelfID, item...)
 	}
-	msg := make(message.Message, 2)
-	msg[0] = message.Image("base64://" + binary.BytesToString(pic))
-	msg[1] = message.Text(ctx.Event.SelfID, message.Text(view.Source.Link))
+	//msg:= formatRssToTextMsg(view)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//msg := make(message.Message, 2)
+	//msg[0] = message.Image("base64://" + binary.BytesToString(pic))
+	//msg[1] = message.Text(ctx.Event.SelfID, message.Text(view.Source.Link))
 	return msg, nil
 }

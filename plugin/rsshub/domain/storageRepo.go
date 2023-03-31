@@ -28,7 +28,7 @@ func (s *repoStorage) GetSubscribesBySource(ctx context.Context, feedPath string
 	//
 	rs := make([]*RssSubscribe, 0)
 	err := s.orm.Model(&RssSubscribe{}).Joins(fmt.Sprintf("%s left join %s on %s.rss_source_id=%s.id", tableNameRssSubscribe, tableNameRssSource, tableNameRssSubscribe, tableNameRssSource)).
-		Where(&RssSource{RssHubFeedPath: feedPath}).Select("rss_subscribe.*").Find(&rs).Error
+		Where("rss_source.rss_hub_feed_path = ?", feedPath).Select("rss_subscribe.*").Find(&rs).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -41,17 +41,23 @@ func (s *repoStorage) GetSubscribesBySource(ctx context.Context, feedPath string
 
 // GetIfExistedSubscribe Impl
 func (s *repoStorage) GetIfExistedSubscribe(ctx context.Context, gid int64, feedPath string) (*RssSubscribe, bool, error) {
-	rs := RssSubscribe{GroupID: gid}
-	err := s.orm.Model(rs).Select("rss_subscribe.id,rss_subscribe.group_id,rss_source.id,rss_subscribe.mtime").
-		Joins(fmt.Sprintf("%s left join %s on %s.rss_source_id=%s.id",
-			tableNameRssSubscribe, tableNameRssSource, tableNameRssSubscribe, tableNameRssSource)).
-		Where(&RssSource{RssHubFeedPath: feedPath}).Error
+	rs := RssSubscribe{}
+
+	err := s.orm.Table(tableNameRssSubscribe).
+		Select("rss_subscribe.id, rss_subscribe.group_id, rss_subscribe.rss_source_id, rss_subscribe.mtime").
+		Joins(fmt.Sprintf("INNER JOIN %s ON %s.rss_source_id=%s.id",
+			tableNameRssSource, tableNameRssSubscribe, tableNameRssSource)).
+		Where("rss_source.rss_hub_feed_path = ? AND rss_subscribe.group_id = ?", feedPath, gid).Scan(&rs).Error
+
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, false, nil
 		}
 		logrus.WithContext(ctx).Errorf("[rsshub GetIfExistedSubscribe] error: %v", err)
 		return nil, false, err
+	}
+	if rs.ID == 0 {
+		return nil, false, nil
 	}
 	return &rs, true, nil
 }
@@ -72,7 +78,7 @@ func (s *repoStorage) initDB() (err error) {
 func (s *repoStorage) UpsertSource(ctx context.Context, source *RssSource) (err error) {
 	// Update columns to default value on `id` conflict
 	querySource := &RssSource{RssHubFeedPath: source.RssHubFeedPath}
-	err = s.orm.Take(querySource, "rss_hub_feed_path = ?", querySource.RssHubFeedPath).Error
+	err = s.orm.First(querySource, "rss_hub_feed_path = ?", querySource.RssHubFeedPath).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			err = s.orm.Create(source).Omit("id").Error
@@ -83,6 +89,7 @@ func (s *repoStorage) UpsertSource(ctx context.Context, source *RssSource) (err 
 		}
 		return
 	}
+	source.ID = querySource.ID
 	logrus.WithContext(ctx).Infof("[rsshub] update source: %+v", source.UpdatedParsed)
 	err = s.orm.Updates(source).Where(&RssSource{ID: source.ID}).Error
 	if err != nil {
@@ -94,8 +101,8 @@ func (s *repoStorage) UpsertSource(ctx context.Context, source *RssSource) (err 
 }
 
 // GetSources Impl
-func (s *repoStorage) GetSources(ctx context.Context) (sources []*RssSource, err error) {
-	sources = []*RssSource{}
+func (s *repoStorage) GetSources(ctx context.Context) (sources []RssSource, err error) {
+	sources = []RssSource{}
 	err = s.orm.Find(&sources, "id > 0").Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -203,8 +210,8 @@ func (s *repoStorage) CreateSubscribe(ctx context.Context, gid, rssSourceID int6
 }
 
 // DeleteSubscribe Impl
-func (s *repoStorage) DeleteSubscribe(ctx context.Context, gid int64, subscribeID int64) (err error) {
-	err = s.orm.Delete(&RssSubscribe{}, "rss_source_id = ? and group_id = ?", subscribeID, gid).Error
+func (s *repoStorage) DeleteSubscribe(ctx context.Context, subscribeID int64) (err error) {
+	err = s.orm.Delete(&RssSubscribe{}, "id = ?", subscribeID).Error
 	if err != nil {
 		logrus.WithContext(ctx).Errorf("[rsshub] storage.DeleteSubscribe error: %v", err)
 		return

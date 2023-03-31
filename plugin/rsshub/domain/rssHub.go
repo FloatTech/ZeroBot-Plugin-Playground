@@ -129,7 +129,7 @@ func (repo *rssDomain) Unsubscribe(ctx context.Context, gid int64, feedPath stri
 		logrus.WithContext(ctx).Infof("[rsshub Subscribe] source existed: %v", ifExisted)
 		return errors.New("频道不存在")
 	}
-	err = repo.storage.DeleteSubscribe(ctx, gid, existedSubscribes.ID)
+	err = repo.storage.DeleteSubscribe(ctx, existedSubscribes.ID)
 	if err != nil {
 		logrus.WithContext(ctx).Errorf("[rsshub Subscribe] delete source error: %v", err)
 		return errors.New("删除失败")
