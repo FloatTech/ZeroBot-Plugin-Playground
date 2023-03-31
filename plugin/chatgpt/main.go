@@ -128,7 +128,7 @@ func init() {
 				}
 			} else {
 				if zero.SuperUserPermission(ctx) {
-					gid = -1 //全局为-1的群号
+					gid = -1 // 全局为-1的群号
 				} else {
 					ctx.SendChain(message.Text("权限不足"))
 					return
