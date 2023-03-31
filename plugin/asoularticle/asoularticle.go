@@ -23,7 +23,7 @@ func init() { // 插件主体
 		PrivateDataFolder: "asoularticle",
 	})
 	go func() {
-		// adb = initialize(engine.DataFolder() + "asoularticle.db")
+		adb = initialize(engine.DataFolder() + "asoularticle.db")
 	}()
 	engine.OnFullMatch(`小作文`).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
