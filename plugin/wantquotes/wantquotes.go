@@ -9,10 +9,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/FloatTech/floatbox/binary"
 	"github.com/FloatTech/floatbox/web"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
 	"github.com/FloatTech/zbputils/ctxext"
+	"github.com/FloatTech/zbputils/img/text"
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
@@ -153,17 +155,21 @@ func getPara(ctx *zero.Ctx) bool {
 	next := zero.NewFutureEvent("message", 999, false, ctx.CheckSession())
 	recv, cancel := next.Repeat()
 	defer cancel()
-	typeText := ""
-	text := strings.Builder{}
+	tex := strings.Builder{}
+	tex.WriteString("请下列选择查询名句的类型\n")
 	for i, v := range typeList {
-		text.WriteString(strconv.Itoa(i))
-		text.WriteString(". ")
-		text.WriteString(v)
-		text.WriteString("\n")
-		typeText += fmt.Sprintf("%d. %s\n", i, v)
-		text.Reset()
+		tex.WriteString(strconv.Itoa(i))
+		tex.WriteString(". ")
+		tex.WriteString(v)
+		tex.WriteString("\n")
 	}
-	ctx.SendChain(message.Text("请下列选择查询名句的类型\n", typeText))
+	base64Str, err := text.RenderToBase64(tex.String(), text.FontFile, 400, 20)
+	if err != nil {
+		ctx.SendChain(message.Text("图片生成错误了, ", zero.BotConfig.NickName[0], "帮你选择查询名句类型"))
+		ctx.State["quotesType"] = typeList[0]
+		return true
+	}
+	ctx.SendChain(message.Image("base64://" + binary.BytesToString(base64Str)))
 	for {
 		select {
 		case <-time.After(time.Second * 10):
