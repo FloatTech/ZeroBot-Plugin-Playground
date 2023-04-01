@@ -49,6 +49,7 @@ type semanticRsp struct {
 	TopSim float64  `json:"top_sim"`
 }
 
+// Quotes 名句结构体
 type Quotes struct {
 	Quote      string `json:"quote"`
 	SourceType string `json:"source_type"`
@@ -137,8 +138,7 @@ func init() {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
 			}
-			switch lcr.Login {
-			case 1:
+			if lcr.Login == 1 {
 				err := setAPIKey(ctx.State["manager"].(*ctrl.Control[*zero.Ctx]), lcr.Unionid+"|"+lcr.Secret)
 				if err != nil {
 					ctx.SendChain(message.Text("ERROR: ", err))
