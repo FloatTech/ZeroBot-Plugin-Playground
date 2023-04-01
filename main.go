@@ -27,7 +27,6 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fadian"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fyzhq"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/games"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/hitokoto"
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/draw" // 服务详情
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fgopickup"
@@ -43,6 +42,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/subweibo"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/tgyj"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vote"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/wantquotes"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/youdaotranslate"
 
 	// 程序主体
@@ -148,7 +148,7 @@ func init() {
 }
 func main() {
 	if !strings.Contains(runtime.Version(), "go1.2") { // go1.20之前版本需要全局 seed，其他插件无需再 seed
-		rand.Seed(time.Now().UnixNano()) 
+		rand.Seed(time.Now().UnixNano())
 	}
 
 	zero.OnCommand("hello").
