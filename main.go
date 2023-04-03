@@ -1,4 +1,4 @@
-// Package main ZeroBot-Plugin-Plugin main file
+// Package main ZeroBot-Plugin-Playground main file
 package main
 
 import (
@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/FloatTech/floatbox/process"
@@ -17,7 +19,6 @@ import (
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
-
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/asoularticle"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chatgpt"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chinesebqb"
@@ -26,9 +27,9 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fadian"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fyzhq"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/games"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/hitokoto"
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/draw" // 服务详情
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fgopickup"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/moegozh"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/movies"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/ottoshout"
@@ -37,10 +38,11 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/qqci"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/qqclean"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/recall" // SGK2401
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/steam"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/subweibo"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/tgyj"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vote"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/wantquotes"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/youdaotranslate"
 
 	// 程序主体
@@ -145,7 +147,9 @@ func init() {
 	}
 }
 func main() {
-	rand.Seed(time.Now().Unix()) // 全局 seed, 插件无需再 seed
+	if !strings.Contains(runtime.Version(), "go1.2") { // go1.20之前版本需要全局 seed，其他插件无需再 seed
+		rand.Seed(time.Now().UnixNano())
+	}
 
 	zero.OnCommand("hello").
 		Handle(func(ctx *zero.Ctx) {
