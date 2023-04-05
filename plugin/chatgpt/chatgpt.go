@@ -106,7 +106,7 @@ func completions(messages []chatMessage, apiKey string) (*chatGPTResponseBody, e
 	defer res.Body.Close()
 
 	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusBadRequest {
-		return nil, errors.New("response error" + strconv.Itoa(res.StatusCode))
+		return nil, errors.New("response error：" + strconv.Itoa(res.StatusCode))
 	}
 
 	v := new(chatGPTResponseBody)
