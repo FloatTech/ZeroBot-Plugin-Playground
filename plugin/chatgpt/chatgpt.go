@@ -16,6 +16,7 @@ const (
 	modelGPT3Dot5Turbo = "gpt-3.5-turbo"
 )
 
+/*
 type chatkeymessage struct {
 	Code           int     `json:"code"`
 	Msg            string  `json:"msg"`
@@ -24,7 +25,7 @@ type chatkeymessage struct {
 	TotalAvailable float64 `json:"total_available"`
 	EffectiveAt    int64   `json:"effective_at"`
 	ExpiresAt      int64   `json:"expires_at"`
-}
+}*/
 
 // chatGPTResponseBody 响应体
 type chatGPTResponseBody struct {
