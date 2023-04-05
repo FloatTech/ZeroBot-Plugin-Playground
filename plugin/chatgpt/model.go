@@ -192,6 +192,17 @@ func (db *model) delgkey(gid int64) (err error) {
 	return db.sql.Del("gtoqq", "where groupid = "+strconv.FormatInt(gid, 10))
 }
 
+func (db *model) findgtoqq(gid int64) (qquid int64, err error) {
+	db.Lock()
+	defer db.Unlock()
+	var m gtoqq
+	err = db.sql.Find("gtoqq", &m, "where groupid = "+strconv.FormatInt(gid, 10))
+	if err != nil {
+		return 0, errors.New("没有用户授权key")
+	}
+	return m.QQuid, nil
+}
+
 func (db *model) findgkey(gid int64) (content string, err error) {
 	db.Lock()
 	defer db.Unlock()
