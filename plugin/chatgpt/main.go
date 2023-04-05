@@ -2,12 +2,12 @@
 package chatgpt
 
 import (
-	"encoding/json"
-	"strconv"
+	//"encoding/json"
+	//"strconv"
 	"strings"
 	"time"
 
-	"github.com/FloatTech/floatbox/web"
+	//"github.com/FloatTech/floatbox/web"
 	"github.com/FloatTech/ttl"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
@@ -15,15 +15,12 @@ import (
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
-const chatgptapikeygid = -3
-
 type sessionKey struct {
 	group int64
 	user  int64
 }
 
 var (
-	apiKey string
 	cache  = ttl.NewCache[sessionKey, []chatMessage](time.Minute * 15)
 	engine = control.Register("chatgpt", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
@@ -33,8 +30,10 @@ var (
 			"设置(默认)预设xxx\n" +
 			"删除本群预设\n" +
 			"查看预设列表\n" +
-			"余额查询\n" +
-			"(私聊发送)设置OpenAI apikey [apikey]",
+			//"余额查询\n" +
+			"(私聊发送)设置OpenAI apikey [apikey]" +
+			"(群聊发送)授权||取消本群使用apikey" +
+			"注:先私聊设置自己的key,再授权群聊使用,不会泄露key的",
 		PrivateDataFolder: "chatgpt",
 	})
 )
@@ -42,6 +41,11 @@ var (
 func init() {
 	engine.OnRegex(`^(?:chatgpt|//)([\s\S]*)$`, zero.OnlyToMe, getdb).SetBlock(false).
 		Handle(func(ctx *zero.Ctx) {
+			var (
+				apiKey   string
+				err      error
+				messages []chatMessage
+			)
 			args := ctx.State["regex_matched"].([]string)[1]
 			key := sessionKey{
 				group: ctx.Event.GroupID,
@@ -53,10 +57,20 @@ func init() {
 				return
 			}
 			// 添加预设
-			var messages []chatMessage
 			gid := ctx.Event.GroupID
 			if gid == 0 {
 				gid = -ctx.Event.UserID
+				apiKey, err = db.findkey(gid)
+				if err != nil {
+					ctx.SendChain(message.Text("ERROR:", err))
+					return
+				}
+			} else {
+				apiKey, err = db.findgkey(gid)
+				if err != nil {
+					ctx.SendChain(message.Text("ERROR:", err))
+					return
+				}
 			}
 			content, err := db.findgroupmode(gid)
 			if err == nil {
@@ -96,13 +110,10 @@ func init() {
 			cache.Set(key, messages)
 			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(reply.Content))
 		})
-	engine.OnRegex(`^设置\s*OpenAI\s*apikey\s*(.*)$`, zero.OnlyPrivate, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
-		apiKey = ctx.State["regex_matched"].([]string)[1]
-		m := ctx.State["manager"].(*ctrl.Control[*zero.Ctx])
-		_ = m.Manager.Response(chatgptapikeygid)
-		err := m.Manager.SetExtra(chatgptapikeygid, apiKey)
+	engine.OnRegex(`^设置\s*OpenAI\s*apikey\s*(.*)$`, zero.OnlyPrivate, zero.SuperUserPermission, getdb).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+		err := db.insertkey(-ctx.Event.UserID, ctx.State["regex_matched"].([]string)[1])
 		if err != nil {
-			ctx.SendChain(message.Text("保存apikey失败"))
+			ctx.SendChain(message.Text("ERROR:", err))
 			return
 		}
 		ctx.SendChain(message.Text("保存apikey成功"))
@@ -127,24 +138,12 @@ func init() {
 					gid = -ctx.Event.UserID
 				}
 			} else {
-				if zero.SuperUserPermission(ctx) {
-					gid = -1 //全局为-1的群号
-				} else {
-					ctx.SendChain(message.Text("权限不足"))
-					return
-				}
+				gid = -1 //全局为-1的群号
 			}
 			err := db.changemode(gid, modename)
 			if err != nil {
 				ctx.SendChain(message.Text("设置失败: ", err))
 				return
-			}
-			for _, v := range ctx.GetThisGroupMemberListNoCache().Array() {
-				cache.Delete(
-					sessionKey{
-						group: ctx.Event.GroupID,
-						user:  v.Get("user_id").Int(),
-					})
 			}
 			ctx.SendChain(message.Text("设置成功"))
 			for _, v := range ctx.GetThisGroupMemberListNoCache().Array() {
@@ -167,7 +166,6 @@ func init() {
 				ctx.SendChain(message.Text("删除失败: ", err))
 				return
 			}
-
 			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("删除成功"))
 			for _, v := range ctx.GetThisGroupMemberListNoCache().Array() {
 				cache.Delete(
@@ -187,35 +185,54 @@ func init() {
 			}
 			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(pre))
 		})
-	engine.OnFullMatch("余额查询", getdb).SetBlock(true).
+	/*engine.OnFullMatch("余额查询", getdb).SetBlock(true).
+	Handle(func(ctx *zero.Ctx) {
+		data, err := web.GetData("https://v1.apigpt.cn/key/?key=" + apiKey)
+		if err != nil {
+			ctx.SendChain(message.Text("请求网站失败,网站可能跑路惹"))
+			return
+		}
+		var all chatkeymessage
+		err = json.Unmarshal(data, &all)
+		if err != nil {
+			ctx.SendChain(message.Text("ERROR:", err))
+			return
+		}
+		if all.Code != 200 {
+			ctx.SendChain(message.Text("请求key错误", err))
+			return
+		}
+		var msg strings.Builder
+		msg.WriteString(all.Msg)
+		msg.WriteString("\n总量：$")
+		msg.WriteString(strconv.FormatFloat(all.TotalGranted, 'f', 2, 64))
+		msg.WriteString("\n剩余：$")
+		msg.WriteString(strconv.FormatFloat(all.TotalAvailable, 'f', 2, 64))
+		msg.WriteString("\n注册时间：")
+		tm := time.Unix(all.EffectiveAt, 0)
+		msg.WriteString(tm.Format("2006-01-02 15:04:05")) // 格式化时间
+		msg.WriteString("\n到期时间：")
+		tm = time.Unix(all.ExpiresAt, 0)
+		msg.WriteString(tm.Format("2006-01-02 15:04:05")) // 格式化时间
+		ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(msg.String()))
+	})*/
+	engine.OnRegex(`^(取消|授权)本群使用apikey$`, getdb).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
-			data, err := web.GetData("https://v1.apigpt.cn/key/?key=" + apiKey)
+			if ctx.State["regex_matched"].([]string)[1] == "授权" {
+				err := db.insertgkey(-ctx.Event.UserID, ctx.Event.GroupID)
+				if err != nil {
+					ctx.SendChain(message.Text("授权失败: ", err))
+					return
+				}
+				ctx.SendChain(message.Text("授权成功"))
+				return
+			}
+			err := db.delgkey(ctx.Event.GroupID)
 			if err != nil {
-				ctx.SendChain(message.Text("请求网站失败,网站可能跑路惹"))
+				ctx.SendChain(message.Text("取消失败: ", err))
 				return
 			}
-			var all chatkeymessage
-			err = json.Unmarshal(data, &all)
-			if err != nil {
-				ctx.SendChain(message.Text("ERROR:", err))
-				return
-			}
-			if all.Code != 200 {
-				ctx.SendChain(message.Text("请求key错误", err))
-				return
-			}
-			var msg strings.Builder
-			msg.WriteString(all.Msg)
-			msg.WriteString("\n总量：$")
-			msg.WriteString(strconv.FormatFloat(all.TotalGranted, 'f', 2, 64))
-			msg.WriteString("\n剩余：$")
-			msg.WriteString(strconv.FormatFloat(all.TotalAvailable, 'f', 2, 64))
-			msg.WriteString("\n注册时间：")
-			tm := time.Unix(all.EffectiveAt, 0)
-			msg.WriteString(tm.Format("2006-01-02 15:04:05")) // 格式化时间
-			msg.WriteString("\n到期时间：")
-			tm = time.Unix(all.ExpiresAt, 0)
-			msg.WriteString(tm.Format("2006-01-02 15:04:05")) // 格式化时间
-			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(msg.String()))
+			ctx.SendChain(message.Text("取消成功"))
+			return
 		})
 }
