@@ -237,9 +237,19 @@ func init() {
 				ctx.SendChain(message.Text("授权成功"))
 				return
 			}
-			err := db.delgkey(ctx.Event.GroupID)
+			t, err := db.findgtoqq(ctx.Event.GroupID)
 			if err != nil {
 				ctx.SendChain(message.Text("取消失败: ", err))
+				return
+			}
+			if t != ctx.Event.UserID {
+				ctx.SendChain(message.Text("取消失败: 你不是授权用户"))
+				return
+			}
+			err = db.delgkey(ctx.Event.GroupID)
+			if err != nil {
+				ctx.SendChain(message.Text("取消失败: ", err))
+
 				return
 			}
 			ctx.SendChain(message.Text("取消成功"))
