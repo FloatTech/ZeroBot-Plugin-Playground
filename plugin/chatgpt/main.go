@@ -111,7 +111,7 @@ func init() {
 			cache.Set(key, messages)
 			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(reply.Content))
 		})
-	engine.OnRegex(`^设置\s*OpenAI\s*apikey\s*(.*)$`, zero.OnlyPrivate, zero.SuperUserPermission, getdb).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnRegex(`^设置\s*OpenAI\s*apikey\s*(.*)$`, zero.OnlyPrivate, getdb).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		err := db.insertkey(-ctx.Event.UserID, ctx.State["regex_matched"].([]string)[1])
 		if err != nil {
 			ctx.SendChain(message.Text("ERROR:", err))
