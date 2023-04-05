@@ -249,6 +249,7 @@ func init() {
 			err = db.delgkey(ctx.Event.GroupID)
 			if err != nil {
 				ctx.SendChain(message.Text("取消失败: ", err))
+
 				return
 			}
 			ctx.SendChain(message.Text("取消成功"))
