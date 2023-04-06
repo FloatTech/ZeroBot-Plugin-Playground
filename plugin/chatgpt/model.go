@@ -166,7 +166,7 @@ func (db *model) findkey(gid int64) (content string, err error) {
 	var m key
 	err = db.sql.Find("key", &m, "where qquid = "+strconv.FormatInt(gid, 10))
 	if err != nil {
-		return
+		return "", errors.New("账号未绑定OpenAI-apikey,请私聊设置key后使用")
 	}
 	return m.Content, nil
 }
