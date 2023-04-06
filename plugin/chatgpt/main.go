@@ -2,12 +2,12 @@
 package chatgpt
 
 import (
-	//"encoding/json"
+	// "encoding/json"
 	//"strconv"
 	"strings"
 	"time"
 
-	//"github.com/FloatTech/floatbox/web"
+	// "github.com/FloatTech/floatbox/web"
 	"github.com/FloatTech/ttl"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
@@ -30,7 +30,7 @@ var (
 			"设置(默认)预设xxx\n" +
 			"删除本群预设\n" +
 			"查看预设列表\n" +
-			//"余额查询\n" +
+			// "余额查询\n" +
 			"(私聊发送)设置OpenAI apikey [apikey]" +
 			"(私聊发送)删除apikey" +
 			"(群聊发送)(授权|取消)(本群|全局)使用apikey" +
@@ -138,7 +138,7 @@ func init() {
 					gid = -ctx.Event.UserID
 				}
 			} else {
-				gid = -1 //全局为-1的群号
+				gid = -1 // 全局为-1的群号
 			}
 			err := db.changemode(gid, modename)
 			if err != nil {
