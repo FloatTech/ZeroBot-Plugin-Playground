@@ -120,6 +120,7 @@ func init() {
 			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(reply.Content))
 		})
 	engine.OnRegex(`^设置\s*OpenAI\s*apikey\s*(.*)$`, zero.OnlyPrivate, getdb).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnRegex(`^设置\s*OpenAI\s*apikey\s*(.*)$`, zero.OnlyPrivate, getdb).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		err := db.insertkey(-ctx.Event.UserID, ctx.State["regex_matched"].([]string)[1])
 		if err != nil {
 			ctx.SendChain(message.Text("ERROR:", err))
@@ -277,6 +278,16 @@ func init() {
 			err = db.delgkey(ctx.Event.GroupID)
 			if err != nil {
 				ctx.SendChain(message.Text("取消失败: ", err))
+				return
+			}
+			if t != ctx.Event.UserID {
+				ctx.SendChain(message.Text("取消失败: 你不是授权用户"))
+				return
+			}
+			err = db.delgkey(ctx.Event.GroupID)
+			if err != nil {
+				ctx.SendChain(message.Text("取消失败: ", err))
+
 				return
 			}
 			ctx.SendChain(message.Text("取消成功"))
