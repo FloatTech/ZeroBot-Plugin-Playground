@@ -42,11 +42,7 @@ var (
 func init() {
 	engine.OnRegex(`^(?:chatgpt|//)([\s\S]*)$`, zero.OnlyToMe, getdb).SetBlock(false).
 		Handle(func(ctx *zero.Ctx) {
-			var (
-				apiKey   string
-				err      error
-				messages []chatMessage
-			)
+			var messages []chatMessage
 			args := ctx.State["regex_matched"].([]string)[1]
 			key := sessionKey{
 				group: ctx.Event.GroupID,
@@ -58,28 +54,14 @@ func init() {
 				return
 			}
 			// 添加预设
-			apiKey, err = db.findkey(-ctx.Event.UserID) //个人key>授权key>全局key
+			apiKey, err := getkey(ctx)
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR：", err))
+				return
+			}
 			gid := ctx.Event.GroupID
 			if gid == 0 {
 				gid = -ctx.Event.UserID
-				if err != nil {
-					apiKey, err = db.findgkey(-1)
-					if err != nil {
-						ctx.SendChain(message.Text("ERROR：未设置OpenAI-apikey,请私聊设置key以后使用"))
-						return
-					}
-				}
-			} else {
-				if err != nil {
-					apiKey, err = db.findgkey(gid)
-					if err != nil {
-						apiKey, err = db.findgkey(-1)
-						if err != nil {
-							ctx.SendChain(message.Text("ERROR：", err))
-							return
-						}
-					}
-				}
 			}
 			content, err := db.findgroupmode(gid)
 			if err == nil {
