@@ -166,7 +166,7 @@ func (db *model) findkey(gid int64) (content string, err error) {
 	var m key
 	err = db.sql.Find("key", &m, "where qquid = "+strconv.FormatInt(gid, 10))
 	if err != nil {
-		return
+		return "", errors.New("账号未绑定OpenAI-apikey,请私聊设置key后使用")
 	}
 	return m.Content, nil
 }
@@ -217,4 +217,23 @@ func (db *model) findgkey(gid int64) (content string, err error) {
 		return "", errors.New("授权账号未绑定OpenAI-apikey,请私聊设置key以后使用")
 	}
 	return n.Content, nil
+}
+
+func getkey(ctx *zero.Ctx) (key string, err error) {
+	// 先从群聊中查找API Key
+	if ctx.Event.GroupID != 0 {
+		if key, err = db.findgkey(ctx.Event.GroupID); err == nil {
+			return key, nil
+		}
+	}
+	// 再从个人中查找API Key
+	if key, err = db.findkey(-ctx.Event.UserID); err == nil {
+		return key, nil
+	}
+	// 最后从全局中查找API Key
+	if key, err = db.findgkey(-1); err == nil {
+		return key, nil
+	}
+	// 如果都没有设置则会返回错误提示
+	return "", err
 }

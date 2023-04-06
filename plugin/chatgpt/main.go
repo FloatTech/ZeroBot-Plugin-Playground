@@ -33,7 +33,7 @@ var (
 			//"余额查询\n" +
 			"(私聊发送)设置OpenAI apikey [apikey]" +
 			"(私聊发送)删除apikey" +
-			"(群聊发送)授权||取消本群使用apikey" +
+			"(群聊发送)(授权|取消)(本群|全局)使用apikey" +
 			"注:先私聊设置自己的key,再授权群聊使用,不会泄露key的",
 		PrivateDataFolder: "chatgpt",
 	})
@@ -42,11 +42,7 @@ var (
 func init() {
 	engine.OnRegex(`^(?:chatgpt|//)([\s\S]*)$`, zero.OnlyToMe, getdb).SetBlock(false).
 		Handle(func(ctx *zero.Ctx) {
-			var (
-				apiKey   string
-				err      error
-				messages []chatMessage
-			)
+			var messages []chatMessage
 			args := ctx.State["regex_matched"].([]string)[1]
 			key := sessionKey{
 				group: ctx.Event.GroupID,
@@ -58,20 +54,14 @@ func init() {
 				return
 			}
 			// 添加预设
+			apiKey, err := getkey(ctx)
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR：", err))
+				return
+			}
 			gid := ctx.Event.GroupID
 			if gid == 0 {
 				gid = -ctx.Event.UserID
-				apiKey, err = db.findkey(gid)
-				if err != nil {
-					ctx.SendChain(message.Text("ERROR:", err))
-					return
-				}
-			} else {
-				apiKey, err = db.findgkey(gid)
-				if err != nil {
-					ctx.SendChain(message.Text("ERROR:", err))
-					return
-				}
 			}
 			content, err := db.findgroupmode(gid)
 			if err == nil {
@@ -226,8 +216,28 @@ func init() {
 		msg.WriteString(tm.Format("2006-01-02 15:04:05")) // 格式化时间
 		ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(msg.String()))
 	})*/
-	engine.OnRegex(`^(取消|授权)本群使用apikey$`, getdb).SetBlock(true).
+	engine.OnRegex(`^(取消|授权)(全局|本群)使用apikey$`, getdb).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
+			if ctx.State["regex_matched"].([]string)[2] == "全局" {
+				if !zero.SuperUserPermission(ctx) {
+					ctx.SendChain(message.Text("失败: 权限不足"))
+					return
+				}
+				if ctx.State["regex_matched"].([]string)[1] == "授权" {
+					err := db.insertgkey(-ctx.Event.UserID, -1)
+					if err != nil {
+						ctx.SendChain(message.Text("授权失败: ", err))
+						return
+					}
+					ctx.SendChain(message.Text("授权成功"))
+					return
+				}
+				err := db.delgkey(-1)
+				if err != nil {
+					ctx.SendChain(message.Text("取消失败: ", err))
+					return
+				}
+			}
 			if ctx.State["regex_matched"].([]string)[1] == "授权" {
 				err := db.insertgkey(-ctx.Event.UserID, ctx.Event.GroupID)
 				if err != nil {
@@ -249,7 +259,6 @@ func init() {
 			err = db.delgkey(ctx.Event.GroupID)
 			if err != nil {
 				ctx.SendChain(message.Text("取消失败: ", err))
-
 				return
 			}
 			ctx.SendChain(message.Text("取消成功"))
