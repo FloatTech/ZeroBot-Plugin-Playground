@@ -33,7 +33,7 @@ var (
 			//"余额查询\n" +
 			"(私聊发送)设置OpenAI apikey [apikey]" +
 			"(私聊发送)删除apikey" +
-			"(群聊发送)授权||取消本群使用apikey" +
+			"(群聊发送)(授权|取消)(本群|全局)使用apikey" +
 			"注:先私聊设置自己的key,再授权群聊使用,不会泄露key的",
 		PrivateDataFolder: "chatgpt",
 	})
