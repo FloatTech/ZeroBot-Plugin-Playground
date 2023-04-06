@@ -58,19 +58,27 @@ func init() {
 				return
 			}
 			// 添加预设
+			apiKey, err = db.findkey(-ctx.Event.UserID) //个人key>授权key>全局key
 			gid := ctx.Event.GroupID
 			if gid == 0 {
 				gid = -ctx.Event.UserID
-				apiKey, err = db.findkey(gid)
 				if err != nil {
-					ctx.SendChain(message.Text("ERROR:", err))
-					return
+					apiKey, err = db.findgkey(-1)
+					if err != nil {
+						ctx.SendChain(message.Text("ERROR：未设置OpenAI-apikey,请私聊设置key以后使用"))
+						return
+					}
 				}
 			} else {
-				apiKey, err = db.findgkey(gid)
 				if err != nil {
-					ctx.SendChain(message.Text("ERROR:", err))
-					return
+					apiKey, err = db.findgkey(gid)
+					if err != nil {
+						apiKey, err = db.findgkey(-1)
+						if err != nil {
+							ctx.SendChain(message.Text("ERROR：", err))
+							return
+						}
+					}
 				}
 			}
 			content, err := db.findgroupmode(gid)
@@ -226,8 +234,28 @@ func init() {
 		msg.WriteString(tm.Format("2006-01-02 15:04:05")) // 格式化时间
 		ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(msg.String()))
 	})*/
-	engine.OnRegex(`^(取消|授权)本群使用apikey$`, getdb).SetBlock(true).
+	engine.OnRegex(`^(取消|授权)(全局|本群)使用apikey$`, getdb).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
+			if ctx.State["regex_matched"].([]string)[2] == "全局" {
+				if !zero.SuperUserPermission(ctx) {
+					ctx.SendChain(message.Text("失败: 权限不足"))
+					return
+				}
+				if ctx.State["regex_matched"].([]string)[1] == "授权" {
+					err := db.insertgkey(-ctx.Event.UserID, -1)
+					if err != nil {
+						ctx.SendChain(message.Text("授权失败: ", err))
+						return
+					}
+					ctx.SendChain(message.Text("授权成功"))
+					return
+				}
+				err := db.delgkey(-1)
+				if err != nil {
+					ctx.SendChain(message.Text("取消失败: ", err))
+					return
+				}
+			}
 			if ctx.State["regex_matched"].([]string)[1] == "授权" {
 				err := db.insertgkey(-ctx.Event.UserID, ctx.Event.GroupID)
 				if err != nil {
@@ -249,7 +277,6 @@ func init() {
 			err = db.delgkey(ctx.Event.GroupID)
 			if err != nil {
 				ctx.SendChain(message.Text("取消失败: ", err))
-
 				return
 			}
 			ctx.SendChain(message.Text("取消成功"))
