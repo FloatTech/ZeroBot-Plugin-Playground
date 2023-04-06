@@ -1,6 +1,7 @@
 package chatgpt
 
 import (
+	"errors"
 	"strconv"
 	"strings"
 	"sync"
@@ -8,7 +9,6 @@ import (
 
 	fcext "github.com/FloatTech/floatbox/ctxext"
 	sql "github.com/FloatTech/sqlite"
-	ctrl "github.com/FloatTech/zbpctrl"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
@@ -26,6 +26,16 @@ type mode struct {
 type note struct {
 	GroupID int64  `db:"groupid"`
 	Content string `db:"content"`
+}
+
+type key struct {
+	QQuid   int64  `db:"qquid"`
+	Content string `db:"keys"`
+}
+
+type gtoqq struct {
+	GroupID int64 `db:"groupid"`
+	QQuid   int64 `db:"qquid"`
 }
 
 var (
@@ -47,11 +57,14 @@ var (
 			ctx.SendChain(message.Text("ERROR: ", err))
 			return false
 		}
-		m := ctx.State["manager"].(*ctrl.Control[*zero.Ctx])
-		_ = m.Manager.Response(chatgptapikeygid)
-		_ = m.Manager.GetExtra(chatgptapikeygid, &apiKey)
-		if apiKey == "" {
-			ctx.SendChain(message.Text("ERROR: 未设置OpenAI apikey"))
+		err = db.sql.Create("key", &key{})
+		if err != nil {
+			ctx.SendChain(message.Text("ERROR: ", err))
+			return false
+		}
+		err = db.sql.Create("gtoqq", &gtoqq{})
+		if err != nil {
+			ctx.SendChain(message.Text("ERROR: ", err))
 			return false
 		}
 		return true
@@ -94,11 +107,7 @@ func (db *model) changemode(gid int64, modename string) (err error) {
 	}
 	db.Lock()
 	defer db.Unlock()
-	err = db.sql.Insert("note", &n)
-	if err != nil {
-		return
-	}
-	return
+	return db.sql.Insert("note", &n)
 }
 
 func (db *model) delgroupmode(gid int64) (err error) {
@@ -133,4 +142,79 @@ func (db *model) findformode() (string, error) {
 		return "", err
 	}
 	return sb.String(), nil
+}
+
+func (db *model) insertkey(qquid int64, content string) (err error) {
+	db.Lock()
+	defer db.Unlock()
+	m := key{
+		QQuid:   qquid,
+		Content: content,
+	}
+	return db.sql.Insert("key", &m)
+}
+
+func (db *model) delkey(gid int64) (err error) {
+	db.Lock()
+	defer db.Unlock()
+	return db.sql.Del("key", "where qquid = "+strconv.FormatInt(gid, 10))
+}
+
+func (db *model) findkey(gid int64) (content string, err error) {
+	db.Lock()
+	defer db.Unlock()
+	var m key
+	err = db.sql.Find("key", &m, "where qquid = "+strconv.FormatInt(gid, 10))
+	if err != nil {
+		return
+	}
+	return m.Content, nil
+}
+
+func (db *model) insertgkey(qquid, guid int64) (err error) {
+	db.Lock()
+	defer db.Unlock()
+	var n key
+	err = db.sql.Find("key", &n, "where qquid = "+strconv.FormatInt(qquid, 10))
+	if err != nil || n.Content == "" {
+		return errors.New("授权账号未绑定OpenAI-apikey,请私聊设置key以后使用")
+	}
+	m := gtoqq{
+		GroupID: guid,
+		QQuid:   qquid,
+	}
+	return db.sql.Insert("gtoqq", &m)
+}
+
+func (db *model) delgkey(gid int64) (err error) {
+	db.Lock()
+	defer db.Unlock()
+	return db.sql.Del("gtoqq", "where groupid = "+strconv.FormatInt(gid, 10))
+}
+
+func (db *model) findgtoqq(gid int64) (qquid int64, err error) {
+	db.Lock()
+	defer db.Unlock()
+	var m gtoqq
+	err = db.sql.Find("gtoqq", &m, "where groupid = "+strconv.FormatInt(gid, 10))
+	if err != nil {
+		return 0, errors.New("没有用户授权key")
+	}
+	return m.QQuid, nil
+}
+
+func (db *model) findgkey(gid int64) (content string, err error) {
+	db.Lock()
+	defer db.Unlock()
+	var m gtoqq
+	err = db.sql.Find("gtoqq", &m, "where groupid = "+strconv.FormatInt(gid, 10))
+	if err != nil {
+		return "", errors.New("未设置OpenAI-apikey,请私聊设置key以后授权本群使用")
+	}
+	var n key
+	err = db.sql.Find("key", &n, "where qquid = "+strconv.FormatInt(m.QQuid, 10))
+	if err != nil || n.Content == "" {
+		return "", errors.New("授权账号未绑定OpenAI-apikey,请私聊设置key以后使用")
+	}
+	return n.Content, nil
 }
