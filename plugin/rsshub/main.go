@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub/domain"
-	"github.com/FloatTech/floatbox/ctxext"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
 	zbpCtxExt "github.com/FloatTech/zbputils/ctxext"
@@ -19,16 +18,16 @@ import (
 var (
 	rssRepo domain.RssDomain
 	initErr error
-	// getRssRepo repo 初始化方法，单例
-	getRssRepo = ctxext.DoOnceOnSuccess(func(ctx *zero.Ctx) bool {
-		logrus.Infoln("RssHub订阅姬：初始化")
-		rssRepo, initErr = domain.NewRssDomain(engine.DataFolder() + "rsshub.db")
-		if initErr != nil {
-			ctx.SendChain(message.Text("RssHub订阅姬：初始化失败", initErr.Error()))
-			return false
-		}
-		return true
-	})
+	//// getRssRepo repo 初始化方法，单例
+	//getRssRepo = ctxext.DoOnceOnSuccess(func(ctx *zero.Ctx) bool {
+	//	logrus.Infoln("RssHub订阅姬：初始化")
+	//	rssRepo, initErr = domain.NewRssDomain(engine.DataFolder() + "rsshub.db")
+	//	if initErr != nil {
+	//		ctx.SendChain(message.Text("RssHub订阅姬：初始化失败", initErr.Error()))
+	//		return false
+	//	}
+	//	return true
+	//})
 	// regexpForSQL 防注入
 	regexpForSQL = regexp.MustCompile(`[\^<>\[\]%&\*\(\)\{\}\|\=]|(union\s+select|update\s+|delete\s+|drop\s+|truncate\s+|insert\s+|exec\s+|declare\s+)`)
 )
@@ -64,7 +63,12 @@ var (
 
 // init 命令路由
 func init() {
-	engine.OnFullMatch("rsshub同步", zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	rssRepo, initErr = domain.NewRssDomain(engine.DataFolder() + "rsshub.db")
+	if initErr != nil {
+		logrus.Errorln("RssHub订阅姬：初始化失败", initErr)
+		panic(initErr)
+	}
+	engine.OnFullMatch("rsshub同步", zero.OnlyGroup).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		// 群组-频道推送视图  map[群组]推送内容数组
 		groupToFeedsMap, err := rssRepo.Sync(context.Background())
 		if err != nil {
@@ -80,7 +84,7 @@ func init() {
 		sendRssUpdateMsg(ctx, groupToFeedsMap)
 	})
 	// 添加订阅
-	engine.OnRegex(`^添加rsshub订阅-(.+)$`, zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnRegex(`^添加rsshub订阅-(.+)$`, zero.OnlyGroup).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		routeStr := ctx.State["regex_matched"].([]string)[1]
 		input := regexpForSQL.ReplaceAllString(routeStr, "")
 		logrus.Debugf("添加rsshub订阅：raw(%s), replaced(%s)", routeStr, input)
@@ -104,7 +108,7 @@ func init() {
 			ctx.SendChain(message.Text("ERROR: 发送订阅源快照失败，可能被风控了"))
 		}
 	})
-	engine.OnRegex(`^删除rsshub订阅-(.+)$`, zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnRegex(`^删除rsshub订阅-(.+)$`, zero.OnlyGroup).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		routeStr := ctx.State["regex_matched"].([]string)[1]
 		input := regexpForSQL.ReplaceAllString(routeStr, "")
 		logrus.Debugf("删除rsshub订阅：raw(%s), replaced(%s)", routeStr, input)
@@ -115,7 +119,7 @@ func init() {
 		}
 		ctx.SendChain(message.Text(fmt.Sprintf("RssHub订阅姬：删除%s成功", input)))
 	})
-	engine.OnFullMatch("查看rsshub订阅列表", zero.OnlyGroup, getRssRepo).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnFullMatch("查看rsshub订阅列表", zero.OnlyGroup).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		rv, err := rssRepo.GetSubscribedChannelsByGroupID(context.Background(), ctx.Event.GroupID)
 		if err != nil {
 			ctx.SendChain(message.Text("RssHub订阅姬：查询失败 ", err.Error()))

@@ -247,7 +247,7 @@ func (s *repoStorage) GetSubscribeByID(ctx context.Context, gid int64, subscribe
 func (s *repoStorage) GetSubscribedChannelsByGroupID(ctx context.Context, gid int64) (res []*RssSource, err error) {
 	res = make([]*RssSource, 0)
 	err = s.orm.Model(&RssSource{}).
-		Joins(fmt.Sprintf("join %s on rss_source_id=%s.id", tableNameRssSubscribe, tableNameRssSource)).Where(&RssSubscribe{GroupID: gid}).
+		Joins(fmt.Sprintf("join %s on rss_source_id=%s.id", tableNameRssSubscribe, tableNameRssSource)).Where("rss_subscribe.group_id = ?", gid).
 		Select("rss_source.*").
 		Find(&res).
 		Error
