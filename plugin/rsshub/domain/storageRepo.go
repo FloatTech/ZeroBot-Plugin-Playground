@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -23,10 +24,20 @@ type repoStorage struct {
 	orm *gorm.DB
 }
 
+// initDB ...
+func (s *repoStorage) initDB() (err error) {
+	err = s.orm.AutoMigrate(&RssSource{}, &RssContent{}, &RssSubscribe{})
+	if err != nil {
+		logrus.Errorf("[rsshub initDB] error: %v", err)
+		return err
+	}
+	return nil
+	//s.orm.LogMode(true)
+}
+
 // GetSubscribesBySource Impl
 func (s *repoStorage) GetSubscribesBySource(ctx context.Context, feedPath string) ([]*RssSubscribe, error) {
 	logrus.WithContext(ctx).Infof("[rsshub GetSubscribesBySource] feedPath: %s", feedPath)
-	//
 	rs := make([]*RssSubscribe, 0)
 	err := s.orm.Model(&RssSubscribe{}).Joins(fmt.Sprintf("%s left join %s on %s.rss_source_id=%s.id", tableNameRssSubscribe, tableNameRssSource, tableNameRssSubscribe, tableNameRssSource)).
 		Where("rss_source.rss_hub_feed_path = ?", feedPath).Select("rss_subscribe.*").Find(&rs).Error
@@ -63,16 +74,6 @@ func (s *repoStorage) GetIfExistedSubscribe(ctx context.Context, gid int64, feed
 	return &rs, true, nil
 }
 
-// initDB ...
-func (s *repoStorage) initDB() (err error) {
-	err = s.orm.AutoMigrate(&RssSource{}, &RssContent{}, &RssSubscribe{})
-	if err != nil {
-		logrus.Errorf("[rsshub initDB] error: %v", err)
-		return err
-	}
-	return nil
-}
-
 // ==================== RepoSource ==================== [Start]
 
 // UpsertSource Impl
@@ -92,7 +93,15 @@ func (s *repoStorage) UpsertSource(ctx context.Context, source *RssSource) (err 
 	}
 	source.ID = querySource.ID
 	logrus.WithContext(ctx).Infof("[rsshub] update source: %+v", source.UpdatedParsed)
-	err = s.orm.Updates(source).Where(&RssSource{ID: source.ID}).Error
+	err = s.orm.Model(&source).Where(&RssSource{ID: source.ID}).
+		Updates(&RssSource{
+			Title:         source.Title,
+			ChannelDesc:   source.ChannelDesc,
+			ImageURL:      source.ImageURL,
+			Link:          source.Link,
+			UpdatedParsed: source.UpdatedParsed,
+			Mtime:         time.Now(),
+		}).Error
 	if err != nil {
 		logrus.WithContext(ctx).Errorf("[rsshub] update source error: %v", err)
 		return
@@ -238,7 +247,7 @@ func (s *repoStorage) GetSubscribeByID(ctx context.Context, gid int64, subscribe
 func (s *repoStorage) GetSubscribedChannelsByGroupID(ctx context.Context, gid int64) (res []*RssSource, err error) {
 	res = make([]*RssSource, 0)
 	err = s.orm.Model(&RssSource{}).
-		Joins(fmt.Sprintf("join %s on rss_source_id=%s.id", tableNameRssSubscribe, tableNameRssSource), s.orm.Where(&RssSubscribe{GroupID: gid})).
+		Joins(fmt.Sprintf("join %s on rss_source_id=%s.id", tableNameRssSubscribe, tableNameRssSource)).Where("rss_subscribe.group_id = ?", gid).
 		Select("rss_source.*").
 		Find(&res).
 		Error

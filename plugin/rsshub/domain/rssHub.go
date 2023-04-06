@@ -48,7 +48,8 @@ func newRssDomain(dbPath string) (*rssDomain, error) {
 	}
 	orm, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 	if err != nil {
-		return nil, errors.New("open db error: " + err.Error())
+		logrus.Errorf("[rsshub NewRssDomain] open db error: %v", err)
+		panic(err)
 	}
 	repo := &rssDomain{
 		storage:      &repoStorage{orm: orm},
@@ -57,7 +58,7 @@ func newRssDomain(dbPath string) (*rssDomain, error) {
 	err = repo.storage.initDB()
 	if err != nil {
 		logrus.Errorf("[rsshub NewRssDomain] open db error: %v", err)
-		return nil, err
+		panic(err)
 	}
 	return repo, nil
 }
@@ -66,7 +67,7 @@ func newRssDomain(dbPath string) (*rssDomain, error) {
 func (repo *rssDomain) Subscribe(ctx context.Context, gid int64, feedPath string) (
 	rv *RssClientView, isChannelExisted, isSubExisted bool, err error) {
 	// 验证
-	feed, err := repo.rssHubClient.FetchFeed(rssHubMirrors[0], feedPath)
+	feed, err := repo.rssHubClient.FetchFeed(feedPath)
 	if err != nil {
 		logrus.WithContext(ctx).Errorf("[rsshub Subscribe] add source error: %v", err)
 		return
