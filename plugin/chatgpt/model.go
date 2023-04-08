@@ -9,6 +9,7 @@ import (
 
 	fcext "github.com/FloatTech/floatbox/ctxext"
 	sql "github.com/FloatTech/sqlite"
+	ctrl "github.com/FloatTech/zbpctrl"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
@@ -65,6 +66,16 @@ var (
 		err = db.sql.Create("gtoqq", &gtoqq{})
 		if err != nil {
 			ctx.SendChain(message.Text("ERROR: ", err))
+			return false
+		}
+		return true
+	})
+	wfinit = fcext.DoOnceOnSuccess(func(ctx *zero.Ctx) bool {
+		m := ctx.State["manager"].(*ctrl.Control[*zero.Ctx])
+		_ = m.Manager.Response(-10)
+		_ = m.Manager.GetExtra(-10, &WFkey)
+		if WFkey == "" {
+			ctx.SendChain(message.Text("ERROR: 未设置OpenAI-Wf apikey"))
 			return false
 		}
 		return true
