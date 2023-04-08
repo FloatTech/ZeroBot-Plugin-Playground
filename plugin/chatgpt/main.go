@@ -6,6 +6,7 @@ import (
 	//"strconv"
 	"strings"
 	"time"
+	"os"
 
 	//"github.com/FloatTech/floatbox/web"
 	"github.com/FloatTech/ttl"
@@ -269,10 +270,9 @@ func init() {
 		})
 	//AI-GPT-WF接口专用
 	engine.OnRegex(`^设置\s?WFkey\s*(.*)$`, zero.OnlyPrivate, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
-		wfkey = ctx.State["regex_matched"].([]string)[1]
-		m := ctx.State["manager"].(*ctrl.Control[*zero.Ctx])
-		_ = m.Manager.Response(-10)
-		err := m.Manager.SetExtra(-10, wfkey)
+		file, _ := os.OpenFile(engine.DataFolder()+"apikey.txt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+		_, err := file.WriteString(ctx.State["regex_matched"].([]string)[1])
+		file.Close()
 		if err != nil {
 			ctx.SendChain(message.Text("保存apikey失败"))
 			return
