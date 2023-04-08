@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
@@ -14,6 +15,7 @@ const (
 	// baseURL  = "https://api.openai.com/v1/"
 	proxyURL           = "https://open.aiproxy.xyz/v1/"
 	modelGPT3Dot5Turbo = "gpt-3.5-turbo"
+	wfurl              = "https://api.gpt.wf/v3/completions"
 )
 
 /*
@@ -64,6 +66,11 @@ type chatUsage struct {
 	TotalTokens      int `json:"total_tokens"`
 }
 
+type wfmess struct {
+	Keys   string `json:"keys"`
+	Prompt string `json:"prompt"`
+}
+
 var client = &http.Client{
 	Transport: &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
@@ -106,7 +113,7 @@ func completions(messages []chatMessage, apiKey string) (*chatGPTResponseBody, e
 	defer res.Body.Close()
 
 	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusBadRequest {
-		return nil, errors.New("response error：" + strconv.Itoa(res.StatusCode))
+		return nil, errors.New("response error: " + strconv.Itoa(res.StatusCode))
 	}
 
 	v := new(chatGPTResponseBody)
@@ -114,4 +121,38 @@ func completions(messages []chatMessage, apiKey string) (*chatGPTResponseBody, e
 		return nil, err
 	}
 	return v, nil
+}
+
+func completionsWF(message, key string) (string, error) {
+	body, err := json.Marshal(wfmess{
+		Prompt: message,
+		Keys:   key,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	payload := bytes.NewReader(body)
+	client := &http.Client{
+		Timeout: time.Minute * 5,
+	}
+	req, err := http.NewRequest(http.MethodPost, wfurl, payload)
+
+	if err != nil {
+		return "", err
+	}
+	req.Header.Add("User-Agent", "Apifox/1.0.0 (https://www.apifox.cn)")
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer res.Body.Close()
+
+	body, err = ioutil.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(body), nil
 }
