@@ -23,7 +23,6 @@ type sessionKey struct {
 
 var (
 	wfkey  string
-	wfkey  string
 	cache  = ttl.NewCache[sessionKey, []chatMessage](time.Minute * 15)
 	engine = control.Register("chatgpt", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
