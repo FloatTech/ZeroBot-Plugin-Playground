@@ -57,7 +57,7 @@ func init() {
 				ctx.SendChain(message.Text("已清除上下文！"))
 				return
 			}
-			// 添加预设
+			// 添加预设1
 			apiKey, err := getkey(ctx)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR：", err))
