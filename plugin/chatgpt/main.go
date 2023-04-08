@@ -4,9 +4,9 @@ package chatgpt
 import (
 	//"encoding/json"
 	//"strconv"
+	"os"
 	"strings"
 	"time"
-	"os"
 
 	//"github.com/FloatTech/floatbox/web"
 	"github.com/FloatTech/ttl"
@@ -39,7 +39,7 @@ var (
 			"注:先私聊设置自己的key,再授权群聊使用,不会泄露key的\n" +
 			"---------------以下WF-apikey专用-------------------\n" +
 			"-@bot ?? [对话内容](?中英文都可以,暂时不支持连续对话)\n" +
-			"(私聊发送)设置 wfkey [apikey](主人权限)\n",
+			"(私聊发送)设置 WFkey [apikey](主人权限)\n",
 		PrivateDataFolder: "chatgpt",
 	})
 )
