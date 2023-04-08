@@ -73,8 +73,8 @@ var (
 	wfinit = fcext.DoOnceOnSuccess(func(ctx *zero.Ctx) bool {
 		m := ctx.State["manager"].(*ctrl.Control[*zero.Ctx])
 		_ = m.Manager.Response(-10)
-		_ = m.Manager.GetExtra(-10, &WFkey)
-		if WFkey == "" {
+		_ = m.Manager.GetExtra(-10, &wfkey)
+		if wfkey == "" {
 			ctx.SendChain(message.Text("ERROR: 未设置OpenAI-Wf apikey"))
 			return false
 		}

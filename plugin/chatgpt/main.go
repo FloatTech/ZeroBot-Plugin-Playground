@@ -21,7 +21,7 @@ type sessionKey struct {
 }
 
 var (
-	WFkey  string
+	wfkey  string
 	cache  = ttl.NewCache[sessionKey, []chatMessage](time.Minute * 15)
 	engine = control.Register("chatgpt", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
@@ -38,7 +38,7 @@ var (
 			"注:先私聊设置自己的key,再授权群聊使用,不会泄露key的\n" +
 			"---------------以下WF-apikey专用-------------------\n" +
 			"-@bot ?? [对话内容](?中英文都可以,暂时不支持连续对话)\n" +
-			"(私聊发送)设置 WFkey [apikey](主人权限)\n",
+			"(私聊发送)设置 wfkey [apikey](主人权限)\n",
 		PrivateDataFolder: "chatgpt",
 	})
 )
@@ -269,10 +269,10 @@ func init() {
 		})
 	//AI-GPT-WF接口专用
 	engine.OnRegex(`^设置\s?WFkey\s*(.*)$`, zero.OnlyPrivate, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
-		WFkey = ctx.State["regex_matched"].([]string)[1]
+		wfkey = ctx.State["regex_matched"].([]string)[1]
 		m := ctx.State["manager"].(*ctrl.Control[*zero.Ctx])
 		_ = m.Manager.Response(-10)
-		err := m.Manager.SetExtra(-10, WFkey)
+		err := m.Manager.SetExtra(-10, wfkey)
 		if err != nil {
 			ctx.SendChain(message.Text("保存apikey失败"))
 			return
@@ -280,7 +280,7 @@ func init() {
 		ctx.SendChain(message.Text("保存apikey成功"))
 	})
 	engine.OnRegex(`^(?:\?\?|？？)([\s\S]*)$`, zero.OnlyToMe, wfinit).SetBlock(false).Handle(func(ctx *zero.Ctx) {
-		reply, err := completionsWF(ctx.State["regex_matched"].([]string)[1], WFkey)
+		reply, err := completionsWF(ctx.State["regex_matched"].([]string)[1], wfkey)
 		if err != nil {
 			ctx.SendChain(message.Text("请求ChatGPT-WF失败: ", err))
 			return

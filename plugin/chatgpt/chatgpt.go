@@ -15,7 +15,7 @@ const (
 	// baseURL  = "https://api.openai.com/v1/"
 	proxyURL           = "https://open.aiproxy.xyz/v1/"
 	modelGPT3Dot5Turbo = "gpt-3.5-turbo"
-	WFurl              = "https://api.gpt.wf/v3/completions"
+	wfurl              = "https://api.gpt.wf/v3/completions"
 )
 
 /*
@@ -136,7 +136,7 @@ func completionsWF(message, key string) (string, error) {
 	client := &http.Client{
 		Timeout: time.Minute * 5,
 	}
-	req, err := http.NewRequest(http.MethodPost, WFurl, payload)
+	req, err := http.NewRequest(http.MethodPost, wfurl, payload)
 
 	if err != nil {
 		return "", err
