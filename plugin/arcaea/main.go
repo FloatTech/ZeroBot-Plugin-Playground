@@ -23,7 +23,7 @@ import (
 type randsong struct {
 	Status  int `json:"status"`
 	Content struct {
-		Id          string `json:"id"`
+		ID          string `json:"id"`
 		RatingClass int    `json:"ratingClass"`
 		Songinfo    struct {
 			NameEn         string  `json:"name_en"`
