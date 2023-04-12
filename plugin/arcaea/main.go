@@ -3,21 +3,19 @@ package arcaea
 
 import (
 	"encoding/json"
+	"math/rand"
+	"os"
+	"strconv"
+	"strings"
+	"time"
+
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
 	aua "github.com/MoYoez/Arcaea_auaAPI"
 	"github.com/fumiama/jieba/util/helper"
 	zero "github.com/wdvxdr1123/ZeroBot"
-	"github.com/wdvxdr1123/ZeroBot/message"
-	"math/rand"
-	"os"
-	"strconv"
-	"strings"
-)
-
-import (
 	"github.com/wdvxdr1123/ZeroBot/extension/rate"
-	"time"
+	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
 type randsong struct {
