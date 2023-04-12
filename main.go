@@ -28,6 +28,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fyzhq"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/games"
 
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/arcaea"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/draw" // 服务详情
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fgopickup"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/moegozh"
