@@ -242,6 +242,8 @@ func init() {
 					ctx.SendChain(message.Text("取消失败: ", err))
 					return
 				}
+				ctx.SendChain(message.Text("取消成功: ", err))
+				return
 			}
 			if ctx.State["regex_matched"].([]string)[1] == "授权" {
 				err := db.insertgkey(-ctx.Event.UserID, ctx.Event.GroupID)
@@ -277,6 +279,7 @@ func init() {
 			ctx.SendChain(message.Text("保存apikey失败"))
 			return
 		}
+		wfkey = ctx.State["regex_matched"].([]string)[1]
 		ctx.SendChain(message.Text("保存apikey成功"))
 	})
 	engine.OnRegex(`^(?:\?\?|？？)([\s\S]*)$`, zero.OnlyToMe, wfinit).SetBlock(false).Handle(func(ctx *zero.Ctx) {
