@@ -104,7 +104,8 @@ func init() {
 			reply.Content = strings.TrimSpace(reply.Content)
 			messages = append(messages, reply)
 			cache.Set(key, messages)
-			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(reply.Content))
+			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(reply.Content),
+				message.Text("\n本次消耗token: ", resp.Usage.PromptTokens, "+", resp.Usage.CompletionTokens, "=", resp.Usage.TotalTokens))
 		})
 	engine.OnRegex(`^设置\s*OpenAI\s*apikey\s*(.*)$`, zero.OnlyPrivate, getdb).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		err := db.insertkey(-ctx.Event.UserID, ctx.State["regex_matched"].([]string)[1])
@@ -181,14 +182,25 @@ func init() {
 			}
 			ctx.SendChain(message.Text("本群记忆清除成功"))
 		})
-	engine.OnFullMatch("查看预设列表", getdb).SetBlock(true).
+	engine.OnRegex(`^查看预设\s*(\S+)$`, getdb).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
-			pre, err := db.findformode()
-			if err != nil {
-				ctx.SendChain(message.Text(message.Reply(ctx.Event.MessageID), "当前没有任何预设: ", err))
+			if ctx.State["regex_matched"].([]string)[1] == "列表" {
+				pre, err := db.findformode()
+				if err != nil {
+					ctx.SendChain(message.Text(message.Reply(ctx.Event.MessageID), "当前没有任何预设: ", err))
+					return
+				}
+				ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(pre))
 				return
 			}
-			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(pre))
+			if zero.AdminPermission(ctx) {
+				content, err := db.findmode(ctx.State["regex_matched"].([]string)[1])
+				if err != nil {
+					ctx.SendChain(message.Text("ERROR: ", err))
+					return
+				}
+				ctx.SendChain(message.Text(content))
+			}
 		})
 	/*engine.OnFullMatch("余额查询", getdb).SetBlock(true).
 	Handle(func(ctx *zero.Ctx) {
