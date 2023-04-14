@@ -32,7 +32,7 @@ func (s *repoStorage) initDB() (err error) {
 		return err
 	}
 	return nil
-	//s.orm.LogMode(true)
+	// s.orm.LogMode(true)
 }
 
 // GetSubscribesBySource Impl
