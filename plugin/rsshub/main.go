@@ -4,14 +4,16 @@ package rsshub
 import (
 	"context"
 	"fmt"
-	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub/domain"
+	"regexp"
+
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
 	zbpCtxExt "github.com/FloatTech/zbputils/ctxext"
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
-	"regexp"
+
+	"github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub/domain"
 )
 
 // 初始化 repo
@@ -19,7 +21,7 @@ var (
 	rssRepo domain.RssDomain
 	initErr error
 	//// getRssRepo repo 初始化方法，单例
-	//getRssRepo = ctxext.DoOnceOnSuccess(func(ctx *zero.Ctx) bool {
+	// getRssRepo = ctxext.DoOnceOnSuccess(func(ctx *zero.Ctx) bool {
 	//	logrus.Infoln("RssHub订阅姬：初始化")
 	//	rssRepo, initErr = domain.NewRssDomain(engine.DataFolder() + "rsshub.db")
 	//	if initErr != nil {
