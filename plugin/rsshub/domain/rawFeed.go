@@ -50,7 +50,7 @@ func (c *RssHubClient) FetchFeed(path string) (feed *gofeed.Feed, err error) {
 		return nil, errors.New("feed data is empty")
 	}
 	// data, err = web.RequestDataWith(c.Client, domain+path, "GET", "", web.RandUA(), nil)
-	//if err != nil {
+	// if err != nil {
 	//	return nil, err
 	//}
 	feed, err = gofeed.NewParser().Parse(bytes.NewBuffer(data))

@@ -29,7 +29,7 @@ var (
 	//		return false
 	//	}
 	//	return true
-	//})
+	// })
 	// regexpForSQL 防注入
 	regexpForSQL = regexp.MustCompile(`[\^<>\[\]%&\*\(\)\{\}\|\=]|(union\s+select|update\s+|delete\s+|drop\s+|truncate\s+|insert\s+|exec\s+|declare\s+)`)
 )
