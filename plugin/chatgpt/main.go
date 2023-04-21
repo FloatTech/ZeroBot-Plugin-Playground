@@ -2,13 +2,13 @@
 package chatgpt
 
 import (
-	// "encoding/json"
-	// "strconv"
+	"encoding/json"
+	"fmt"
 	"os"
 	"strings"
 	"time"
 
-	// "github.com/FloatTech/floatbox/web"
+	"github.com/FloatTech/floatbox/web"
 	"github.com/FloatTech/ttl"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
@@ -202,37 +202,38 @@ func init() {
 				ctx.SendChain(message.Text(content))
 			}
 		})
-	/*engine.OnFullMatch("余额查询", getdb).SetBlock(true).
-	Handle(func(ctx *zero.Ctx) {
-		data, err := web.GetData("https://v1.apigpt.cn/key/?key=" + apiKey)
-		if err != nil {
-			ctx.SendChain(message.Text("请求网站失败,网站可能跑路惹"))
-			return
-		}
-		var all chatkeymessage
-		err = json.Unmarshal(data, &all)
-		if err != nil {
-			ctx.SendChain(message.Text("ERROR:", err))
-			return
-		}
-		if all.Code != 200 {
-			ctx.SendChain(message.Text("请求key错误", err))
-			return
-		}
-		var msg strings.Builder
-		msg.WriteString(all.Msg)
-		msg.WriteString("\n总量：$")
-		msg.WriteString(strconv.FormatFloat(all.TotalGranted, 'f', 2, 64))
-		msg.WriteString("\n剩余：$")
-		msg.WriteString(strconv.FormatFloat(all.TotalAvailable, 'f', 2, 64))
-		msg.WriteString("\n注册时间：")
-		tm := time.Unix(all.EffectiveAt, 0)
-		msg.WriteString(tm.Format("2006-01-02 15:04:05")) // 格式化时间
-		msg.WriteString("\n到期时间：")
-		tm = time.Unix(all.ExpiresAt, 0)
-		msg.WriteString(tm.Format("2006-01-02 15:04:05")) // 格式化时间
-		ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(msg.String()))
-	})*/
+	engine.OnFullMatch("余额查询", getdb).SetBlock(true).
+		Handle(func(ctx *zero.Ctx) {
+			apiKey, err := getkey(ctx)
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR：", err))
+				return
+			}
+			data, err := web.GetData(fmt.Sprintf(yunURL, yunKey, apiKey))
+			if err != nil {
+				ctx.SendChain(message.Text("请求网站失败,网站可能跑路惹"))
+				return
+			}
+			var all yun
+			err = json.Unmarshal(data, &all)
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR:", err))
+				return
+			}
+			var msg strings.Builder
+			msg.WriteString(all.Msg)
+			msg.WriteString("\n总量：$")
+			msg.WriteString(all.Data[0].Total)
+			msg.WriteString("\n剩余：$")
+			msg.WriteString(all.Data[0].Available)
+			/*msg.WriteString("\n注册时间：")
+			tm := time.Unix(all.EffectiveAt, 0)
+			msg.WriteString(tm.Format("2006-01-02 15:04:05")) // 格式化时间
+			msg.WriteString("\n到期时间：")
+			tm = time.Unix(all.ExpiresAt, 0)
+			msg.WriteString(tm.Format("2006-01-02 15:04:05")) // 格式化时间*/
+			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(msg.String()))
+		})
 	engine.OnRegex(`^(取消|授权)(全局|本群)使用apikey$`, getdb).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			if ctx.State["regex_matched"].([]string)[2] == "全局" {
