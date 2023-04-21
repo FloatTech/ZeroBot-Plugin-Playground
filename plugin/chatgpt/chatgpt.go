@@ -15,9 +15,9 @@ const (
 	// baseURL  = "https://api.openai.com/v1/"
 	proxyURL           = "https://open.aiproxy.xyz/v1/"
 	modelGPT3Dot5Turbo = "gpt-3.5-turbo"
-	wfurl              = "https://api.gpt.wf/v3/completions"
+	wfURL              = "https://api.gpt.wf/v3/completions"
 	yunKey             = "7d06a110e9e20a684e02934549db1d3d"
-	yunUrl             = "https://api.a20safe.com/api.php?api=35&key=%s&apikey=%s"
+	yunURL             = "https://api.a20safe.com/api.php?api=35&key=%s&apikey=%s"
 )
 
 type yun struct {
@@ -138,7 +138,7 @@ func completionsWF(message, key string) (string, error) {
 	client := &http.Client{
 		Timeout: time.Minute * 5,
 	}
-	req, err := http.NewRequest(http.MethodPost, wfurl, payload)
+	req, err := http.NewRequest(http.MethodPost, wfURL, payload)
 
 	if err != nil {
 		return "", err

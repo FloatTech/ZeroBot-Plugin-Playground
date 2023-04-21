@@ -209,7 +209,7 @@ func init() {
 				ctx.SendChain(message.Text("ERROR：", err))
 				return
 			}
-			data, err := web.GetData(fmt.Sprintf(yunUrl, yunKey, apiKey))
+			data, err := web.GetData(fmt.Sprintf(yunURL, yunKey, apiKey))
 			if err != nil {
 				ctx.SendChain(message.Text("请求网站失败,网站可能跑路惹"))
 				return
