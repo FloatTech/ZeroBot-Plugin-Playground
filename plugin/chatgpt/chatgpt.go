@@ -15,19 +15,21 @@ const (
 	// baseURL  = "https://api.openai.com/v1/"
 	proxyURL           = "https://open.aiproxy.xyz/v1/"
 	modelGPT3Dot5Turbo = "gpt-3.5-turbo"
-	wfurl              = "https://api.gpt.wf/v3/completions"
+	wfURL              = "https://api.gpt.wf/v3/completions"
+	yunKey             = "7d06a110e9e20a684e02934549db1d3d"
+	yunURL             = "https://api.a20safe.com/api.php?api=35&key=%s&apikey=%s"
 )
 
-/*
-type chatkeymessage struct {
-	Code           int     `json:"code"`
-	Msg            string  `json:"msg"`
-	TotalGranted   float64 `json:"total_granted"`
-	TotalUsed      float64 `json:"total_used"`
-	TotalAvailable float64 `json:"total_available"`
-	EffectiveAt    int64   `json:"effective_at"`
-	ExpiresAt      int64   `json:"expires_at"`
-}*/
+type yun struct {
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
+	Data []struct {
+		Return    string `json:"return"`
+		Total     string `json:"total"`
+		Available string `json:"available"`
+		Used      string `json:"used"`
+	} `json:"data"`
+}
 
 // chatGPTResponseBody 响应体
 type chatGPTResponseBody struct {
@@ -136,7 +138,7 @@ func completionsWF(message, key string) (string, error) {
 	client := &http.Client{
 		Timeout: time.Minute * 5,
 	}
-	req, err := http.NewRequest(http.MethodPost, wfurl, payload)
+	req, err := http.NewRequest(http.MethodPost, wfURL, payload)
 
 	if err != nil {
 		return "", err
