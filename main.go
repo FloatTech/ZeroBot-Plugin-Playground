@@ -27,7 +27,8 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fadian"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fyzhq"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/games"
-
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/klala"	//星穹铁道图鉴
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vtbwife"//抽vtbwife
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/arcaea"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/draw" // 服务详情
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fgopickup"
