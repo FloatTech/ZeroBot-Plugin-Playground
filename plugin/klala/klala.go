@@ -21,7 +21,7 @@ func init() { // 主函数
 		DisableOnDefault: false,
 		Brief:            "星穹铁道图鉴查询",
 		Help: "- *更新图鉴\n" +
-			"- *图鉴列表" +
+			"- *图鉴列表\n" +
 			"- *xx图鉴",
 		PrivateDataFolder: "klala",
 	})
