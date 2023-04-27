@@ -91,8 +91,8 @@ func init() { // 主函数
 			msg2.WriteString(i)
 			msg2.WriteString("\n")
 		}
-		ctx.Send(message.Message{ctxext.FakeSenderForwardNode(ctx, message.Text(msg1.String())),
-			ctxext.FakeSenderForwardNode(ctx, message.Text(msg2.String()))})
+		ctx.Send(message.Message{ctxext.FakeSenderForwardNode(ctx, message.Text(strings.TrimSpace(msg1.String()))),
+			ctxext.FakeSenderForwardNode(ctx, message.Text(strings.TrimSpace(msg2.String())))})
 	})
 }
 
