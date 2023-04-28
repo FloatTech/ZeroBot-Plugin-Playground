@@ -20,14 +20,14 @@ func init() { // 主函数
 	en := control.Register("klala", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "星穹铁道图鉴查询",
-		Help: "- *更新图鉴\n" +
+		Help: "- *(强制)更新图鉴\n" +
 			"- *图鉴列表\n" +
 			"- *xx图鉴",
 		PrivateDataFolder: "klala",
 	})
 	en.OnRegex(`^\*(.*)图鉴$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		if file.IsNotExist(en.DataFolder() + "star-rail-atlas") {
-			ctx.SendChain(message.Text("请先发送\"更新图鉴\"!"))
+			ctx.SendChain(message.Text("请先发送\"*更新图鉴\"!"))
 			return
 		}
 		word := ctx.State["regex_matched"].([]string)[1] // 关键字
@@ -53,14 +53,21 @@ func init() { // 主函数
 		}
 		ctx.SendChain(message.Image("file:///" + file.BOTPATH + "/" + en.DataFolder() + "star-rail-atlas" + path))
 	})
-	en.OnRegex(`^*更新图鉴$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(`^*(强制)?更新图鉴$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		var cmd *exec.Cmd
+		var p = file.BOTPATH + "/" + en.DataFolder()
+		if ctx.State["regex_matched"].([]string)[1] != "" {
+			if err := os.RemoveAll(p + "star-rail-atlas"); err != nil {
+				ctx.SendChain(message.Text("-删除失败", err))
+				return
+			}
+		}
 		if file.IsNotExist(en.DataFolder() + "star-rail-atlas") {
 			cmd = exec.Command("git", "clone", "https://github.com/Nwflower/star-rail-atlas.git")
 		} else {
 			cmd = exec.Command("git", "pull")
 		}
-		cmd.Dir = file.BOTPATH + "/" + en.DataFolder()
+		cmd.Dir = p
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			ctx.SendChain(message.Text("运行失败: ", err, "\n", helper.BytesToString(output)))
