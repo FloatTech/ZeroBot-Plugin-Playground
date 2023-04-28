@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"os"
 	"os/exec"
-	"strings"
 
 	"github.com/FloatTech/floatbox/file"
 	ctrl "github.com/FloatTech/zbpctrl"
@@ -27,7 +26,7 @@ func init() { // 主函数
 	})
 	en.OnRegex(`^\*(.*)图鉴$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		if file.IsNotExist(en.DataFolder() + "star-rail-atlas") {
-			ctx.SendChain(message.Text("请先发送\"*更新图鉴\"!"))
+			ctx.SendChain(message.Text("请先发送\"更新图鉴\"!"))
 			return
 		}
 		word := ctx.State["regex_matched"].([]string)[1] // 关键字
@@ -41,15 +40,10 @@ func init() { // 主函数
 		}
 		var paths wikimap
 		_ = json.Unmarshal(t, &paths)
-		var path string
-		var ok bool
-		path, ok = paths.Light[word]
+		path, ok := paths.findpath(word)
 		if !ok {
-			path, ok = paths.Role[word]
-			if !ok {
-				ctx.SendChain(message.Text("-未找到图鉴"))
-				return
-			}
+			ctx.SendChain(message.Text("未找到该图鉴"))
+			return
 		}
 		ctx.SendChain(message.Image("file:///" + file.BOTPATH + "/" + en.DataFolder() + "star-rail-atlas" + path))
 	})
@@ -64,10 +58,11 @@ func init() { // 主函数
 		}
 		if file.IsNotExist(en.DataFolder() + "star-rail-atlas") {
 			cmd = exec.Command("git", "clone", "https://github.com/Nwflower/star-rail-atlas.git")
+			cmd.Dir = p
 		} else {
 			cmd = exec.Command("git", "pull")
+			cmd.Dir = p + "star-rail-atlas"
 		}
-		cmd.Dir = p
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			ctx.SendChain(message.Text("运行失败: ", err, "\n", helper.BytesToString(output)))
@@ -80,30 +75,39 @@ func init() { // 主函数
 			ctx.SendChain(message.Text("请先发送\"更新图鉴\"!"))
 			return
 		}
-		t, err := os.ReadFile(en.DataFolder() + "star-rail-atlas/path.json") // 获取文件
-		if err != nil {
-			ctx.SendChain(message.Text("获取路径文件失败", err))
-			return
+		index := []string{"role.yaml", "lightcone.yaml", "material for role.yaml"}
+		var t [3][]byte
+		var err error
+		for i := 0; i < 3; i++ {
+			t[i], err = os.ReadFile(en.DataFolder() + "star-rail-atlas/index/" + index[i])
+			if err != nil {
+				ctx.SendChain(message.Text("获取路径文件失败", err))
+				return
+			}
 		}
-		var paths wikimap
-		_ = json.Unmarshal(t, &paths)
-		var msg1, msg2 strings.Builder
-		msg1.WriteString("lightcone: \n")
-		for i := range paths.Light {
-			msg1.WriteString(i)
-			msg1.WriteString("\n")
-		}
-		msg2.WriteString("role: \n")
-		for i := range paths.Role {
-			msg2.WriteString(i)
-			msg2.WriteString("\n")
-		}
-		ctx.Send(message.Message{ctxext.FakeSenderForwardNode(ctx, message.Text(strings.TrimSpace(msg1.String()))),
-			ctxext.FakeSenderForwardNode(ctx, message.Text(strings.TrimSpace(msg2.String())))})
+		ctx.Send(message.Message{
+			ctxext.FakeSenderForwardNode(ctx, message.Text(string(t[0]))),
+			ctxext.FakeSenderForwardNode(ctx, message.Text(string(t[1]))),
+			ctxext.FakeSenderForwardNode(ctx, message.Text(string(t[2]))),
+		})
 	})
 }
 
+func (paths wikimap) findpath(word string) (path string, ok bool) {
+	if path, ok = paths.Role[word]; ok {
+		return
+	}
+	if path, ok = paths.Light[word]; ok {
+		return
+	}
+	if path, ok = paths.Material[word]; ok {
+		return
+	}
+	return
+}
+
 type wikimap struct {
-	Light map[string]string `json:"lightcone"`
-	Role  map[string]string `json:"role"`
+	Light    map[string]string `json:"lightcone"`
+	Role     map[string]string `json:"role"`
+	Material map[string]string `json:"material for role"`
 }
