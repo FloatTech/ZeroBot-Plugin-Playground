@@ -70,7 +70,7 @@ func init() { // 主函数
 			cmd.Dir = p
 		} else {
 			cmd = exec.Command("git", "pull")
-			cmd.Dir = p + "star-rail-atlas"
+			cmd.Dir = p + "star-rail-atlas/"
 		}
 		output, err := cmd.CombinedOutput()
 		if err != nil {
