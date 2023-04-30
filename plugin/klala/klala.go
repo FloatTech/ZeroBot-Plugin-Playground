@@ -22,7 +22,7 @@ func init() { // 主函数
 		Help: "- *(强制)更新图鉴\n" +
 			"- *图鉴列表\n" +
 			"- *xx图鉴\n" +
-			"- xx材料|素材",
+			"- *xx材料|素材",
 		PrivateDataFolder: "klala",
 	})
 	en.OnRegex(`^\*(.*)(材料|素材|图鉴)$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
