@@ -22,10 +22,10 @@ func init() { // 主函数
 		Help: "- *(强制)更新图鉴\n" +
 			"- *图鉴列表\n" +
 			"- *xx图鉴\n" +
-			"- xx攻略",
+			"- xx材料|素材",
 		PrivateDataFolder: "klala",
 	})
-	en.OnRegex(`^\*(.*)(攻略|图鉴)$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(`^\*(.*)(材料|素材|图鉴)$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		if file.IsNotExist(en.DataFolder() + "star-rail-atlas") {
 			ctx.SendChain(message.Text("请先发送\"更新图鉴\"!"))
 			return
@@ -45,7 +45,7 @@ func init() { // 主函数
 		var path string
 		var ok bool
 		switch ctx.State["regex_matched"].([]string)[2] {
-		case "攻略":
+		case "材料", "素材":
 			path, ok = paths.findhow(word)
 		case "图鉴":
 			path, ok = paths.findwhat(word)
