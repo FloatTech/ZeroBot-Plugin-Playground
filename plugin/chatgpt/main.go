@@ -4,7 +4,6 @@ package chatgpt
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -22,7 +21,6 @@ type sessionKey struct {
 }
 
 var (
-	wfkey  string
 	cache  = ttl.NewCache[sessionKey, []chatMessage](time.Minute * 15)
 	engine = control.Register("chatgpt", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
@@ -283,24 +281,5 @@ func init() {
 			}
 			ctx.SendChain(message.Text("取消成功"))
 		})
-	// AI-GPT-WF接口专用
-	engine.OnRegex(`^设置\s?WFkey\s*(.*)$`, zero.OnlyPrivate, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
-		file, _ := os.OpenFile(engine.DataFolder()+"apikey.txt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-		_, err := file.WriteString(ctx.State["regex_matched"].([]string)[1])
-		file.Close()
-		if err != nil {
-			ctx.SendChain(message.Text("保存apikey失败"))
-			return
-		}
-		wfkey = ctx.State["regex_matched"].([]string)[1]
-		ctx.SendChain(message.Text("保存apikey成功"))
-	})
-	engine.OnRegex(`^(?:\?\?|？？)([\s\S]*)$`, zero.OnlyToMe, wfinit).SetBlock(false).Handle(func(ctx *zero.Ctx) {
-		reply, err := completionsWF(ctx.State["regex_matched"].([]string)[1], wfkey)
-		if err != nil {
-			ctx.SendChain(message.Text("请求ChatGPT-WF失败: ", err))
-			return
-		}
-		ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(reply))
-	})
+
 }
