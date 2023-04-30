@@ -2,7 +2,6 @@ package chatgpt
 
 import (
 	"errors"
-	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -66,16 +65,6 @@ var (
 		err = db.sql.Create("gtoqq", &gtoqq{})
 		if err != nil {
 			ctx.SendChain(message.Text("ERROR: ", err))
-			return false
-		}
-		return true
-	})
-	wfinit = fcext.DoOnceOnSuccess(func(ctx *zero.Ctx) bool {
-		// 获取本地缓存数据
-		b, err := os.ReadFile(engine.DataFolder() + "apikey.txt")
-		wfkey = string(b)
-		if wfkey == "" || err != nil {
-			ctx.SendChain(message.Text("ERROR: 未设置OpenAI-Wf apikey"))
 			return false
 		}
 		return true
