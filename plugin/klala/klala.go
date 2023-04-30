@@ -21,10 +21,11 @@ func init() { // 主函数
 		Brief:            "星穹铁道图鉴查询",
 		Help: "- *(强制)更新图鉴\n" +
 			"- *图鉴列表\n" +
-			"- *xx图鉴",
+			"- *xx图鉴\n" +
+			"- xx攻略",
 		PrivateDataFolder: "klala",
 	})
-	en.OnRegex(`^\*(.*)图鉴$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(`^\*(.*)(攻略|图鉴)$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		if file.IsNotExist(en.DataFolder() + "star-rail-atlas") {
 			ctx.SendChain(message.Text("请先发送\"更新图鉴\"!"))
 			return
@@ -40,9 +41,17 @@ func init() { // 主函数
 		}
 		var paths wikimap
 		_ = json.Unmarshal(t, &paths)
-		path, ok := paths.findpath(word)
+		//匹配类型
+		var path string
+		var ok bool
+		switch ctx.State["regex_matched"].([]string)[2] {
+		case "攻略":
+			path, ok = paths.findhow(word)
+		case "图鉴":
+			path, ok = paths.findwhat(word)
+		}
 		if !ok {
-			ctx.SendChain(message.Text("未找到该图鉴"))
+			ctx.SendChain(message.Text("未找到该", ctx.State["regex_matched"].([]string)[2]))
 			return
 		}
 		ctx.SendChain(message.Image("file:///" + file.BOTPATH + "/" + en.DataFolder() + "star-rail-atlas" + path))
@@ -93,13 +102,17 @@ func init() { // 主函数
 	})
 }
 
-func (paths wikimap) findpath(word string) (path string, ok bool) {
+// 寻找图鉴
+func (paths wikimap) findwhat(word string) (path string, ok bool) {
 	if path, ok = paths.Role[word]; ok {
 		return
 	}
 	if path, ok = paths.Light[word]; ok {
 		return
 	}
+	return
+}
+func (paths wikimap) findhow(word string) (path string, ok bool) {
 	if path, ok = paths.Material[word]; ok {
 		return
 	}
