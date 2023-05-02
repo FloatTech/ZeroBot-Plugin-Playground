@@ -17,7 +17,7 @@ import (
 
 const (
 	gitteUrl  = "https://gitee.com/Nwflower/star-rail-atlas.git"
-	githubUrl = "https://github.com/Nwflower/star-rail-atlas.git"
+	//githubUrl = "https://github.com/Nwflower/star-rail-atlas.git"
 )
 
 func init() { // 主函数
