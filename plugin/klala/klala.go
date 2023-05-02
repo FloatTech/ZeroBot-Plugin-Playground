@@ -17,7 +17,7 @@ import (
 
 const (
 	gitteURL = "https://gitee.com/Nwflower/star-rail-atlas.git"
-	//githubURL = "https://github.com/Nwflower/star-rail-atlas.git"
+	// githubURL = "https://github.com/Nwflower/star-rail-atlas.git"
 )
 
 func init() { // 主函数
@@ -46,7 +46,7 @@ func init() { // 主函数
 		}
 		var paths wikimap
 		_ = json.Unmarshal(t, &paths)
-		//匹配类型
+		// 匹配类型
 		var path string
 		var ok bool
 		switch ctx.State["regex_matched"].([]string)[2] {

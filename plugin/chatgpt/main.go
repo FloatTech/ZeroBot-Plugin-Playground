@@ -281,5 +281,4 @@ func init() {
 			}
 			ctx.SendChain(message.Text("取消成功"))
 		})
-
 }
