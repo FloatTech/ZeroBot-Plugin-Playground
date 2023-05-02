@@ -15,6 +15,11 @@ import (
 	"github.com/wdvxdr1123/ZeroBot/utils/helper"
 )
 
+const (
+	gitteURL = "https://gitee.com/Nwflower/star-rail-atlas.git"
+	//githubURL = "https://github.com/Nwflower/star-rail-atlas.git"
+)
+
 func init() { // 主函数
 	en := control.Register("klala", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
@@ -66,7 +71,7 @@ func init() { // 主函数
 			}
 		}
 		if file.IsNotExist(en.DataFolder() + "star-rail-atlas") {
-			cmd = exec.Command("git", "clone", "https://github.com/Nwflower/star-rail-atlas.git")
+			cmd = exec.Command("git", "clone", gitteURL)
 			cmd.Dir = p
 		} else {
 			cmd = exec.Command("git", "pull")
