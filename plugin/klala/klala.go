@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	gitteUrl  = "https://gitee.com/Nwflower/star-rail-atlas.git"
-	//githubUrl = "https://github.com/Nwflower/star-rail-atlas.git"
+	gitteURL = "https://gitee.com/Nwflower/star-rail-atlas.git"
+	//githubURL = "https://github.com/Nwflower/star-rail-atlas.git"
 )
 
 func init() { // 主函数
@@ -71,7 +71,7 @@ func init() { // 主函数
 			}
 		}
 		if file.IsNotExist(en.DataFolder() + "star-rail-atlas") {
-			cmd = exec.Command("git", "clone", gitteUrl)
+			cmd = exec.Command("git", "clone", gitteURL)
 			cmd.Dir = p
 		} else {
 			cmd = exec.Command("git", "pull")
