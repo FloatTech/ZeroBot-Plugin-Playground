@@ -132,7 +132,7 @@ func init() {
 			}
 			ctx.SendChain(message.Reply(id), message.Text("猫猫", userInfo.Name, "和你的感情淡了,选择了离家出走"))
 			return
-		case userInfo.Weight <= 0 && time.Since(time.Unix(userInfo.LastTime, 0)).Hours() > 72: //三天不喂食就死
+		case userInfo.Weight <= 0 && time.Since(time.Unix(userInfo.LastTime, 0)).Hours() > 72: // 三天不喂食就死
 			if err = catdata.delcat(gidStr, uidStr); err != nil {
 				ctx.SendChain(message.Text("[ERROR]:", err))
 				return
