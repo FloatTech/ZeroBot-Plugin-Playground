@@ -7,14 +7,14 @@ import (
 	"strconv"
 
 	"github.com/FloatTech/gg"
-	"github.com/nfnt/resize"
+	img "github.com/FloatTech/imgfactory"
 )
 
 const (
-	NameFont = "data/klala/kkk/font/NZBZ.ttf"                    // 名字字体
-	FontFile = "data/klala/kkk/font/SourceHanMonoSC-HeavyIt.ttf" // 汉字字体
-	FiFile   = "data/klala/kkk/font/tttgbnumber.ttf"             // 其余字体(数字英文)
-	BaFile   = "data/klala/kkk/font/STLITI.TTF"                  // 华文隶书版本版本号字体
+	NameFont = "data/klala/kkk/font/NZBZ.ttf"                    //NameFont 名字字体
+	FontFile = "data/klala/kkk/font/SourceHanMonoSC-HeavyIt.ttf" //FontFile  汉字字体
+	FiFile   = "data/klala/kkk/font/tttgbnumber.ttf"             //FiFile  其余字体(数字英文)
+	BaFile   = "data/klala/kkk/font/STLITI.TTF"                  //	BaFile   华文隶书版本版本号字体
 )
 
 func (t *thisdata) drawcard() (image.Image, error) {
@@ -27,13 +27,13 @@ func (t *thisdata) drawcard() (image.Image, error) {
 	if err != nil {
 		return nil, err
 	}
-	beijing = resize.Resize(0, 1680, beijing, resize.Bilinear) //改比例
+	beijing = img.Size(beijing, 0, 1680).Image()
 	dc.DrawImageAnchored(beijing, 540, 0, 0.5, 0)
 	lihui, err := gg.LoadPNG("data/klala/kkk/lihui/" + strconv.Itoa(t.RoleData.ID) + ".png")
 	if err != nil {
 		return nil, err
 	}
-	lihui = resize.Resize(0, 880, lihui, resize.Bilinear)
+	lihui = img.Size(lihui, 0, 880).Image()
 	sxx := lihui.Bounds().Size().X
 	dc.DrawImage(lihui, int(300-float64(sxx)/2), 0)
 	//昵称框图
@@ -108,12 +108,12 @@ func (t *thisdata) drawcard() (image.Image, error) {
 		//图标
 		lpic, err := gg.LoadImage("data/klala/kkk/lights/" + strconv.Itoa(t.RoleData.Light.ID) + ".png")
 		if err == nil {
-			lpic = resize.Resize(0, 140, lpic, resize.Bilinear) //缩小
+			lpic = img.Size(lpic, 0, 140).Image()
 			two.DrawImage(lpic, 700, 30)
 		}
 		two.DrawString(t.RoleData.Light.Name, 830, 60)
 		//星级
-		two.DrawImageAnchored(resize.Resize(0, 30, Drawstars("#FFCC00", "#FFE43A", t.RoleData.Light.Star), resize.Bilinear), 1020, 80, 1, 0)
+		two.DrawImageAnchored(img.Size(Drawstars("#FFCC00", "#FFE43A", t.RoleData.Light.Star), 0, 30).Image(), 1020, 80, 1, 0)
 		if err := two.LoadFontFace(FiFile, 30); err != nil {
 			panic(err)
 		}
@@ -181,7 +181,7 @@ func (t *thisdata) drawcard() (image.Image, error) {
 				panic(err)
 			}
 			//主词条属性
-			three.DrawStringAnchored("+"+yw.MainV.Value+Stofen(yw.MainV.Name), 325, yy, 1, 0) //主词条属性
+			three.DrawStringAnchored("+"+yw.MainV.Value+stofen(yw.MainV.Name), 325, yy, 1, 0) //主词条属性
 			three.SetHexColor("#98F5FF")                                                      //蓝色
 			for k := 0; k < len(yw.Vlist); k++ {
 				switch k {
@@ -201,7 +201,7 @@ func (t *thisdata) drawcard() (image.Image, error) {
 				if err := three.LoadFontFace(FiFile, 30); err != nil {
 					panic(err)
 				}
-				three.DrawStringAnchored("+"+yw.Vlist[k].Value+Stofen(yw.Vlist[k].Name), 325, yy, 1, 0)
+				three.DrawStringAnchored("+"+yw.Vlist[k].Value+stofen(yw.Vlist[k].Name), 325, yy, 1, 0)
 			}
 			switch i {
 			case 0:

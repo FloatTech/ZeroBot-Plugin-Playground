@@ -34,10 +34,10 @@ func init() { // 主函数
 			"- *绑定xxx",
 	})
 	en.OnRegex(`^\*(.*)面板$`, initdata).SetBlock(true).Handle(func(ctx *zero.Ctx) {
-		wife := GetWifeOrWq("wife")
+		wife := getWifeOrWq("wife")
 		currentTime := time.Now().Unix()
 		key := ctx.State["regex_matched"].([]string)[1]
-		uid := strconv.Itoa(Getuid(strconv.FormatInt(ctx.Event.UserID, 10)))
+		uid := strconv.Itoa(getuid(strconv.FormatInt(ctx.Event.UserID, 10)))
 		if uid == "0" {
 			ctx.SendChain(message.Text("-未绑定uid\n-第一次使用请发送\"*绑定xxx\""))
 			return
@@ -50,8 +50,8 @@ func init() { // 主函数
 				return
 			}
 			lastExecutionTime = currentTime
-			_, _ = Updata(uid)
-			listdata, err := CaseList(uid)
+			_, _ = updata(uid)
+			listdata, err := caseList(uid)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR: ", err))
 				return
@@ -65,7 +65,7 @@ func init() { // 主函数
 			var msg strings.Builder
 			msg.WriteString("-更新成功,您展示的角色为: ")
 			for _, v := range list.Data.Characters {
-				d, err := GetRole(uid, strconv.Itoa(v.ID))
+				d, err := getRole(uid, strconv.Itoa(v.ID))
 				if err != nil {
 					ctx.SendChain(message.Text("ERROR: ", err))
 					return
@@ -76,11 +76,7 @@ func init() { // 主函数
 					ctx.SendChain(message.Text("ERROR: ", err))
 					return
 				}
-				thisdata, err := r.convertData(list.Data.NickName, v)
-				if err != nil {
-					ctx.SendChain(message.Text("数据映射错误捏：", err))
-					return
-				}
+				thisdata := r.convertData(list.Data.NickName, v)
 				es, err := json.Marshal(&thisdata)
 				if err != nil {
 					ctx.SendChain(message.Text("数据反解析错误捏：", err))
@@ -91,13 +87,13 @@ func init() { // 主函数
 				_, _ = file.Write(es)
 				file.Close()
 				msg.WriteString("\n")
-				msg.WriteString(wife.Idmap(strconv.Itoa(v.ID)))
+				msg.WriteString(wife.idmap(strconv.Itoa(v.ID)))
 			}
 			ctx.SendChain(message.Text(msg.String()))
 			return
 		}
-		wifeid := wife.Findnames(key)
-		key = wife.Idmap(wifeid)
+		wifeid := wife.findnames(key)
+		key = wife.idmap(wifeid)
 		if key == "" {
 			ctx.SendChain(message.Text("-请输入角色全名"))
 			return
@@ -149,7 +145,7 @@ func init() { // 主函数
 		cds = c
 		ctx.SendChain(message.Text("-设置CD为", cs, "S"))
 	})
-	en.OnRegex(`^*更新Klala$`, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(`^*更新klala$`, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		var cmd *exec.Cmd
 		var p = file.BOTPATH + "/data/klala/"
 		if ctx.State["regex_matched"].([]string)[1] != "" {

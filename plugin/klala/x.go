@@ -2,8 +2,6 @@ package klala
 
 import (
 	"encoding/json"
-	"io"
-	"net/http"
 	"os"
 	"os/exec"
 	"strconv"
@@ -13,7 +11,7 @@ import (
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
-func Getuid(sqquid string) (uid int) { // 获取对应游戏uid
+func getuid(sqquid string) (uid int) { // 获取对应游戏uid
 	// 获取本地缓存数据
 	txt, err := os.ReadFile("data/klala/kkk/uid/" + sqquid + ".klala")
 	if err != nil {
@@ -26,10 +24,9 @@ func Getuid(sqquid string) (uid int) { // 获取对应游戏uid
 // FindMap 各种简称map查询
 type FindMap map[string][]string
 
-func GetWifeOrWq(val string) FindMap {
+func getWifeOrWq(val string) FindMap {
 	var txt []byte
-	switch val {
-	case "wife":
+	if val == "wife" {
 		txt, _ = os.ReadFile("data/klala/kkk/json/wife.json")
 	}
 	var m FindMap = make(map[string][]string)
@@ -40,7 +37,7 @@ func GetWifeOrWq(val string) FindMap {
 }
 
 // Findnames 遍历寻找匹配昵称
-func (m FindMap) Findnames(val string) string {
+func (m FindMap) findnames(val string) string {
 	for k, v := range m {
 		for _, vv := range v {
 			if vv == val {
@@ -52,38 +49,12 @@ func (m FindMap) Findnames(val string) string {
 }
 
 // Idmap wifeid->wifename
-func (m FindMap) Idmap(val string) string {
+func (m FindMap) idmap(val string) string {
 	f, b := m[val]
 	if !b {
 		return ""
 	}
 	return f[0]
-}
-
-// 下载立绘文件
-func downcard(url, id string) error {
-	if file.IsExist("data/klala/kkk/lihui/" + id + ".png") {
-		return nil
-	}
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	// 创建文件
-	f, err := os.Create(id + ".png")
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	// 将响应内容写入文件
-	_, err = io.Copy(f, resp.Body)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // Ftoone 保留一位小数并转化string
@@ -131,7 +102,7 @@ func typeToName(i int) string {
 }
 
 // Stofen 判断词条分号
-func Stofen(val string) string {
+func stofen(val string) string {
 	switch val {
 	case "攻击力", "防御力", "生命值", "速度":
 		return ""
@@ -139,7 +110,7 @@ func Stofen(val string) string {
 	return "%"
 }
 
-func Sto100(val string) float64 {
+func sto100(val string) float64 {
 	switch val {
 	case "攻击力", "防御力", "生命值", "速度":
 		return 1
@@ -147,7 +118,7 @@ func Sto100(val string) float64 {
 	return 100
 }
 
-func (r roles) convertData(nickname string, v characters) (thisdata, error) {
+func (r roles) convertData(nickname string, v characters) thisdata {
 	t := new(thisdata)
 	t.UID = strconv.Itoa(r.Data.AvatarCombat.UID)
 	t.Nickname = nickname
@@ -195,7 +166,7 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 		switch r.Data.ItemRelic[i].Type {
 		case "HEAD":
 			t.RoleData.Relics.Head = relicsdata{
-				RelicId: r.Data.ItemRelic[i].RelicID,
+				RelicID: r.Data.ItemRelic[i].RelicID,
 				Name:    r.Data.ItemRelic[i].Name,
 				Type:    "HEAD",
 			}
@@ -203,7 +174,7 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 				if vv.Type == "HEAD" {
 					t.RoleData.Relics.Head.MainV = vlist{
 						Name:  typeToName(vv.MainAffixType),
-						Value: Ftoone(vv.MainAffixValue * Sto100(typeToName(vv.MainAffixType))),
+						Value: Ftoone(vv.MainAffixValue * sto100(typeToName(vv.MainAffixType))),
 					}
 					z := vlist{}
 					for l := 0; l < 4; l++ {
@@ -213,25 +184,25 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 								continue
 							}
 							z.Name = typeToName(vv.Sub1Type)
-							z.Value = Ftoone(vv.Sub1Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub1Value * sto100(z.Name))
 						case 1:
 							if vv.Sub2Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub2Type)
-							z.Value = Ftoone(vv.Sub2Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub2Value * sto100(z.Name))
 						case 2:
 							if vv.Sub3Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub3Type)
-							z.Value = Ftoone(vv.Sub3Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub3Value * sto100(z.Name))
 						case 3:
 							if vv.Sub4Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub4Type)
-							z.Value = Ftoone(vv.Sub4Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub4Value * sto100(z.Name))
 						}
 						t.RoleData.Relics.Head.Vlist = append(t.RoleData.Relics.Head.Vlist, z)
 					}
@@ -240,7 +211,7 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 			}
 		case "HAND":
 			t.RoleData.Relics.Hand = relicsdata{
-				RelicId: r.Data.ItemRelic[i].RelicID,
+				RelicID: r.Data.ItemRelic[i].RelicID,
 				Name:    r.Data.ItemRelic[i].Name,
 				Type:    "HAND",
 			}
@@ -248,7 +219,7 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 				if vv.Type == "HAND" {
 					t.RoleData.Relics.Hand.MainV = vlist{
 						Name:  typeToName(vv.MainAffixType),
-						Value: Ftoone(vv.MainAffixValue * Sto100(typeToName(vv.MainAffixType))),
+						Value: Ftoone(vv.MainAffixValue * sto100(typeToName(vv.MainAffixType))),
 					}
 					z := vlist{}
 					for l := 0; l < 4; l++ {
@@ -258,25 +229,25 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 								continue
 							}
 							z.Name = typeToName(vv.Sub1Type)
-							z.Value = Ftoone(vv.Sub1Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub1Value * sto100(z.Name))
 						case 1:
 							if vv.Sub2Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub2Type)
-							z.Value = Ftoone(vv.Sub2Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub2Value * sto100(z.Name))
 						case 2:
 							if vv.Sub3Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub3Type)
-							z.Value = Ftoone(vv.Sub3Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub3Value * sto100(z.Name))
 						case 3:
 							if vv.Sub4Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub4Type)
-							z.Value = Ftoone(vv.Sub4Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub4Value * sto100(z.Name))
 						}
 						t.RoleData.Relics.Hand.Vlist = append(t.RoleData.Relics.Hand.Vlist, z)
 					}
@@ -285,7 +256,7 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 			}
 		case "BODY":
 			t.RoleData.Relics.Body = relicsdata{
-				RelicId: r.Data.ItemRelic[i].RelicID,
+				RelicID: r.Data.ItemRelic[i].RelicID,
 				Name:    r.Data.ItemRelic[i].Name,
 				Type:    "BODY",
 			}
@@ -293,7 +264,7 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 				if vv.Type == "BODY" {
 					t.RoleData.Relics.Body.MainV = vlist{
 						Name:  typeToName(vv.MainAffixType),
-						Value: Ftoone(vv.MainAffixValue * Sto100(typeToName(vv.MainAffixType))),
+						Value: Ftoone(vv.MainAffixValue * sto100(typeToName(vv.MainAffixType))),
 					}
 					z := vlist{}
 					for l := 0; l < 4; l++ {
@@ -303,25 +274,25 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 								continue
 							}
 							z.Name = typeToName(vv.Sub1Type)
-							z.Value = Ftoone(vv.Sub1Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub1Value * sto100(z.Name))
 						case 1:
 							if vv.Sub2Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub2Type)
-							z.Value = Ftoone(vv.Sub2Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub2Value * sto100(z.Name))
 						case 2:
 							if vv.Sub3Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub3Type)
-							z.Value = Ftoone(vv.Sub3Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub3Value * sto100(z.Name))
 						case 3:
 							if vv.Sub4Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub4Type)
-							z.Value = Ftoone(vv.Sub4Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub4Value * sto100(z.Name))
 						}
 						t.RoleData.Relics.Body.Vlist = append(t.RoleData.Relics.Body.Vlist, z)
 					}
@@ -330,7 +301,7 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 			}
 		case "FOOT":
 			t.RoleData.Relics.Foot = relicsdata{
-				RelicId: r.Data.ItemRelic[i].RelicID,
+				RelicID: r.Data.ItemRelic[i].RelicID,
 				Name:    r.Data.ItemRelic[i].Name,
 				Type:    "FOOT",
 			}
@@ -338,7 +309,7 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 				if vv.Type == "FOOT" {
 					t.RoleData.Relics.Foot.MainV = vlist{
 						Name:  typeToName(vv.MainAffixType),
-						Value: Ftoone(vv.MainAffixValue * Sto100(typeToName(vv.MainAffixType))),
+						Value: Ftoone(vv.MainAffixValue * sto100(typeToName(vv.MainAffixType))),
 					}
 					z := vlist{}
 					for l := 0; l < 4; l++ {
@@ -348,25 +319,25 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 								continue
 							}
 							z.Name = typeToName(vv.Sub1Type)
-							z.Value = Ftoone(vv.Sub1Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub1Value * sto100(z.Name))
 						case 1:
 							if vv.Sub2Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub2Type)
-							z.Value = Ftoone(vv.Sub2Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub2Value * sto100(z.Name))
 						case 2:
 							if vv.Sub3Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub3Type)
-							z.Value = Ftoone(vv.Sub3Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub3Value * sto100(z.Name))
 						case 3:
 							if vv.Sub4Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub4Type)
-							z.Value = Ftoone(vv.Sub4Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub4Value * sto100(z.Name))
 						}
 						t.RoleData.Relics.Foot.Vlist = append(t.RoleData.Relics.Foot.Vlist, z)
 					}
@@ -375,7 +346,7 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 			}
 		case "NECK":
 			t.RoleData.Relics.Neck = relicsdata{
-				RelicId: r.Data.ItemRelic[i].RelicID,
+				RelicID: r.Data.ItemRelic[i].RelicID,
 				Name:    r.Data.ItemRelic[i].Name,
 				Type:    "NECK",
 			}
@@ -383,7 +354,7 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 				if vv.Type == "NECK" {
 					t.RoleData.Relics.Neck.MainV = vlist{
 						Name:  typeToName(vv.MainAffixType),
-						Value: Ftoone(vv.MainAffixValue * Sto100(typeToName(vv.MainAffixType))),
+						Value: Ftoone(vv.MainAffixValue * sto100(typeToName(vv.MainAffixType))),
 					}
 					z := vlist{}
 					for l := 0; l < 4; l++ {
@@ -393,25 +364,25 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 								continue
 							}
 							z.Name = typeToName(vv.Sub1Type)
-							z.Value = Ftoone(vv.Sub1Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub1Value * sto100(z.Name))
 						case 1:
 							if vv.Sub2Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub2Type)
-							z.Value = Ftoone(vv.Sub2Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub2Value * sto100(z.Name))
 						case 2:
 							if vv.Sub3Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub3Type)
-							z.Value = Ftoone(vv.Sub3Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub3Value * sto100(z.Name))
 						case 3:
 							if vv.Sub4Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub4Type)
-							z.Value = Ftoone(vv.Sub4Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub4Value * sto100(z.Name))
 						}
 						t.RoleData.Relics.Neck.Vlist = append(t.RoleData.Relics.Neck.Vlist, z)
 					}
@@ -420,7 +391,7 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 			}
 		case "OBJECT":
 			t.RoleData.Relics.Object = relicsdata{
-				RelicId: r.Data.ItemRelic[i].RelicID,
+				RelicID: r.Data.ItemRelic[i].RelicID,
 				Name:    r.Data.ItemRelic[i].Name,
 				Type:    "OBJECT",
 			}
@@ -428,7 +399,7 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 				if vv.Type == "OBJECT" {
 					t.RoleData.Relics.Object.MainV = vlist{
 						Name:  typeToName(vv.MainAffixType),
-						Value: Ftoone(vv.MainAffixValue * Sto100(typeToName(vv.MainAffixType))),
+						Value: Ftoone(vv.MainAffixValue * sto100(typeToName(vv.MainAffixType))),
 					}
 					z := vlist{}
 					for l := 0; l < 4; l++ {
@@ -438,25 +409,25 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 								continue
 							}
 							z.Name = typeToName(vv.Sub1Type)
-							z.Value = Ftoone(vv.Sub1Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub1Value * sto100(z.Name))
 						case 1:
 							if vv.Sub2Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub2Type)
-							z.Value = Ftoone(vv.Sub2Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub2Value * sto100(z.Name))
 						case 2:
 							if vv.Sub3Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub3Type)
-							z.Value = Ftoone(vv.Sub3Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub3Value * sto100(z.Name))
 						case 3:
 							if vv.Sub4Type == 0 {
 								continue
 							}
 							z.Name = typeToName(vv.Sub4Type)
-							z.Value = Ftoone(vv.Sub4Value * Sto100(z.Name))
+							z.Value = Ftoone(vv.Sub4Value * sto100(z.Name))
 						}
 						t.RoleData.Relics.Object.Vlist = append(t.RoleData.Relics.Object.Vlist, z)
 					}
@@ -466,7 +437,7 @@ func (r roles) convertData(nickname string, v characters) (thisdata, error) {
 		}
 	}
 
-	return *t, nil
+	return *t
 }
 func downdata(ctx *zero.Ctx) bool {
 	if file.IsNotExist("data/klala/kkk") {
@@ -474,6 +445,19 @@ func downdata(ctx *zero.Ctx) bool {
 		cmd := exec.Command("git", "clone", "https://gitee.com/lianhong2758/kkk.git")
 		cmd.Dir = file.BOTPATH + "/data/klala"
 		_, err := cmd.CombinedOutput()
+		if err != nil {
+			return false
+		}
+		ctx.SendChain(message.Text("-下载资源文件成功..."))
+	}
+	if file.IsNotExist("data/klala/kkk/uid") {
+		err := os.MkdirAll("data/klala/kkk/uid", 0755) // 递归创建文件夹
+		if err != nil {
+			return false
+		}
+	}
+	if file.IsNotExist("data/klala/kkk/js") {
+		err := os.MkdirAll("data/klala/kkk/js", 0755) // 递归创建文件夹
 		if err != nil {
 			return false
 		}

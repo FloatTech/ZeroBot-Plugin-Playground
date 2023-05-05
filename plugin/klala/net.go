@@ -15,7 +15,7 @@ var (
 	client = &http.Client{}
 )
 
-func Updata(uid string) (body []byte, err error) {
+func updata(uid string) (body []byte, err error) {
 	req, err := http.NewRequest(http.MethodGet, upURL+uid, nil)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func Updata(uid string) (body []byte, err error) {
 	return
 }
 
-func CaseList(uid string) (body []byte, err error) {
+func caseList(uid string) (body []byte, err error) {
 	req, err := http.NewRequest(http.MethodGet, caseURL+uid, nil)
 
 	if err != nil {
@@ -66,7 +66,7 @@ func CaseList(uid string) (body []byte, err error) {
 	return
 }
 
-func GetRole(uid, n string) (body []byte, err error) {
+func getRole(uid, n string) (body []byte, err error) {
 	req, err := http.NewRequest(http.MethodGet, roleURL+uid+"/"+n, nil)
 
 	if err != nil {
@@ -279,7 +279,7 @@ type relics struct {
 	Object relicsdata `json:"object"`
 }
 type relicsdata struct {
-	RelicId int     `json:"relicId"`
+	RelicID int     `json:"relicId"`
 	Name    string  `json:"name"`
 	Type    string  `json:"type"` //位置"OBJECT","HAND","BODY","FOOT","HEAD", "NECK"
 	MainV   vlist   `json:"main"`
