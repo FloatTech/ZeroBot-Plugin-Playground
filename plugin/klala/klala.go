@@ -15,6 +15,11 @@ import (
 	"github.com/wdvxdr1123/ZeroBot/utils/helper"
 )
 
+const (
+	gitteURL = "https://gitee.com/Nwflower/star-rail-atlas.git"
+	// githubURL = "https://github.com/Nwflower/star-rail-atlas.git"
+)
+
 func init() { // 主函数
 	en := control.Register("klala", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
@@ -40,7 +45,15 @@ func init() { // 主函数
 		}
 		var paths wikimap
 		_ = json.Unmarshal(t, &paths)
-		path, ok := paths.findpath(word)
+		// 匹配类型
+		var path string
+		var ok bool
+		switch ctx.State["regex_matched"].([]string)[2] {
+		case "材料", "素材":
+			path, ok = paths.findhow(word)
+		case "图鉴":
+			path, ok = paths.findwhat(word)
+		}
 		if !ok {
 			ctx.SendChain(message.Text("未找到该图鉴"))
 			return
