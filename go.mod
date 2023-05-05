@@ -21,7 +21,6 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/guohuiyuan/go-fyzhq v0.0.0-20220807135412-25c16c843e5a
 	github.com/mmcdole/gofeed v1.2.1
-	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/playwright-community/playwright-go v0.2000.1
 	github.com/sirupsen/logrus v1.9.0
