@@ -31,7 +31,8 @@ func init() { // 主函数
 		Brief:            "星穹铁道查询",
 		Help: "- *xx面板\n" +
 			"- *更新面板\n" +
-			"- *绑定xxx",
+			"- *绑定xxx\n" +
+			"- *设置CD为xs",
 	})
 	en.OnRegex(`^\*(.*)面板$`, initdata).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		wife := getWifeOrWq("wife")
@@ -133,7 +134,7 @@ func init() { // 主函数
 		file, _ := os.OpenFile("data/klala/kkk/uid/"+sqquid+".klala", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		_, _ = file.WriteString(suid)
 		file.Close()
-		ctx.SendChain(message.Text("-绑定成功"))
+		ctx.SendChain(message.Text("-绑定uid", suid, "成功,发送\"*更新面板\"获取数据"))
 	})
 	en.OnRegex(`^\*设置CD为(\d+)s`, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		cs := ctx.State["regex_matched"].([]string)[1] // 获取uid
