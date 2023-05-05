@@ -14,7 +14,7 @@ const (
 	NameFont = "data/klala/kkk/font/NZBZ.ttf"                    //NameFont 名字字体
 	FontFile = "data/klala/kkk/font/SourceHanMonoSC-HeavyIt.ttf" //FontFile 汉字字体
 	FiFile   = "data/klala/kkk/font/tttgbnumber.ttf"             //FiFile 其余字体(数字英文)
-	BaFile   = "data/klala/kkk/font/STLITI.TTF"                  //	BaFile 华文隶书版本版本号字体
+	BaFile   = "data/klala/kkk/font/STLITI.TTF"                  //BaFile 华文隶书版本版本号字体
 )
 
 func (t *thisdata) drawcard() (image.Image, error) {
