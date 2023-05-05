@@ -28,7 +28,7 @@ func init() {
 			"- 更新xx(uid)" +
 			"- 队伍伤害xx xx xx xx",
 	})
-	en.OnRegex(`^(?:#|＃)?\s*绑定+?\s*(?:uid|UID|Uid)?\s*(\d+)?`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(`^(?:#|＃)\s*绑定+?\s*(?:uid|UID|Uid)?\s*(\d+)?`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		suid := ctx.State["regex_matched"].([]string)[1] // 获取uid
 		body, err := web.GetData(api + "bound?qq=" + strconv.Itoa(int(ctx.Event.UserID)) + "&uid=" + suid)
 		if err != nil {
@@ -42,7 +42,7 @@ func init() {
 		}
 		ctx.SendChain(message.Text(msg))
 	})
-	en.OnRegex(`^(?:#|＃)?(.*)面板\s*(?:(?:\[CQ:at,qq=)(\d+))?(\d+)?(.*)`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(`^(?:#|＃)(.*)面板\s*(?:(?:\[CQ:at,qq=)(\d+))?(\d+)?(.*)`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		fmt.Println(ctx.State["regex_matched"].([]string)[1], ctx.State["regex_matched"].([]string)[2], ctx.State["regex_matched"].([]string)[3], ctx.State["regex_matched"].([]string)[4])
 		var i string
 		str := ctx.State["regex_matched"].([]string)[1] // 获取key
@@ -107,7 +107,7 @@ func init() {
 		}
 		ctx.SendChain(message.Image(url))
 	})
-	en.OnRegex(`^(?:#|＃)?\s*更新+?\s*(?:uid|UID|Uid)?\s*(\d+)`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(`^(?:#|＃)\s*更新+?\s*(?:uid|UID|Uid)?\s*(\d+)`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		suid := ctx.State["regex_matched"].([]string)[1] // 获取uid
 		body, err := web.GetData(api + "find?uid=" + suid)
 		if err != nil {
@@ -122,7 +122,7 @@ func init() {
 		ctx.SendChain(message.Text(msg))
 	})
 
-	en.OnRegex(`^(?:\[CQ:at,qq=)?(\d+)?\]?\s*(?:#|＃)?队伍伤害\s*((\D+)\s(\D+)\s(\D+)\s(\D+))?`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(`^(?:\[CQ:at,qq=)?(\d+)?\]?\s*(?:#|＃)队伍伤害\s*((\D+)\s(\D+)\s(\D+)\s(\D+))?`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		names := []string{ctx.State["regex_matched"].([]string)[3], ctx.State["regex_matched"].([]string)[4], ctx.State["regex_matched"].([]string)[5], ctx.State["regex_matched"].([]string)[6]} // 获取key
 		sqquid := ctx.State["regex_matched"].([]string)[1]                                                                                                                                        // 获取第三者qquid
 		if sqquid == "" {
