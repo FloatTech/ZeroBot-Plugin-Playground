@@ -30,13 +30,9 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fgopickup"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fyzhq"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/games"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/klala" //星穹铁道图鉴
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/klala" // 星穹铁道图鉴
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/kokomi"
 
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vtbwife"// 抽vtbwife
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/arcaea"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/draw" // 服务详情
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fgopickup"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/moegozh"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/movies"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/ottoshout"
@@ -49,7 +45,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/subweibo"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/tgyj"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vote"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vtbwife" //抽vtbwife
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vtbwife" // 抽vtbwife
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/wantquotes"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/youdaotranslate"
 
