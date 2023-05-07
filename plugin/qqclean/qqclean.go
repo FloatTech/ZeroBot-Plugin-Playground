@@ -41,4 +41,28 @@ func init() {
 		})
 		ctx.SendPrivateMessage(ctx.Event.UserID, message.Text("已清理bot好友: (", strings.Join(cleanFriendnameList, ", "), ")"))
 	})
+	// 清理群聊低等级
+	// go func() {
+	// 	time.Sleep(5 * time.Second)
+	// 	zero.RangeBot(func(id int64, ctx *zero.Ctx) bool {
+	// 		gid := int64(1048452984)
+	// 		list := ctx.GetGroupMemberList(gid)
+	// 		qqInfoURL := "https://api.kit9.cn/api/qq_material/api.php?qq=%v"
+	// 		fmt.Println(list)
+	// 		for i, v := range list.Array() {
+	// 			time.Sleep(100 * time.Millisecond)
+	// 			uid := v.Get("user_id").Int()
+	// 			data, err := web.GetData(fmt.Sprintf(qqInfoURL, uid))
+	// 			if err != nil {
+	// 				fmt.Println(err)
+	// 			}
+	// 			level := gjson.ParseBytes(data).Get("data.level").Int()
+	// 			if level <= 3 {
+	// 				ctx.SetGroupKick(gid, uid, false)
+	// 			}
+	// 			fmt.Printf("%v. %v, %v\n", i, v.Get("nickname").String(), level)
+	// 		}
+	// 		return true
+	// 	})
+	// }()
 }
