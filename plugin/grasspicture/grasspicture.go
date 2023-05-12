@@ -123,6 +123,10 @@ func init() {
 			}
 			defer file.Close()
 			part, err := writer.CreateFormFile("file", fileName)
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR: ", err))
+				return
+			}
 			_, err = io.Copy(part, file)
 			if err != nil {
 				ctx.SendChain(message.Text("ERROR: ", err))
