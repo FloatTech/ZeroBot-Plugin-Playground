@@ -30,6 +30,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fgopickup"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fyzhq"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/games"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/grasspicture"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/klala" // 星穹铁道图鉴
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/kokomi"
 
