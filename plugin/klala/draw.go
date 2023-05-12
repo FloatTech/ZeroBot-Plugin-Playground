@@ -14,7 +14,7 @@ const (
 	NameFont    = "data/klala/kkk/font/NZBZ.ttf"                    //NameFont 名字字体
 	FontFile    = "data/klala/kkk/font/SourceHanMonoSC-HeavyIt.ttf" //FontFile 汉字字体
 	FiFile      = "data/klala/kkk/font/tttgbnumber.ttf"             //FiFile 其余字体(数字英文)
-	BaFile      = "data/klala/kkk/font/STLITI.TTF"                  //	BaFile 华文隶书版本版本号字体
+	BaFile      = "data/klala/kkk/font/STLITI.TTF"                  //BaFile 华文隶书版本版本号字体
 	windowsPath = "data/klala/kkk/pro/冰.jpg"
 	lightPath   = "data/klala/kkk/icon/light_cone/"
 	liHuiPath   = "data/klala/kkk/lihui/"
@@ -71,10 +71,8 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 			skillpic, err := gg.LoadImage(tPicPath + strconv.Itoa(t.RoleData[n].ID) + skillList[a])
 			if err == nil {
 				skillpic = img.Size(skillpic, 0, 60).Image()
-				if a < t.RoleData[n].Rank {
-
-				} else {
-					skillpic = AdjustOpacity(skillpic, 0.5)
+				if a >= t.RoleData[n].Rank {
+					skillpic = adjustOpacity(skillpic, 0.5)
 				}
 				ten.DrawImageAnchored(skillpic, 10+a*80, 40, 0, 0.5)
 			}
@@ -155,7 +153,7 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 		}
 		two.DrawString(t.RoleData[n].Light.Name, 830, 60)
 		//星级
-		two.DrawImageAnchored(img.Size(DrawStars("#FFCC00", "#FFE43A", t.RoleData[n].Light.Star), 0, 30).Image(), 1020, 80, 1, 0)
+		two.DrawImageAnchored(img.Size(drawStars("#FFCC00", "#FFE43A", t.RoleData[n].Light.Star), 0, 30).Image(), 1020, 80, 1, 0)
 		if err := two.LoadFontFace(FiFile, 30); err != nil {
 			panic(err)
 		}
@@ -294,8 +292,8 @@ func Polygon(n int) []gg.Point {
 	return result
 }
 
-// Drawstars 画星星
-func DrawStars(side, all string, num int) image.Image {
+// drawStars 画星星
+func drawStars(side, all string, num int) image.Image {
 	dc := gg.NewContext(500, 80)
 	n := 5
 	points := Polygon(n)
@@ -321,8 +319,8 @@ func DrawStars(side, all string, num int) image.Image {
 	return dc.Image()
 }
 
-// AdjustOpacity 更改透明度
-func AdjustOpacity(m image.Image, percentage float64) image.Image {
+// adjustOpacity 更改透明度
+func adjustOpacity(m image.Image, percentage float64) image.Image {
 	bounds := m.Bounds()
 	dx, dy := bounds.Dx(), bounds.Dy()
 	nimg := image.NewRGBA64(bounds)

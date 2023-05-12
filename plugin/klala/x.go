@@ -69,13 +69,12 @@ func (m FindMap) idmap(typ, val string) string {
 			return ""
 		}
 		return f[0]
-	} else {
-		f, b := m.LightCones[val]
-		if !b {
-			return ""
-		}
-		return f[0]
 	}
+	f, b := m.LightCones[val]
+	if !b {
+		return ""
+	}
+	return f[0]
 }
 
 func getLights() (m lightmap) {

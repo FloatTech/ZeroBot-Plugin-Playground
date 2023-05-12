@@ -124,7 +124,6 @@ func init() { // 主函数
 			return
 		}
 		ctx.SendChain(message.Text(msg))
-		return
 	})
 	en.OnRegex(`^\*设置CD为(\d+)s`, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		cs := ctx.State["regex_matched"].([]string)[1] // 获取uid

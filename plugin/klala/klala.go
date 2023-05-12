@@ -84,7 +84,7 @@ func init() { // 主函数
 		}
 		o := helper.BytesToString(output)
 		if len(o) > 500 {
-			o = o[:500] + "..."
+			o = o[:500] + "\n..."
 		}
 		ctx.SendChain(message.Text("运行成功: ", o))
 	})
