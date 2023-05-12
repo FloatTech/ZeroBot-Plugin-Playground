@@ -1,4 +1,4 @@
-// Package klala 星穹铁道图鉴查询
+// Package klala 星穹铁道
 package klala
 
 import (
@@ -82,7 +82,11 @@ func init() { // 主函数
 			ctx.SendChain(message.Text("运行失败: ", err, "\n", helper.BytesToString(output)))
 			return
 		}
-		ctx.SendChain(message.Text("运行成功: ", helper.BytesToString(output)))
+		o := helper.BytesToString(output)
+		if len(o) > 500 {
+			o = o[:500] + "..."
+		}
+		ctx.SendChain(message.Text("运行成功: ", o))
 	})
 	en.OnRegex(`^*图鉴列表$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		if file.IsNotExist(en.DataFolder() + "star-rail-atlas") {
