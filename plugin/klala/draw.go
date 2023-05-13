@@ -15,7 +15,8 @@ const (
 	FontFile    = "data/klala/kkk/font/SourceHanMonoSC-HeavyIt.ttf" //FontFile 汉字字体
 	FiFile      = "data/klala/kkk/font/tttgbnumber.ttf"             //FiFile 其余字体(数字英文)
 	BaFile      = "data/klala/kkk/font/STLITI.TTF"                  //BaFile 华文隶书版本版本号字体
-	windowsPath = "data/klala/kkk/pro/冰.jpg"
+	windowsPath = "data/klala/kkk/sund/冰.jpg"
+	refinePath  = "data/klala/kkk/sund/refine.png"
 	lightPath   = "data/klala/kkk/icon/light_cone/"
 	liHuiPath   = "data/klala/kkk/lihui/"
 	remainPath  = "data/klala/kkk/icon/relic/"
@@ -68,8 +69,7 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 	{
 		ten := gg.NewContext(470, 80)
 		for a := 0; a < 6; a++ {
-			skillpic, err := gg.LoadImage(tPicPath + strconv.Itoa(t.RoleData[n].ID) + skillList[a])
-			if err == nil {
+			if skillpic, err := gg.LoadImage(tPicPath + strconv.Itoa(t.RoleData[n].ID) + skillList[a]); err == nil {
 				skillpic = img.Size(skillpic, 0, 60).Image()
 				if a >= t.RoleData[n].Rank {
 					skillpic = adjustOpacity(skillpic, 0.5)
@@ -135,8 +135,7 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 			default:
 				talentname = skillList[7]
 			}
-			tpic, err := gg.LoadImage(tPicPath + strconv.Itoa(t.RoleData[n].ID) + talentname)
-			if err == nil {
+			if tpic, err := gg.LoadImage(tPicPath + strconv.Itoa(t.RoleData[n].ID) + talentname); err == nil {
 				tpic = img.Size(tpic, 0, 80).Image()
 				two.DrawImage(tpic, 10+ii%2*300, 10+ii/2*80)
 			}
@@ -146,8 +145,7 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 		two.DrawString("终结 ", 90, 140)
 		two.DrawString("天赋 ", 390, 140)
 		//图标
-		lpic, err := gg.LoadImage(lightPath + strconv.Itoa(t.RoleData[n].Light.ID) + ".png")
-		if err == nil {
+		if lpic, err := gg.LoadImage(lightPath + strconv.Itoa(t.RoleData[n].Light.ID) + ".png"); err == nil {
 			lpic = img.Size(lpic, 0, 160).Image()
 			two.DrawImage(lpic, 670, 20)
 		}
@@ -157,11 +155,21 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 		if err := two.LoadFontFace(FiFile, 30); err != nil {
 			panic(err)
 		}
-		two.DrawString("LV"+strconv.Itoa(t.RoleData[n].Light.Level), 830, 150)
-		two.DrawString("LV"+strconv.Itoa(t.RoleData[n].Skill.A), 160, 60)
-		two.DrawString("LV"+strconv.Itoa(t.RoleData[n].Skill.E), 460, 60)
-		two.DrawString("LV"+strconv.Itoa(t.RoleData[n].Skill.Q), 160, 140)
-		two.DrawString("LV"+strconv.Itoa(t.RoleData[n].Skill.T), 460, 140)
+		two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Light.Level), 830, 150)
+		two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Skill.A), 160, 60)
+		two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Skill.E), 460, 60)
+		two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Skill.Q), 160, 140)
+		two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Skill.T), 460, 140)
+		//精炼
+		if err := two.LoadFontFace(FiFile, 30); err != nil {
+			panic(err)
+		}
+		if refpic, err := gg.LoadImage(refinePath); err == nil {
+			refpic = adjustOpacity(refpic, 0.8)
+			refpic = img.Size(refpic, 140, 0).Image()
+			two.DrawImageAnchored(refpic, 970, 140, 0.5, 0.5)
+			two.DrawStringAnchored("ref:"+strconv.Itoa(t.RoleData[n].Light.Rank), 970, 140, 0.5, 0.5)
+		}
 		dc.DrawImage(yinlight, 20, 720)
 		dc.DrawImage(two.Image(), 20, 720)
 	}
@@ -184,7 +192,7 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 			default:
 				yw = t.RoleData[n].Relics.Object
 			}
-			if yw.RelicID == 0 {
+			if yw.SetID == 0 {
 				continue
 			}
 			// 字图层
@@ -199,11 +207,12 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 				three.DrawLine(0, 157+float64(c)*45, 350, 157+float64(c)*45) //横线条分割
 			}
 			three.Stroke()
-			tuyw, err := gg.LoadImage(remainPath + strconv.Itoa(yw.RelicID) + "_" + strconv.Itoa(i%4) + ".png")
-			if err == nil {
+			if tuyw, err := gg.LoadImage(remainPath + strconv.Itoa(yw.SetID) + "_" + strconv.Itoa(i%4) + ".png"); err == nil {
 				tuyw = img.Size(tuyw, 0, 90).Image()
 				three.DrawImage(tuyw, 15, 15)
 			}
+			//星级
+			three.DrawImage(img.Size(drawStars("#FFCC00", "#FFE43A", yw.Star), 0, 20).Image(), 145, 60)
 			//遗物name
 			three.DrawStringAnchored(yw.Name, 325, 50, 1, 0)
 			//圣遗物属性 主词条
@@ -216,12 +225,13 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 			if err := three.LoadFontFace(FontFile, 30); err != nil {
 				panic(err)
 			}
-			three.DrawString(yw.MainV.Name, xx, yy) //"主:"
+			three.DrawString(yw.MainV.Name, xx, yy) //"主"
 			if err := three.LoadFontFace(FiFile, 30); err != nil {
 				panic(err)
 			}
 			//主词条属性
 			three.DrawStringAnchored("+"+yw.MainV.Value+stofen(yw.MainV.Name), 325, yy, 1, 0) //主词条属性
+			three.DrawString("+"+strconv.Itoa(int(yw.Level)), 85, 90)                         //LV
 			three.SetHexColor("#98F5FF")                                                      //蓝色
 			for k := 0; k < len(yw.Vlist); k++ {
 				switch k {
@@ -237,7 +247,7 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 				if err := three.LoadFontFace(FontFile, 30); err != nil {
 					panic(err)
 				}
-				three.DrawString(yw.Vlist[k].Name+func(i int) (s string) {
+				three.DrawString(yw.Vlist[k].Name+func(i int) (s string) { //副词条名
 					for p := 0; p < i; p++ {
 						s += "↑"
 					}

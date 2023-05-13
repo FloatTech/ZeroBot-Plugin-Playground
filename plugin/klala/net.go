@@ -154,11 +154,13 @@ type relics struct {
 	Object relicsdata `json:"object"`
 }
 type relicsdata struct {
-	RelicID int     `json:"relicId"` //套装id
-	Name    string  `json:"name"`
-	Type    int     `json:"type"`
-	MainV   vlist   `json:"main"`
-	Vlist   []vlist `json:"vlist"`
+	SetID int     `json:"relicId"` //套装id
+	Name  string  `json:"name"`
+	Star  int     `json:"star"`
+	Type  int     `json:"type"`
+	Level float64 `json:"level"`
+	MainV vlist   `json:"main"`
+	Vlist []vlist `json:"vlist"`
 }
 type vlist struct {
 	Name  string `json:"valname"`

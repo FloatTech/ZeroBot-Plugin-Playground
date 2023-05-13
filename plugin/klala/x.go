@@ -145,6 +145,9 @@ func saveRoel(uid string) (m string, err error) {
 	}
 	// 映射本地结构
 	t := r.convertData()
+	if len(t.RoleData) < 1 {
+		return "", errors.New("ERROR: 展柜无展示角色")
+	}
 	es, err := json.Marshal(&t)
 	if err != nil {
 		return "", errors.New("ERROR: " + err.Error())
@@ -215,15 +218,17 @@ func (r info) convertData() thisdata {
 		for i := 0; i < len(v.RelicList); i++ {
 			affixID := strconv.Itoa(v.RelicList[i].ID - 10000)
 			mainSetID := relicConfig[strconv.Itoa(v.RelicList[i].ID)].SetID
+			mainData := affixMain[strconv.Itoa(relicConfig[strconv.Itoa(v.RelicList[i].ID)].MainAffixGroup)][strconv.Itoa(v.RelicList[i].MainAffixID)]
+			na := typeMap[mainData.Property]
 			switch v.RelicList[i].Type {
 			case 1:
 				t.RoleData[k].Relics.Head = relicsdata{
-					Name:    yi[strconv.Itoa(mainSetID)].Pieces.Head.Name,
-					RelicID: mainSetID,
-					Type:    1,
+					Name:  yi[strconv.Itoa(mainSetID)].Pieces.Head.Name,
+					SetID: mainSetID,
+					Type:  1,
+					Star:  v.RelicList[i].ID/10000 - 1,
+					Level: v.RelicList[i].Level,
 				}
-				mainData := affixMain[strconv.Itoa(relicConfig[strconv.Itoa(v.RelicList[i].ID)].MainAffixGroup)][strconv.Itoa(v.RelicList[i].MainAffixID)]
-				na := typeMap[mainData.Property]
 				t.RoleData[k].Relics.Head.MainV = vlist{
 					Name:  na,
 					Value: Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
@@ -238,12 +243,12 @@ func (r info) convertData() thisdata {
 				}
 			case 2:
 				t.RoleData[k].Relics.Hand = relicsdata{
-					Name:    yi[strconv.Itoa(mainSetID)].Pieces.Head.Name,
-					RelicID: mainSetID,
-					Type:    2,
+					Name:  yi[strconv.Itoa(mainSetID)].Pieces.Hands.Name,
+					SetID: mainSetID,
+					Type:  2,
+					Star:  v.RelicList[i].ID/10000 - 1,
+					Level: v.RelicList[i].Level,
 				}
-				mainData := affixMain[strconv.Itoa(relicConfig[strconv.Itoa(v.RelicList[i].ID)].MainAffixGroup)][strconv.Itoa(v.RelicList[i].MainAffixID)]
-				na := typeMap[mainData.Property]
 				t.RoleData[k].Relics.Hand.MainV = vlist{
 					Name:  na,
 					Value: Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
@@ -258,12 +263,12 @@ func (r info) convertData() thisdata {
 				}
 			case 3:
 				t.RoleData[k].Relics.Body = relicsdata{
-					Name:    yi[strconv.Itoa(mainSetID)].Pieces.Head.Name,
-					RelicID: mainSetID,
-					Type:    3,
+					Name:  yi[strconv.Itoa(mainSetID)].Pieces.Body.Name,
+					SetID: mainSetID,
+					Type:  3,
+					Star:  v.RelicList[i].ID/10000 - 1,
+					Level: v.RelicList[i].Level,
 				}
-				mainData := affixMain[strconv.Itoa(relicConfig[strconv.Itoa(v.RelicList[i].ID)].MainAffixGroup)][strconv.Itoa(v.RelicList[i].MainAffixID)]
-				na := typeMap[mainData.Property]
 				t.RoleData[k].Relics.Body.MainV = vlist{
 					Name:  na,
 					Value: Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
@@ -278,12 +283,12 @@ func (r info) convertData() thisdata {
 				}
 			case 4:
 				t.RoleData[k].Relics.Foot = relicsdata{
-					Name:    yi[strconv.Itoa(mainSetID)].Pieces.Head.Name,
-					RelicID: mainSetID,
-					Type:    4,
+					Name:  yi[strconv.Itoa(mainSetID)].Pieces.Feet.Name,
+					SetID: mainSetID,
+					Type:  4,
+					Star:  v.RelicList[i].ID/10000 - 1,
+					Level: v.RelicList[i].Level,
 				}
-				mainData := affixMain[strconv.Itoa(relicConfig[strconv.Itoa(v.RelicList[i].ID)].MainAffixGroup)][strconv.Itoa(v.RelicList[i].MainAffixID)]
-				na := typeMap[mainData.Property]
 				t.RoleData[k].Relics.Foot.MainV = vlist{
 					Name:  na,
 					Value: Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
@@ -298,12 +303,12 @@ func (r info) convertData() thisdata {
 				}
 			case 5:
 				t.RoleData[k].Relics.Neck = relicsdata{
-					Name:    yi[affixID[1:4]].Pieces.PlanarSphere.Name,
-					RelicID: relicConfig[strconv.Itoa(v.RelicList[i].ID)].SetID,
-					Type:    5,
+					Name:  yi[affixID[1:4]].Pieces.PlanarSphere.Name,
+					SetID: relicConfig[strconv.Itoa(v.RelicList[i].ID)].SetID,
+					Type:  5,
+					Star:  v.RelicList[i].ID/10000 - 1,
+					Level: v.RelicList[i].Level,
 				}
-				mainData := affixMain[strconv.Itoa(relicConfig[strconv.Itoa(v.RelicList[i].ID)].MainAffixGroup)][strconv.Itoa(v.RelicList[i].MainAffixID)]
-				na := typeMap[mainData.Property]
 				t.RoleData[k].Relics.Neck.MainV = vlist{
 					Name:  na,
 					Value: Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
@@ -318,12 +323,12 @@ func (r info) convertData() thisdata {
 				}
 			case 6:
 				t.RoleData[k].Relics.Object = relicsdata{
-					Name:    yi[affixID[1:4]].Pieces.LinkRope.Name,
-					RelicID: relicConfig[strconv.Itoa(v.RelicList[i].ID)].SetID,
-					Type:    6,
+					Name:  yi[affixID[1:4]].Pieces.LinkRope.Name,
+					SetID: relicConfig[strconv.Itoa(v.RelicList[i].ID)].SetID,
+					Type:  6,
+					Star:  v.RelicList[i].ID/10000 - 1,
+					Level: v.RelicList[i].Level,
 				}
-				mainData := affixMain[strconv.Itoa(relicConfig[strconv.Itoa(v.RelicList[i].ID)].MainAffixGroup)][strconv.Itoa(v.RelicList[i].MainAffixID)]
-				na := typeMap[mainData.Property]
 				t.RoleData[k].Relics.Object.MainV = vlist{
 					Name:  na,
 					Value: Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
