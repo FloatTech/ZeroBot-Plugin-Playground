@@ -21,6 +21,7 @@ const (
 	wifesPath       = "data/klala/kkk/json/nickname.json"
 	relicConfigPath = "data/klala/kkk/json/RelicConfig.json"
 	uidPath         = "data/klala/kkk/uid/"
+	wifeDataPath    = "data/klala/kkk/json/AvatarPromotionConfig.json"
 )
 
 func getuid(sqquid string) (uid int) { // 获取对应游戏uid
@@ -107,6 +108,12 @@ func getRelicConfig() (m relicConfigMap) {
 	return
 }
 
+func getWifeData() (m wifeData) {
+	txt, _ := os.ReadFile(wifeDataPath)
+	_ = json.Unmarshal(txt, &m)
+	return
+}
+
 // Ftoone 保留一位小数并转化string
 func Ftoone(f float64) string {
 	// return strconv.FormatFloat(f, 'f', 1, 64)
@@ -173,8 +180,10 @@ func (r info) convertData() thisdata {
 	affix := getAffix()
 	affixMain := getAffixMain()
 	relicConfig := getRelicConfig()
+	wifeData := getWifeData()
 	t.UID = strconv.Itoa(r.PlayerDetailInfo.UID)
 	t.Nickname = r.PlayerDetailInfo.NickName
+	t.Level = r.PlayerDetailInfo.Level
 	for k, v := range r.PlayerDetailInfo.DisplayAvatarList {
 		t.RoleData = append(t.RoleData, ro{
 			ID:   v.AvatarID,
@@ -182,21 +191,22 @@ func (r info) convertData() thisdata {
 			Name: wife.idmap("wife", strconv.Itoa(v.AvatarID)),
 			Rank: v.Rank,
 		})
+		//给基础值
+		thisWifeData := wifeData[strconv.Itoa(v.AvatarID)][strconv.Itoa(v.Promotion)]
 		t.RoleData[k].List = combat{
 			AvatarID:          v.AvatarID,
 			Level:             v.Level,
-			Promotion:         0,
-			HpBase:            0,
+			Promotion:         v.Promotion,
+			HpBase:            thisWifeData.HPBase.Value + thisWifeData.HPAdd.Value*float64(v.Level),
 			HpFinal:           0,
-			AttackBase:        0,
+			AttackBase:        thisWifeData.AttackBase.Value + thisWifeData.AttackAdd.Value*float64(v.Level),
 			AttackFinal:       0,
-			DefenseBase:       0,
+			DefenseBase:       thisWifeData.DefenceBase.Value + thisWifeData.DefenceAdd.Value*float64(v.Level),
 			DefenseFinal:      0,
-			SpeedBase:         0,
+			SpeedBase:         thisWifeData.SpeedBase.Value,
 			SpeedFinal:        0,
-			CriticalChance:    0,
-			CriticalDamage:    0,
-			HealRatio:         0,
+			CriticalChance:    thisWifeData.CriticalChance.Value,
+			CriticalDamage:    thisWifeData.CriticalDamage.Value,
 			StatusProbability: 0,
 			StatusResistance:  0,
 		}

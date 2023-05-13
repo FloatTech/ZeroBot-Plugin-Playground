@@ -96,6 +96,7 @@ type role struct {
 type thisdata struct {
 	UID      string `json:"uid"`
 	Nickname string `json:"nickname"`
+	Level    int    `json:"level"`
 	RoleData []ro   `json:"data"`
 }
 type ro struct {
@@ -113,15 +114,15 @@ type ro struct {
 type combat struct {
 	AvatarID          int     `json:"avatarId"` //角色序号
 	Level             int     `json:"level"`
-	Promotion         int     `json:"promotion"`   //突破次数
-	HpBase            float64 `json:"hpBase"`      //hp白值
-	HpFinal           float64 `json:"hpFinal"`     //总和
-	AttackBase        float64 `json:"attackBase"`  //akt白值
-	AttackFinal       float64 `json:"attackFinal"` //akt总和
-	DefenseBase       float64 `json:"defenseBase"` //防御
-	DefenseFinal      float64 `json:"defenseFinal"`
-	SpeedBase         int     `json:"speedBase"` //速度
-	SpeedFinal        float64 `json:"speedFinal"`
+	Promotion         int     `json:"promotion"`         //突破次数
+	HpBase            float64 `json:"hpBase"`            //hp白值
+	HpFinal           float64 `json:"hpFinal"`           //总和
+	AttackBase        float64 `json:"attackBase"`        //akt白值
+	AttackFinal       float64 `json:"attackFinal"`       //akt总和
+	DefenseBase       float64 `json:"defenseBase"`       //防御白值
+	DefenseFinal      float64 `json:"defenseFinal"`      //防御
+	SpeedBase         int     `json:"speedBase"`         //速度白值
+	SpeedFinal        float64 `json:"speedFinal"`        //速度
 	CriticalChance    float64 `json:"criticalChance"`    //暴击率
 	CriticalDamage    float64 `json:"criticalDamage"`    //暴击伤害
 	HealRatio         int     `json:"healRatio"`         //治疗
@@ -287,6 +288,48 @@ type yiwumap map[string]struct {
 	} `json:"pieces"`
 	VersionAdded string `json:"version_added"`
 	Icon         string `json:"icon"`
+}
+
+type wifeData map[string]wifeDataMap
+type wifeDataMap map[string]struct {
+	AvatarID          int `json:"AvatarID"`
+	Promotion         int `json:"Promotion"`
+	PromotionCostList []struct {
+		ItemID  int `json:"ItemID"`
+		ItemNum int `json:"ItemNum"`
+	} `json:"PromotionCostList"`
+	MaxLevel           int `json:"MaxLevel"`
+	PlayerLevelRequire int `json:"PlayerLevelRequire"`
+	AttackBase         struct {
+		Value float64 `json:"Value"`
+	} `json:"AttackBase"`
+	AttackAdd struct {
+		Value float64 `json:"Value"`
+	} `json:"AttackAdd"`
+	DefenceBase struct {
+		Value float64 `json:"Value"`
+	} `json:"DefenceBase"`
+	DefenceAdd struct {
+		Value float64 `json:"Value"`
+	} `json:"DefenceAdd"`
+	HPBase struct {
+		Value float64 `json:"Value"`
+	} `json:"HPBase"`
+	HPAdd struct {
+		Value float64 `json:"Value"`
+	} `json:"HPAdd"`
+	SpeedBase struct {
+		Value int `json:"Value"`
+	} `json:"SpeedBase"`
+	CriticalChance struct {
+		Value float64 `json:"Value"`
+	} `json:"CriticalChance"`
+	CriticalDamage struct {
+		Value float64 `json:"Value"`
+	} `json:"CriticalDamage"`
+	BaseAggro struct {
+		Value float64 `json:"Value"`
+	} `json:"BaseAggro"`
 }
 
 // 词条英文对应中文

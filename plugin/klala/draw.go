@@ -60,7 +60,7 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 		if err := zero.LoadFontFace(FiFile, 30); err != nil {
 			panic(err)
 		}
-		zero.DrawStringAnchored("UID:"+t.UID, 505, 180, 1, 0)
+		zero.DrawStringAnchored("UID:"+t.UID+"-LV."+strconv.Itoa(t.Level), 505, 180, 1, 0)
 		newying := Yinying(540, 200, 16, color.NRGBA{R: 0, G: 0, B: 0, A: 106})
 		dc.DrawImage(newying, 505, 20)
 		dc.DrawImage(zero.Image(), 505, 20)
@@ -94,24 +94,24 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 		one.DrawString("速度:", 70, 250)
 		one.DrawString("暴击率:", 70, 301.25)
 		one.DrawString("暴击伤害:", 70, 352.5)
-		one.DrawString("治疗加成:", 70, 403.75)
-		one.DrawString("效果命中:", 70, 455)
+		one.DrawString("效果命中:", 70, 403.75)
+		one.DrawString("效果抵抗:", 70, 455)
 		//值,一一对f应
 		if err := one.LoadFontFace(FiFile, 30); err != nil {
 			panic(err)
 		}
 		// 属性540*460,字30,间距15,60
-		one.SetRGB(1, 1, 1)                                                                              //白色
-		one.DrawStringAnchored("Lv"+strconv.Itoa(t.RoleData[n].List.Level), 470, 45, 1, 0)               //Lv
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.HpFinal), 470, 96.25, 1, 0)                     //生命
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.AttackFinal), 470, 147.5, 1, 0)                 //攻击
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.DefenseFinal), 470, 198.75, 1, 0)               //防御
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.SpeedFinal), 470, 250, 1, 0)                    //速度
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.CriticalChance*100)+"%", 470, 301.25, 1, 0)     //暴击
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.CriticalDamage*100)+"%", 470, 352.5, 1, 0)      //爆伤
-		one.DrawStringAnchored(Ftoone(float64(t.RoleData[n].List.HealRatio*100))+"%", 470, 403.75, 1, 0) //治疗加成
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.StatusProbability*100)+"%", 470, 455, 1, 0)     //效果命中
-		dc.DrawImage(Yinying(540, 470, 16, yinyinBlack127), 505, 240)                                    // 背景
+		one.SetRGB(1, 1, 1)                                                                             //白色
+		one.DrawStringAnchored("Lv"+strconv.Itoa(t.RoleData[n].List.Level), 470, 45, 1, 0)              //Lv
+		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.HpBase), 470, 96.25, 1, 0)                     //生命
+		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.AttackBase), 470, 147.5, 1, 0)                 //攻击
+		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.DefenseBase), 470, 198.75, 1, 0)               //防御
+		one.DrawStringAnchored(Ftoone(float64(t.RoleData[n].List.SpeedBase)), 470, 250, 1, 0)           //速度
+		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.CriticalChance*100)+"%", 470, 301.25, 1, 0)    //暴击
+		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.CriticalDamage*100)+"%", 470, 352.5, 1, 0)     //爆伤
+		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.StatusProbability*100)+"%", 470, 403.75, 1, 0) //效果命中
+		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.StatusResistance*100)+"%", 470, 455, 1, 0)     //效果抵抗
+		dc.DrawImage(Yinying(540, 470, 16, yinyinBlack127), 505, 240)                                   // 背景
 		dc.DrawImage(one.Image(), 505, 240)
 	}
 	// 光锥
