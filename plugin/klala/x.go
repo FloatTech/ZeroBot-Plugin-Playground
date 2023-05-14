@@ -340,12 +340,8 @@ func (r info) convertData() thisdata {
 								w.addList(typeMap[vvv[0].Type], vvv[0].Value)
 							}
 						}
-					} else {
-						if len(ywSetData[strconv.Itoa(kk)].Properties) > 0 {
-							if len(ywSetData[strconv.Itoa(kk)].Properties[0]) > 0 {
-								w.addList(typeMap[ywSetData[strconv.Itoa(kk)].Properties[0][0].Type], ywSetData[strconv.Itoa(kk)].Properties[0][0].Value)
-							}
-						}
+					} else if len(ywSetData[strconv.Itoa(kk)].Properties) > 0 && len(ywSetData[strconv.Itoa(kk)].Properties[0]) > 0 {
+						w.addList(typeMap[ywSetData[strconv.Itoa(kk)].Properties[0][0].Type], ywSetData[strconv.Itoa(kk)].Properties[0][0].Value)
 					}
 				}
 			}
