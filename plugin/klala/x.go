@@ -192,6 +192,7 @@ func (w *combat) addList(str string, val float64) {
 
 // ywsuit 遗物套装判断
 func ywsuit(syws []int) (sss map[int]int) {
+	sss = make(map[int]int)
 	ywMap := make(map[int]int)
 	for _, v := range syws {
 		i := ywMap[v]
@@ -332,7 +333,7 @@ func (r info) convertData() thisdata {
 					nnn := typeMap[affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].Property]
 					w.addList(nnn, float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value+float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value)
 				}
-				for kk, vv := range ywsuits {
+				for kk, vv := range ywsuit(ywsuits) {
 					if vv == 1 {
 						for _, vvv := range ywSetData[strconv.Itoa(kk)].Properties {
 							if len(vvv) > 0 {
