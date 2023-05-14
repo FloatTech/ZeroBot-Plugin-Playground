@@ -5,6 +5,7 @@ import (
 	"image/color"
 	"math"
 	"strconv"
+	"sync"
 
 	"github.com/FloatTech/gg"
 	img "github.com/FloatTech/imgfactory"
@@ -26,6 +27,9 @@ const (
 var skillList = []string{"_rank1.png", "_rank2.png", "_ultimate.png", "_rank4.png", "_skill.png", "_rank6.png", "_basic_atk.png", "_talent.png"} //0-5为星魂,6-7为普攻+天赋
 
 func (t *thisdata) drawcard(n int) (image.Image, error) {
+	var wg sync.WaitGroup
+	wg.Add(5)
+	yinyinBlack127 := color.NRGBA{R: 0, G: 0, B: 0, A: 127}
 	dc := gg.NewContext(1080, 1680)
 	dc.SetRGB(1, 1, 1)
 	if err := dc.LoadFontFace(FontFile, 40); err != nil {
@@ -45,7 +49,8 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 	sxx := lihui.Bounds().Size().X
 	dc.DrawImage(lihui, int(300-float64(sxx)/2), 0)
 	//昵称框图
-	{
+	go func() {
+		defer wg.Done()
 		zero := gg.NewContext(540, 200)
 		zero.SetRGB(1, 1, 1) //白色
 		//角色名字
@@ -64,9 +69,10 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 		newying := Yinying(540, 200, 16, color.NRGBA{R: 0, G: 0, B: 0, A: 106})
 		dc.DrawImage(newying, 505, 20)
 		dc.DrawImage(zero.Image(), 505, 20)
-	}
+	}()
 	//星魂
-	{
+	go func() {
+		defer wg.Done()
 		ten := gg.NewContext(470, 80)
 		for a := 0; a < 6; a++ {
 			if skillpic, err := gg.LoadImage(tPicPath + strconv.Itoa(t.RoleData[n].ID) + skillList[a]); err == nil {
@@ -78,10 +84,10 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 			}
 		}
 		dc.DrawImage(ten.Image(), 20, 630)
-	}
+	}()
 	//属性列表
-	yinyinBlack127 := color.NRGBA{R: 0, G: 0, B: 0, A: 127}
-	{
+	go func() {
+		defer wg.Done()
 		one := gg.NewContext(540, 470)
 		if err := one.LoadFontFace(FontFile, 30); err != nil {
 			panic(err)
@@ -113,9 +119,10 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.StatusResistance*100)+"%", 470, 455, 1, 0)     //效果抵抗
 		dc.DrawImage(Yinying(540, 470, 16, yinyinBlack127), 505, 240)                                   // 背景
 		dc.DrawImage(one.Image(), 505, 240)
-	}
+	}()
 	// 光锥
-	{
+	go func() {
+		defer wg.Done()
 		yinlight := Yinying(1040, 180, 16, yinyinBlack127)
 		two := gg.NewContext(1040, 180)
 		two.SetRGB(1, 1, 1) //白色
@@ -172,9 +179,10 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 		}
 		dc.DrawImage(yinlight, 20, 720)
 		dc.DrawImage(two.Image(), 20, 720)
-	}
+	}()
 	//遗物
-	{
+	go func() {
+		defer wg.Done()
 		yinsyw := Yinying(340, 350, 16, yinyinBlack127)
 		var yw relicsdata
 		for i := 0; i < 6; i++ {
@@ -275,11 +283,12 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 			dc.DrawImage(yinsyw, x, y)
 			dc.DrawImage(three.Image(), x, y)
 		}
-	}
+	}()
 	if err := dc.LoadFontFace(BaFile, 30); err != nil {
 		panic(err)
 	}
 	dc.DrawStringAnchored("Created By Zerobot-Plugin & Klala", 540, 1655, 0.5, 0.5)
+	wg.Wait()
 	return dc.Image(), nil
 }
 
