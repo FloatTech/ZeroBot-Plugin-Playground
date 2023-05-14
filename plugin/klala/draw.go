@@ -103,10 +103,10 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 		// 属性540*460,字30,间距15,60
 		one.SetRGB(1, 1, 1)                                                                             //白色
 		one.DrawStringAnchored("Lv"+strconv.Itoa(t.RoleData[n].List.Level), 470, 45, 1, 0)              //Lv
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.HpBase), 470, 96.25, 1, 0)                     //生命
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.AttackBase), 470, 147.5, 1, 0)                 //攻击
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.DefenseBase), 470, 198.75, 1, 0)               //防御
-		one.DrawStringAnchored(Ftoone(float64(t.RoleData[n].List.SpeedBase)), 470, 250, 1, 0)           //速度
+		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.HpFinal), 470, 96.25, 1, 0)                    //生命
+		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.AttackFinal), 470, 147.5, 1, 0)                //攻击
+		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.DefenseFinal), 470, 198.75, 1, 0)              //防御
+		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.SpeedFinal), 470, 250, 1, 0)                   //速度
 		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.CriticalChance*100)+"%", 470, 301.25, 1, 0)    //暴击
 		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.CriticalDamage*100)+"%", 470, 352.5, 1, 0)     //爆伤
 		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.StatusProbability*100)+"%", 470, 403.75, 1, 0) //效果命中

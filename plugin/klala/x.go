@@ -14,14 +14,16 @@ import (
 )
 
 const (
-	affixMainFile   = "data/klala/kkk/json/RelicMainAffixConfig.json"
-	affixPath       = "data/klala/kkk/json/RelicSubAffixConfig.json"
-	yiWuPath        = "data/klala/kkk/json/relics.json"
-	lightJSONPath   = "data/klala/kkk/json/light_cones.json"
-	wifesPath       = "data/klala/kkk/json/nickname.json"
-	relicConfigPath = "data/klala/kkk/json/RelicConfig.json"
+	affixMainFile   = "data/klala/kkk/json/RelicMainAffixConfig.json" //主词条属性
+	affixFile       = "data/klala/kkk/json/RelicSubAffixConfig.json"  //副词条属性
+	yiWuPath        = "data/klala/kkk/json/relics.json"               //遗物介绍
+	lightJSONPath   = "data/klala/kkk/json/light_cones.json"          //光锥详情
+	wifesPath       = "data/klala/kkk/json/nickname.json"             //别名
+	relicConfigPath = "data/klala/kkk/json/RelicConfig.json"          //遗物对应属性
 	uidPath         = "data/klala/kkk/uid/"
-	wifeDataPath    = "data/klala/kkk/json/AvatarPromotionConfig.json"
+	wifeDataPath    = "data/klala/kkk/json/AvatarPromotionConfig.json" //角色基础属性
+	lightsPath      = "data/klala/kkk/json/light_cone_promotions.json" //光锥属性
+	lightAffixPath  = "data/klala/kkk/json/light_cone_ranks.json"      //光锥副词条
 )
 
 func getuid(sqquid string) (uid int) { // 获取对应游戏uid
@@ -91,7 +93,7 @@ func getYiWu() (m yiwumap) {
 }
 
 func getAffix() (m affixStarMap) {
-	txt, _ := os.ReadFile(affixPath)
+	txt, _ := os.ReadFile(affixFile)
 	_ = json.Unmarshal(txt, &m)
 	return
 }
@@ -110,6 +112,18 @@ func getRelicConfig() (m relicConfigMap) {
 
 func getWifeData() (m wifeData) {
 	txt, _ := os.ReadFile(wifeDataPath)
+	_ = json.Unmarshal(txt, &m)
+	return
+}
+
+func getLightsData() (m lightData) {
+	txt, _ := os.ReadFile(lightsPath)
+	_ = json.Unmarshal(txt, &m)
+	return
+}
+
+func getLightAffix() (m lightAffix) {
+	txt, _ := os.ReadFile(lightAffixPath)
 	_ = json.Unmarshal(txt, &m)
 	return
 }
@@ -138,6 +152,35 @@ func sto100(val string) float64 {
 		return 1
 	}
 	return 100
+}
+
+// 计算总属性
+func (w *combat) addList(str string, val float64) {
+	switch str {
+	case "生命值":
+		w.HpFinal += val
+	case "大生命":
+		w.HpFinal += val * w.HpBase
+	case "攻击力":
+		w.AttackFinal += val
+	case "大攻击":
+		w.AttackFinal += val * w.AttackBase
+	case "防御力":
+		w.DefenseFinal += val
+	case "大防御":
+		w.DefenseFinal += val * w.DefenseBase
+	case "速度":
+		w.SpeedFinal += val
+	case "效果命中":
+		w.StatusProbability += val
+	case "效果抵抗":
+		w.StatusResistance += val
+	case "暴击率":
+		w.CriticalChance += val
+	case "暴击伤害":
+		w.CriticalDamage += val
+	default:
+	}
 }
 
 func saveRoel(uid string) (m string, err error) {
@@ -181,6 +224,8 @@ func (r info) convertData() thisdata {
 	affixMain := getAffixMain()
 	relicConfig := getRelicConfig()
 	wifeData := getWifeData()
+	lightsData := getLightsData()
+	lightAffix := getLightAffix()
 	t.UID = strconv.Itoa(r.PlayerDetailInfo.UID)
 	t.Nickname = r.PlayerDetailInfo.NickName
 	t.Level = r.PlayerDetailInfo.Level
@@ -197,14 +242,14 @@ func (r info) convertData() thisdata {
 			AvatarID:          v.AvatarID,
 			Level:             v.Level,
 			Promotion:         v.Promotion,
-			HpBase:            thisWifeData.HPBase.Value + thisWifeData.HPAdd.Value*float64(v.Level),
-			HpFinal:           0,
-			AttackBase:        thisWifeData.AttackBase.Value + thisWifeData.AttackAdd.Value*float64(v.Level),
-			AttackFinal:       0,
-			DefenseBase:       thisWifeData.DefenceBase.Value + thisWifeData.DefenceAdd.Value*float64(v.Level),
-			DefenseFinal:      0,
+			HpBase:            thisWifeData.HPBase.Value + thisWifeData.HPAdd.Value*float64(v.Level-1),
+			HpFinal:           thisWifeData.HPBase.Value + thisWifeData.HPAdd.Value*float64(v.Level-1),
+			AttackBase:        thisWifeData.AttackBase.Value + thisWifeData.AttackAdd.Value*float64(v.Level-1),
+			AttackFinal:       thisWifeData.AttackBase.Value + thisWifeData.AttackAdd.Value*float64(v.Level-1),
+			DefenseBase:       thisWifeData.DefenceBase.Value + thisWifeData.DefenceAdd.Value*float64(v.Level-1),
+			DefenseFinal:      thisWifeData.DefenceBase.Value + thisWifeData.DefenceAdd.Value*float64(v.Level-1),
 			SpeedBase:         thisWifeData.SpeedBase.Value,
-			SpeedFinal:        0,
+			SpeedFinal:        float64(thisWifeData.SpeedBase.Value),
 			CriticalChance:    thisWifeData.CriticalChance.Value,
 			CriticalDamage:    thisWifeData.CriticalDamage.Value,
 			StatusProbability: 0,
@@ -213,10 +258,27 @@ func (r info) convertData() thisdata {
 		t.RoleData[k].Light = light{
 			Name:      wife.idmap("light", strconv.Itoa(v.EquipmentID.ID)),
 			ID:        v.EquipmentID.ID,
-			Star:      lights[strconv.Itoa(v.EquipmentID.ID)].Rarity, //后期改
+			Star:      lights[strconv.Itoa(v.EquipmentID.ID)].Rarity,
 			Level:     v.EquipmentID.Level,
-			Promotion: v.Promotion,
+			Promotion: v.EquipmentID.Promotion,
 			Rank:      v.EquipmentID.Rank,
+		}
+		w := &t.RoleData[k].List
+		lD := lightsData[strconv.Itoa(v.EquipmentID.ID)].Values[v.EquipmentID.Promotion]
+		{
+			//光锥基础属性
+			w.HpFinal += lD.Hp.Base + lD.Hp.Step*float64(v.EquipmentID.Level-1)
+			w.AttackFinal += lD.Atk.Base + lD.Atk.Step*float64(v.EquipmentID.Level-1)
+			w.DefenseFinal += lD.Def.Base + lD.Def.Step*float64(v.EquipmentID.Level-1)
+			w.HpBase += lD.Hp.Base + lD.Hp.Step*float64(v.EquipmentID.Level-1)
+			w.AttackBase += lD.Atk.Base + lD.Atk.Step*float64(v.EquipmentID.Level-1)
+			w.DefenseBase += lD.Def.Base + lD.Def.Step*float64(v.EquipmentID.Level-1)
+			//副词条
+			if b := lightAffix[strconv.Itoa(v.EquipmentID.ID)].Properties; len(b) > 0 {
+				for _, bb := range b[v.EquipmentID.Rank-1] {
+					w.addList(typeMap[bb.Type], bb.Value)
+				}
+			}
 		}
 		t.RoleData[k].Skill = skill{
 			A: v.BehaviorList[0].Level,
@@ -230,6 +292,14 @@ func (r info) convertData() thisdata {
 			mainSetID := relicConfig[strconv.Itoa(v.RelicList[i].ID)].SetID
 			mainData := affixMain[strconv.Itoa(relicConfig[strconv.Itoa(v.RelicList[i].ID)].MainAffixGroup)][strconv.Itoa(v.RelicList[i].MainAffixID)]
 			na := typeMap[mainData.Property]
+			//属性计算
+			{
+				w.addList(na, v.RelicList[i].Level*mainData.LevelAdd.Value+mainData.BaseValue.Value)
+				for _, vv := range v.RelicList[i].RelicSubAffix {
+					nnn := typeMap[affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].Property]
+					w.addList(nnn, float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value+float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value)
+				}
+			}
 			switch v.RelicList[i].Type {
 			case 1:
 				t.RoleData[k].Relics.Head = relicsdata{

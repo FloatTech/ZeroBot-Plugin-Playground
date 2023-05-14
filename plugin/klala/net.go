@@ -332,6 +332,39 @@ type wifeDataMap map[string]struct {
 	} `json:"BaseAggro"`
 }
 
+type lightData map[string]struct {
+	ID     string `json:"id"`
+	Values []struct {
+		Hp struct {
+			Base float64 `json:"base"`
+			Step float64 `json:"step"`
+		} `json:"hp"`
+		Atk struct {
+			Base float64 `json:"base"`
+			Step float64 `json:"step"`
+		} `json:"atk"`
+		Def struct {
+			Base float64 `json:"base"`
+			Step float64 `json:"step"`
+		} `json:"def"`
+	} `json:"values"`
+	Materials [][]struct {
+		ID  string `json:"id"`
+		Num int    `json:"num"`
+	} `json:"materials"`
+}
+
+type lightAffix map[string]struct {
+	ID         string      `json:"id"`
+	Skill      string      `json:"skill"`
+	Desc       string      `json:"desc"`
+	Params     [][]float64 `json:"params"`
+	Properties [][]struct {
+		Type  string  `json:"type"`
+		Value float64 `json:"value"`
+	} `json:"properties"`
+}
+
 // 词条英文对应中文
 var typeMap = map[string]string{
 	"MaxHP":                     "生命值",
