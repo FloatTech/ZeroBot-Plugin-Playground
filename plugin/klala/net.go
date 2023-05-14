@@ -290,46 +290,42 @@ type yiwumap map[string]struct {
 	Icon         string `json:"icon"`
 }
 
-type wifeData map[string]wifeDataMap
-type wifeDataMap map[string]struct {
-	AvatarID          int `json:"AvatarID"`
-	Promotion         int `json:"Promotion"`
-	PromotionCostList []struct {
-		ItemID  int `json:"ItemID"`
-		ItemNum int `json:"ItemNum"`
-	} `json:"PromotionCostList"`
-	MaxLevel           int `json:"MaxLevel"`
-	PlayerLevelRequire int `json:"PlayerLevelRequire"`
-	AttackBase         struct {
-		Value float64 `json:"Value"`
-	} `json:"AttackBase"`
-	AttackAdd struct {
-		Value float64 `json:"Value"`
-	} `json:"AttackAdd"`
-	DefenceBase struct {
-		Value float64 `json:"Value"`
-	} `json:"DefenceBase"`
-	DefenceAdd struct {
-		Value float64 `json:"Value"`
-	} `json:"DefenceAdd"`
-	HPBase struct {
-		Value float64 `json:"Value"`
-	} `json:"HPBase"`
-	HPAdd struct {
-		Value float64 `json:"Value"`
-	} `json:"HPAdd"`
-	SpeedBase struct {
-		Value int `json:"Value"`
-	} `json:"SpeedBase"`
-	CriticalChance struct {
-		Value float64 `json:"Value"`
-	} `json:"CriticalChance"`
-	CriticalDamage struct {
-		Value float64 `json:"Value"`
-	} `json:"CriticalDamage"`
-	BaseAggro struct {
-		Value float64 `json:"Value"`
-	} `json:"BaseAggro"`
+type wifeData map[string]struct {
+	ID     string `json:"id"`
+	Values []struct {
+		Hp struct {
+			Base float64 `json:"base"`
+			Step float64 `json:"step"`
+		} `json:"hp"`
+		Atk struct {
+			Base float64 `json:"base"`
+			Step float64 `json:"step"`
+		} `json:"atk"`
+		Def struct {
+			Base float64 `json:"base"`
+			Step float64 `json:"step"`
+		} `json:"def"`
+		Spd struct {
+			Base float64 `json:"base"`
+			Step float64 `json:"step"`
+		} `json:"spd"`
+		Taunt struct {
+			Base float64 `json:"base"`
+			Step float64 `json:"step"`
+		} `json:"taunt"`
+		CritRate struct {
+			Base float64 `json:"base"`
+			Step float64 `json:"step"`
+		} `json:"crit_rate"`
+		CritDmg struct {
+			Base float64 `json:"base"`
+			Step float64 `json:"step"`
+		} `json:"crit_dmg"`
+	} `json:"values"`
+	Materials [][]struct {
+		ID  string `json:"id"`
+		Num int    `json:"num"`
+	} `json:"materials"`
 }
 
 type lightData map[string]struct {

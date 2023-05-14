@@ -14,17 +14,17 @@ import (
 )
 
 const (
-	affixMainFile   = "data/klala/kkk/json/RelicMainAffixConfig.json" //主词条属性
-	affixFile       = "data/klala/kkk/json/RelicSubAffixConfig.json"  //副词条属性
-	yiWuPath        = "data/klala/kkk/json/relics.json"               //遗物介绍
-	lightJSONPath   = "data/klala/kkk/json/light_cones.json"          //光锥详情
-	wifesPath       = "data/klala/kkk/json/nickname.json"             //别名
-	relicConfigPath = "data/klala/kkk/json/RelicConfig.json"          //遗物对应属性
 	uidPath         = "data/klala/kkk/uid/"
-	wifeDataPath    = "data/klala/kkk/json/AvatarPromotionConfig.json" //角色基础属性
+	affixMainFile   = "data/klala/kkk/json/RelicMainAffixConfig.json"  //主词条属性
+	affixFile       = "data/klala/kkk/json/RelicSubAffixConfig.json"   //副词条属性
+	relicConfigPath = "data/klala/kkk/json/RelicConfig.json"           //遗物对应属性
+	ywSetPath       = "data/klala/kkk/json/relic_sets.json"            //遗物Set属性
+	yiWuPath        = "data/klala/kkk/json/relics.json"                //遗物介绍
+	wifesPath       = "data/klala/kkk/json/nickname.json"              //别名
+	wifeDataPath    = "data/klala/kkk/json/character_promotions.json"  //角色基础属性
 	lightsPath      = "data/klala/kkk/json/light_cone_promotions.json" //光锥属性
 	lightAffixPath  = "data/klala/kkk/json/light_cone_ranks.json"      //光锥副词条
-	ywSetPath       = "data/klala/kkk/json/relic_sets.json"            //遗物Set属性
+	lightJSONPath   = "data/klala/kkk/json/light_cones.json"           //光锥详情
 )
 
 func getuid(sqquid string) (uid int) { // 获取对应游戏uid
@@ -191,23 +191,14 @@ func (w *combat) addList(str string, val float64) {
 }
 
 // ywsuit 遗物套装判断
-func ywsuit(syws []int) (sss map[int]int) {
-	sss = make(map[int]int)
+func ywsuit(syws []int) map[int]int {
 	ywMap := make(map[int]int)
 	for _, v := range syws {
 		i := ywMap[v]
 		ywMap[v] = i + 1
 	}
 	ywMap[0] = 0
-	for k, v := range ywMap {
-		if v >= 2 {
-			sss[k] = 0
-		}
-		if v >= 4 {
-			sss[k] = 1
-		}
-	}
-	return
+	return ywMap
 }
 func saveRoel(uid string) (m string, err error) {
 	data, err := getRole(uid)
@@ -243,7 +234,6 @@ func saveRoel(uid string) (m string, err error) {
 
 func (r info) convertData() thisdata {
 	t := new(thisdata)
-	ywsuits := []int{}
 	wife := getWifeOrWq()
 	lights := getLights()
 	yi := getYiWu()
@@ -258,6 +248,7 @@ func (r info) convertData() thisdata {
 	t.Nickname = r.PlayerDetailInfo.NickName
 	t.Level = r.PlayerDetailInfo.Level
 	for k, v := range r.PlayerDetailInfo.DisplayAvatarList {
+		ywsuits := []int{}
 		t.RoleData = append(t.RoleData, ro{
 			ID:   v.AvatarID,
 			Star: v.EquipmentID.Rank + 4,
@@ -265,21 +256,21 @@ func (r info) convertData() thisdata {
 			Rank: v.Rank,
 		})
 		//给基础值
-		thisWifeData := wifeData[strconv.Itoa(v.AvatarID)][strconv.Itoa(v.Promotion)]
+		thisWifeData := wifeData[strconv.Itoa(v.AvatarID)].Values[v.Promotion]
 		t.RoleData[k].List = combat{
 			AvatarID:          v.AvatarID,
 			Level:             v.Level,
 			Promotion:         v.Promotion,
-			HpBase:            thisWifeData.HPBase.Value + thisWifeData.HPAdd.Value*float64(v.Level-1),
-			HpFinal:           thisWifeData.HPBase.Value + thisWifeData.HPAdd.Value*float64(v.Level-1),
-			AttackBase:        thisWifeData.AttackBase.Value + thisWifeData.AttackAdd.Value*float64(v.Level-1),
-			AttackFinal:       thisWifeData.AttackBase.Value + thisWifeData.AttackAdd.Value*float64(v.Level-1),
-			DefenseBase:       thisWifeData.DefenceBase.Value + thisWifeData.DefenceAdd.Value*float64(v.Level-1),
-			DefenseFinal:      thisWifeData.DefenceBase.Value + thisWifeData.DefenceAdd.Value*float64(v.Level-1),
-			SpeedBase:         thisWifeData.SpeedBase.Value,
-			SpeedFinal:        float64(thisWifeData.SpeedBase.Value),
-			CriticalChance:    thisWifeData.CriticalChance.Value,
-			CriticalDamage:    thisWifeData.CriticalDamage.Value,
+			HpBase:            thisWifeData.Hp.Base + thisWifeData.Hp.Step*float64(v.Level-1),
+			HpFinal:           thisWifeData.Hp.Base + thisWifeData.Hp.Step*float64(v.Level-1),
+			AttackBase:        thisWifeData.Atk.Base + thisWifeData.Atk.Step*float64(v.Level-1),
+			AttackFinal:       thisWifeData.Atk.Base + thisWifeData.Atk.Step*float64(v.Level-1),
+			DefenseBase:       thisWifeData.Def.Base + thisWifeData.Def.Step*float64(v.Level-1),
+			DefenseFinal:      thisWifeData.Def.Base + thisWifeData.Def.Step*float64(v.Level-1),
+			SpeedBase:         int(thisWifeData.Spd.Base),
+			SpeedFinal:        thisWifeData.Spd.Base,
+			CriticalChance:    thisWifeData.CritRate.Base,
+			CriticalDamage:    thisWifeData.CritDmg.Base,
 			StatusProbability: 0,
 			StatusResistance:  0,
 		}
@@ -334,10 +325,10 @@ func (r info) convertData() thisdata {
 					w.addList(nnn, float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value+float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value)
 				}
 				for kk, vv := range ywsuit(ywsuits) {
-					if vv == 1 {
+					if vv > 3 {
 						for _, vvv := range ywSetData[strconv.Itoa(kk)].Properties {
-							if len(vvv) > 0 {
-								w.addList(typeMap[vvv[0].Type], vvv[0].Value)
+							for _, vvvv := range vvv {
+								w.addList(typeMap[vvvv.Type], vvvv.Value)
 							}
 						}
 					} else if len(ywSetData[strconv.Itoa(kk)].Properties) > 0 && len(ywSetData[strconv.Itoa(kk)].Properties[0]) > 0 {
