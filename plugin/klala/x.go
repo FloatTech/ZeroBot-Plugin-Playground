@@ -24,6 +24,7 @@ const (
 	wifeDataPath    = "data/klala/kkk/json/AvatarPromotionConfig.json" //角色基础属性
 	lightsPath      = "data/klala/kkk/json/light_cone_promotions.json" //光锥属性
 	lightAffixPath  = "data/klala/kkk/json/light_cone_ranks.json"      //光锥副词条
+	ywSetPath       = "data/klala/kkk/json/relic_sets.json"            //遗物Set属性
 )
 
 func getuid(sqquid string) (uid int) { // 获取对应游戏uid
@@ -128,6 +129,12 @@ func getLightAffix() (m lightAffix) {
 	return
 }
 
+func getYiwuSet() (m ywSetData) {
+	txt, _ := os.ReadFile(ywSetPath)
+	_ = json.Unmarshal(txt, &m)
+	return
+}
+
 // Ftoone 保留一位小数并转化string
 func Ftoone(f float64) string {
 	// return strconv.FormatFloat(f, 'f', 1, 64)
@@ -183,6 +190,24 @@ func (w *combat) addList(str string, val float64) {
 	}
 }
 
+// ywsuit 遗物套装判断
+func ywsuit(syws []int) (sss map[int]int) {
+	ywMap := make(map[int]int)
+	for _, v := range syws {
+		i := ywMap[v]
+		ywMap[v] = i + 1
+	}
+	ywMap[0] = 0
+	for k, v := range ywMap {
+		if v >= 2 {
+			sss[k] = 0
+		}
+		if v >= 4 {
+			sss[k] = 1
+		}
+	}
+	return
+}
 func saveRoel(uid string) (m string, err error) {
 	data, err := getRole(uid)
 	if err != nil {
@@ -217,6 +242,7 @@ func saveRoel(uid string) (m string, err error) {
 
 func (r info) convertData() thisdata {
 	t := new(thisdata)
+	ywsuits := []int{}
 	wife := getWifeOrWq()
 	lights := getLights()
 	yi := getYiWu()
@@ -226,6 +252,7 @@ func (r info) convertData() thisdata {
 	wifeData := getWifeData()
 	lightsData := getLightsData()
 	lightAffix := getLightAffix()
+	ywSetData := getYiwuSet()
 	t.UID = strconv.Itoa(r.PlayerDetailInfo.UID)
 	t.Nickname = r.PlayerDetailInfo.NickName
 	t.Level = r.PlayerDetailInfo.Level
@@ -292,12 +319,33 @@ func (r info) convertData() thisdata {
 			mainSetID := relicConfig[strconv.Itoa(v.RelicList[i].ID)].SetID
 			mainData := affixMain[strconv.Itoa(relicConfig[strconv.Itoa(v.RelicList[i].ID)].MainAffixGroup)][strconv.Itoa(v.RelicList[i].MainAffixID)]
 			na := typeMap[mainData.Property]
+			//遗物套装加成
+			if v.RelicList[i].Type < 5 || v.RelicList[i].Type > 0 {
+				ywsuits = append(ywsuits, mainSetID)
+			} else {
+				ywsuits = append(ywsuits, relicConfig[strconv.Itoa(v.RelicList[i].ID)].SetID)
+			}
 			//属性计算
 			{
 				w.addList(na, v.RelicList[i].Level*mainData.LevelAdd.Value+mainData.BaseValue.Value)
 				for _, vv := range v.RelicList[i].RelicSubAffix {
 					nnn := typeMap[affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].Property]
 					w.addList(nnn, float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value+float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value)
+				}
+				for kk, vv := range ywsuits {
+					if vv == 1 {
+						for _, vvv := range ywSetData[strconv.Itoa(kk)].Properties {
+							if len(vvv) > 0 {
+								w.addList(typeMap[vvv[0].Type], vvv[0].Value)
+							}
+						}
+					} else {
+						if len(ywSetData[strconv.Itoa(kk)].Properties) > 0 {
+							if len(ywSetData[strconv.Itoa(kk)].Properties[0]) > 0 {
+								w.addList(typeMap[ywSetData[strconv.Itoa(kk)].Properties[0][0].Type], ywSetData[strconv.Itoa(kk)].Properties[0][0].Value)
+							}
+						}
+					}
 				}
 			}
 			switch v.RelicList[i].Type {

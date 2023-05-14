@@ -365,6 +365,16 @@ type lightAffix map[string]struct {
 	} `json:"properties"`
 }
 
+type ywSetData map[string]struct {
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	Properties [][]struct {
+		Type  string  `json:"type"`
+		Value float64 `json:"value"`
+	} `json:"properties"`
+	Icon string `json:"icon"`
+}
+
 // 词条英文对应中文
 var typeMap = map[string]string{
 	"MaxHP":                     "生命值",
