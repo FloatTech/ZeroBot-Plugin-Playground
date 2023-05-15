@@ -22,6 +22,7 @@ const (
 	yiWuPath        = "data/klala/kkk/json/relics.json"                //遗物介绍
 	wifesPath       = "data/klala/kkk/json/nickname.json"              //别名
 	wifeDataPath    = "data/klala/kkk/json/character_promotions.json"  //角色基础属性
+	wifeTreePath    = "data/klala/kkk/json/character_skill_trees.json" //角色行迹属性
 	lightsPath      = "data/klala/kkk/json/light_cone_promotions.json" //光锥属性
 	lightAffixPath  = "data/klala/kkk/json/light_cone_ranks.json"      //光锥副词条
 	lightJSONPath   = "data/klala/kkk/json/light_cones.json"           //光锥详情
@@ -135,6 +136,12 @@ func getYiwuSet() (m ywSetData) {
 	return
 }
 
+func getWifeTree() (m wifeTrees) {
+	txt, _ := os.ReadFile(wifeTreePath)
+	_ = json.Unmarshal(txt, &m)
+	return
+}
+
 // Ftoone 保留一位小数并转化string
 func Ftoone(f float64) string {
 	// return strconv.FormatFloat(f, 'f', 1, 64)
@@ -244,6 +251,7 @@ func (r info) convertData() thisdata {
 	lightsData := getLightsData()
 	lightAffix := getLightAffix()
 	ywSetData := getYiwuSet()
+	wifeTree := getWifeTree()
 	t.UID = strconv.Itoa(r.PlayerDetailInfo.UID)
 	t.Nickname = r.PlayerDetailInfo.NickName
 	t.Level = r.PlayerDetailInfo.Level
@@ -306,15 +314,21 @@ func (r info) convertData() thisdata {
 			T: v.BehaviorList[3].Level,
 			F: v.BehaviorList[4].Level,
 		}
+		//遗迹属性加成
+		for _, vv := range v.BehaviorList {
+			if vv.BehaviorID%1000 > 200 {
+				for _, vvv := range wifeTree[strconv.Itoa(vv.BehaviorID)].Levels[0].Properties {
+					w.addList(typeMap[vvv.Type], vvv.Value)
+				}
+			}
+		}
 		for i := 0; i < len(v.RelicList); i++ {
 			affixID := strconv.Itoa(v.RelicList[i].ID - 10000)
 			mainSetID := relicConfig[strconv.Itoa(v.RelicList[i].ID)].SetID
 			mainData := affixMain[strconv.Itoa(relicConfig[strconv.Itoa(v.RelicList[i].ID)].MainAffixGroup)][strconv.Itoa(v.RelicList[i].MainAffixID)]
 			na := typeMap[mainData.Property]
 			//遗物套装加成
-
 			ywsuits = append(ywsuits, mainSetID)
-
 			//属性计算
 			{
 				w.addList(na, v.RelicList[i].Level*mainData.LevelAdd.Value+mainData.BaseValue.Value)

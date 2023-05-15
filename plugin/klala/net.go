@@ -371,6 +371,25 @@ type ywSetData map[string]struct {
 	Icon string `json:"icon"`
 }
 
+type wifeTrees map[string]struct {
+	ID       string `json:"id"`
+	MaxLevel int    `json:"max_level"`
+	Anchor   string `json:"anchor"`
+	//	PrePoints     []any  `json:"pre_points"`
+	//	LevelUpSkills []any  `json:"level_up_skills"`
+	Levels []struct {
+		Promotion  int `json:"promotion"`
+		Properties []struct {
+			Type  string  `json:"type"`
+			Value float64 `json:"value"`
+		} `json:"properties"`
+		Materials []struct {
+			ID  string `json:"id"`
+			Num int    `json:"num"`
+		} `json:"materials"`
+	} `json:"levels"`
+}
+
 // 词条英文对应中文
 var typeMap = map[string]string{
 	"MaxHP":                     "生命值",
