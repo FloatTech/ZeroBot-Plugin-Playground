@@ -3,7 +3,6 @@ package klala
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 	"os/exec"
 	"strconv"
@@ -449,8 +448,6 @@ func (r info) convertData() thisdata {
 		}
 		//套装属性
 		{
-			fmt.Println(k, "位置2,暴击率", t.RoleData[k].List.CriticalChance)
-			fmt.Println(ywsuit(ywsuits))
 			for kk, vv := range ywsuit(ywsuits) {
 				if vv > 3 {
 					for _, vvv := range ywSetData[strconv.Itoa(kk)].Properties {
@@ -468,7 +465,6 @@ func (r info) convertData() thisdata {
 					}
 				}
 			}
-			fmt.Println(k, "位置3,暴击率", t.RoleData[k].List.CriticalChance)
 		}
 
 	}
