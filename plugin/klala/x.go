@@ -3,6 +3,7 @@ package klala
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"strconv"
@@ -312,28 +313,15 @@ func (r info) convertData() thisdata {
 			mainData := affixMain[strconv.Itoa(relicConfig[strconv.Itoa(v.RelicList[i].ID)].MainAffixGroup)][strconv.Itoa(v.RelicList[i].MainAffixID)]
 			na := typeMap[mainData.Property]
 			//遗物套装加成
-			if v.RelicList[i].Type < 5 || v.RelicList[i].Type > 0 {
-				ywsuits = append(ywsuits, mainSetID)
-			} else {
-				ywsuits = append(ywsuits, relicConfig[strconv.Itoa(v.RelicList[i].ID)].SetID)
-			}
+
+			ywsuits = append(ywsuits, mainSetID)
+
 			//属性计算
 			{
 				w.addList(na, v.RelicList[i].Level*mainData.LevelAdd.Value+mainData.BaseValue.Value)
 				for _, vv := range v.RelicList[i].RelicSubAffix {
 					nnn := typeMap[affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].Property]
 					w.addList(nnn, float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value+float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value)
-				}
-				for kk, vv := range ywsuit(ywsuits) {
-					if vv > 3 {
-						for _, vvv := range ywSetData[strconv.Itoa(kk)].Properties {
-							for _, vvvv := range vvv {
-								w.addList(typeMap[vvvv.Type], vvvv.Value)
-							}
-						}
-					} else if len(ywSetData[strconv.Itoa(kk)].Properties) > 1 && len(ywSetData[strconv.Itoa(kk)].Properties[0]) > 0 && vv > 1 {
-						w.addList(typeMap[ywSetData[strconv.Itoa(kk)].Properties[0][0].Type], ywSetData[strconv.Itoa(kk)].Properties[0][0].Value)
-					}
 				}
 			}
 			switch v.RelicList[i].Type {
@@ -458,6 +446,29 @@ func (r info) convertData() thisdata {
 					})
 				}
 			}
+		}
+		//套装属性
+		{
+			fmt.Println(k, "位置2,暴击率", t.RoleData[k].List.CriticalChance)
+			fmt.Println(ywsuit(ywsuits))
+			for kk, vv := range ywsuit(ywsuits) {
+				if vv > 3 {
+					for _, vvv := range ywSetData[strconv.Itoa(kk)].Properties {
+						for _, vvvv := range vvv {
+							w.addList(typeMap[vvvv.Type], vvvv.Value)
+						}
+					}
+				} else if vv > 1 {
+					for _, vvv := range ywSetData[strconv.Itoa(kk)].Properties {
+						for _, vvvv := range vvv {
+							w.addList(typeMap[vvvv.Type], vvvv.Value)
+							break
+						}
+						break
+					}
+				}
+			}
+			fmt.Println(k, "位置3,暴击率", t.RoleData[k].List.CriticalChance)
 		}
 
 	}
