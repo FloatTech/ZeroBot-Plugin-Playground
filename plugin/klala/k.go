@@ -64,7 +64,7 @@ func init() { // 主函数
 			ctx.SendChain(message.Text("-请输入角色全名"))
 			return
 		}
-		data, err := os.ReadFile("data/klala/kkk/js/" + uid + ".klala")
+		data, err := os.ReadFile(jsPath + uid + ".klala")
 		if err != nil {
 			ctx.SendChain(message.Text("-未找到本地缓存数据"))
 			return
@@ -109,7 +109,7 @@ func init() { // 主函数
 			return
 		}
 		sqquid := strconv.Itoa(int(ctx.Event.UserID))
-		file, _ := os.OpenFile("data/klala/kkk/uid/"+sqquid+".klala", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+		file, _ := os.OpenFile(uidPath+sqquid+".klala", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		_, _ = file.WriteString(suid)
 		file.Close()
 		ctx.SendChain(message.Text("-绑定uid", suid, "成功,尝试获取角色信息"))
@@ -135,7 +135,7 @@ func init() { // 主函数
 		cds = c
 		ctx.SendChain(message.Text("-设置CD为", cs, "S"))
 	})
-	en.OnRegex(`^*(强制)?更新klala$`, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(`^\*(强制)?更新klala$`, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		var cmd *exec.Cmd
 		var p = file.BOTPATH + "/data/klala/"
 		if ctx.State["regex_matched"].([]string)[1] != "" {
@@ -156,6 +156,10 @@ func init() { // 主函数
 			ctx.SendChain(message.Text("运行失败: ", err, "\n", helper.BytesToString(output)))
 			return
 		}
-		ctx.SendChain(message.Text("运行成功: ", helper.BytesToString(output)))
+		o := helper.BytesToString(output)
+		if len(o) > 500 {
+			o = o[:500] + "\n..."
+		}
+		ctx.SendChain(message.Text("运行成功: ", o))
 	})
 }

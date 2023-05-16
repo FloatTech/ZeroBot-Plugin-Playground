@@ -14,7 +14,8 @@ import (
 )
 
 const (
-	uidPath         = "data/klala/kkk/uid/"
+	jsPath          = "data/klala/user/js/"
+	uidPath         = "data/klala/user/uid/"
 	affixMainFile   = "data/klala/kkk/json/RelicMainAffixConfig.json"  //主词条属性
 	affixFile       = "data/klala/kkk/json/RelicSubAffixConfig.json"   //副词条属性
 	relicConfigPath = "data/klala/kkk/json/RelicConfig.json"           //遗物对应属性
@@ -226,7 +227,7 @@ func saveRoel(uid string) (m string, err error) {
 	if err != nil {
 		return "", errors.New("ERROR: " + err.Error())
 	}
-	file, _ := os.OpenFile("data/klala/kkk/js/"+t.UID+".klala", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	file, _ := os.OpenFile(jsPath+t.UID+".klala", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	_, _ = file.Write(es)
 	file.Close()
 	var msg strings.Builder
@@ -247,7 +248,6 @@ func (r *info) mergeRole() {
 	}
 	//未找到相同
 	r.PlayerDetailInfo.DisplayAvatarList = append(r.PlayerDetailInfo.DisplayAvatarList, r.PlayerDetailInfo.AssistAvatar)
-	return
 }
 func (r *info) convertData() thisdata {
 	t := new(thisdata)
@@ -508,14 +508,14 @@ func downdata(ctx *zero.Ctx) bool {
 		}
 		ctx.SendChain(message.Text("-下载资源文件成功..."))
 	}
-	if file.IsNotExist("data/klala/kkk/uid") {
-		err := os.MkdirAll("data/klala/kkk/uid", 0755) // 递归创建文件夹
+	if file.IsNotExist("data/klala/user/uid") {
+		err := os.MkdirAll("data/klala/user/uid", 0755) // 递归创建文件夹
 		if err != nil {
 			return false
 		}
 	}
-	if file.IsNotExist("data/klala/kkk/js") {
-		err := os.MkdirAll("data/klala/kkk/js", 0755) // 递归创建文件夹
+	if file.IsNotExist("data/klala/user/js") {
+		err := os.MkdirAll("data/klala/user/js", 0755) // 递归创建文件夹
 		if err != nil {
 			return false
 		}
