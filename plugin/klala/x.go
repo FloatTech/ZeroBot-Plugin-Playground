@@ -364,7 +364,7 @@ func (r *info) convertData() thisdata {
 				nb := typeMap[affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].Property]
 				tAffixVlist = append(tAffixVlist, vlist{
 					Name:  nb,
-					Value: Ftoone((float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value + float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value) * sto100(na)),
+					Value: Ftoone((float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value + float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value) * sto100(nb)),
 					Adds:  vv.Cnt,
 				})
 			}
