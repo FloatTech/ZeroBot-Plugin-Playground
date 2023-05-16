@@ -239,7 +239,17 @@ func saveRoel(uid string) (m string, err error) {
 	return
 }
 
-func (r info) convertData() thisdata {
+func (r *info) mergeRole() {
+	for _, v := range r.PlayerDetailInfo.DisplayAvatarList {
+		if v.AvatarID == r.PlayerDetailInfo.AssistAvatar.AvatarID {
+			return
+		}
+	}
+	//未找到相同
+	r.PlayerDetailInfo.DisplayAvatarList = append(r.PlayerDetailInfo.DisplayAvatarList, r.PlayerDetailInfo.AssistAvatar)
+	return
+}
+func (r *info) convertData() thisdata {
 	t := new(thisdata)
 	wife := getWifeOrWq()
 	lights := getLights()
@@ -255,6 +265,8 @@ func (r info) convertData() thisdata {
 	t.UID = strconv.Itoa(r.PlayerDetailInfo.UID)
 	t.Nickname = r.PlayerDetailInfo.NickName
 	t.Level = r.PlayerDetailInfo.Level
+	//合并助战角色
+	r.mergeRole()
 	for k, v := range r.PlayerDetailInfo.DisplayAvatarList {
 		ywsuits := []int{}
 		t.RoleData = append(t.RoleData, ro{
