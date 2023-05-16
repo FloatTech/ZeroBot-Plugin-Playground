@@ -79,7 +79,7 @@ func init() { // 主函数
 		var n = -1
 		// 匹配角色
 		for i, v := range t.RoleData {
-			if wifeid == strconv.Itoa(v.ID) {
+			if key == v.Name {
 				n = i
 			}
 		}

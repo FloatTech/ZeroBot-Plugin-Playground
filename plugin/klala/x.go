@@ -349,127 +349,56 @@ func (r *info) convertData() thisdata {
 					w.addList(nnn, float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value+float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value)
 				}
 			}
+			tRelicsdata := relicsdata{
+				SetID: mainSetID,
+				Type:  v.RelicList[i].Type,
+				Star:  v.RelicList[i].ID/10000 - 1,
+				Level: v.RelicList[i].Level,
+			}
+			tVlist := vlist{
+				Name:  na,
+				Value: Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
+			}
+			var tAffixVlist = []vlist{}
+			for _, vv := range v.RelicList[i].RelicSubAffix {
+				nb := typeMap[affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].Property]
+				tAffixVlist = append(tAffixVlist, vlist{
+					Name:  nb,
+					Value: Ftoone((float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value + float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value) * sto100(na)),
+					Adds:  vv.Cnt,
+				})
+			}
 			switch v.RelicList[i].Type {
 			case 1:
-				t.RoleData[k].Relics.Head = relicsdata{
-					Name:  yi[strconv.Itoa(mainSetID)].Pieces.Head.Name,
-					SetID: mainSetID,
-					Type:  1,
-					Star:  v.RelicList[i].ID/10000 - 1,
-					Level: v.RelicList[i].Level,
-				}
-				t.RoleData[k].Relics.Head.MainV = vlist{
-					Name:  na,
-					Value: Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
-				}
-				for _, vv := range v.RelicList[i].RelicSubAffix {
-					na = typeMap[affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].Property]
-					t.RoleData[k].Relics.Head.Vlist = append(t.RoleData[k].Relics.Head.Vlist, vlist{
-						Name:  na,
-						Value: Ftoone((float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value + float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value) * sto100(na)),
-						Adds:  vv.Cnt,
-					})
-				}
+				t.RoleData[k].Relics.Head = tRelicsdata
+				t.RoleData[k].Relics.Head.Name = yi[strconv.Itoa(mainSetID)].Pieces.Head.Name
+				t.RoleData[k].Relics.Head.MainV = tVlist
+				t.RoleData[k].Relics.Head.Vlist = append(t.RoleData[k].Relics.Head.Vlist, tAffixVlist...)
 			case 2:
-				t.RoleData[k].Relics.Hand = relicsdata{
-					Name:  yi[strconv.Itoa(mainSetID)].Pieces.Hands.Name,
-					SetID: mainSetID,
-					Type:  2,
-					Star:  v.RelicList[i].ID/10000 - 1,
-					Level: v.RelicList[i].Level,
-				}
-				t.RoleData[k].Relics.Hand.MainV = vlist{
-					Name:  na,
-					Value: Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
-				}
-				for _, vv := range v.RelicList[i].RelicSubAffix {
-					na = typeMap[affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].Property]
-					t.RoleData[k].Relics.Hand.Vlist = append(t.RoleData[k].Relics.Hand.Vlist, vlist{
-						Name:  na,
-						Value: Ftoone((float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value + float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value) * sto100(na)),
-						Adds:  vv.Cnt,
-					})
-				}
+				t.RoleData[k].Relics.Hand = tRelicsdata
+				t.RoleData[k].Relics.Hand.Name = yi[strconv.Itoa(mainSetID)].Pieces.Hands.Name
+				t.RoleData[k].Relics.Hand.MainV = tVlist
+				t.RoleData[k].Relics.Hand.Vlist = append(t.RoleData[k].Relics.Hand.Vlist, tAffixVlist...)
 			case 3:
-				t.RoleData[k].Relics.Body = relicsdata{
-					Name:  yi[strconv.Itoa(mainSetID)].Pieces.Body.Name,
-					SetID: mainSetID,
-					Type:  3,
-					Star:  v.RelicList[i].ID/10000 - 1,
-					Level: v.RelicList[i].Level,
-				}
-				t.RoleData[k].Relics.Body.MainV = vlist{
-					Name:  na,
-					Value: Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
-				}
-				for _, vv := range v.RelicList[i].RelicSubAffix {
-					na = typeMap[affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].Property]
-					t.RoleData[k].Relics.Body.Vlist = append(t.RoleData[k].Relics.Body.Vlist, vlist{
-						Name:  na,
-						Value: Ftoone((float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value + float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value) * sto100(na)),
-						Adds:  vv.Cnt,
-					})
-				}
+				t.RoleData[k].Relics.Body = tRelicsdata
+				t.RoleData[k].Relics.Body.Name = yi[strconv.Itoa(mainSetID)].Pieces.Body.Name
+				t.RoleData[k].Relics.Body.MainV = tVlist
+				t.RoleData[k].Relics.Body.Vlist = append(t.RoleData[k].Relics.Body.Vlist, tAffixVlist...)
 			case 4:
-				t.RoleData[k].Relics.Foot = relicsdata{
-					Name:  yi[strconv.Itoa(mainSetID)].Pieces.Feet.Name,
-					SetID: mainSetID,
-					Type:  4,
-					Star:  v.RelicList[i].ID/10000 - 1,
-					Level: v.RelicList[i].Level,
-				}
-				t.RoleData[k].Relics.Foot.MainV = vlist{
-					Name:  na,
-					Value: Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
-				}
-				for _, vv := range v.RelicList[i].RelicSubAffix {
-					na = typeMap[affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].Property]
-					t.RoleData[k].Relics.Foot.Vlist = append(t.RoleData[k].Relics.Foot.Vlist, vlist{
-						Name:  na,
-						Value: Ftoone((float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value + float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value) * sto100(na)),
-						Adds:  vv.Cnt,
-					})
-				}
+				t.RoleData[k].Relics.Foot = tRelicsdata
+				t.RoleData[k].Relics.Foot.Name = yi[strconv.Itoa(mainSetID)].Pieces.Feet.Name
+				t.RoleData[k].Relics.Foot.MainV = tVlist
+				t.RoleData[k].Relics.Foot.Vlist = append(t.RoleData[k].Relics.Foot.Vlist, tAffixVlist...)
 			case 5:
-				t.RoleData[k].Relics.Neck = relicsdata{
-					Name:  yi[affixID[1:4]].Pieces.PlanarSphere.Name,
-					SetID: relicConfig[strconv.Itoa(v.RelicList[i].ID)].SetID,
-					Type:  5,
-					Star:  v.RelicList[i].ID/10000 - 1,
-					Level: v.RelicList[i].Level,
-				}
-				t.RoleData[k].Relics.Neck.MainV = vlist{
-					Name:  na,
-					Value: Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
-				}
-				for _, vv := range v.RelicList[i].RelicSubAffix {
-					na = typeMap[affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].Property]
-					t.RoleData[k].Relics.Neck.Vlist = append(t.RoleData[k].Relics.Neck.Vlist, vlist{
-						Name:  na,
-						Value: Ftoone((float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value + float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value) * sto100(na)),
-						Adds:  vv.Cnt,
-					})
-				}
+				t.RoleData[k].Relics.Neck = tRelicsdata
+				t.RoleData[k].Relics.Neck.Name = yi[strconv.Itoa(mainSetID)].Pieces.PlanarSphere.Name
+				t.RoleData[k].Relics.Neck.MainV = tVlist
+				t.RoleData[k].Relics.Neck.Vlist = append(t.RoleData[k].Relics.Neck.Vlist, tAffixVlist...)
 			case 6:
-				t.RoleData[k].Relics.Object = relicsdata{
-					Name:  yi[affixID[1:4]].Pieces.LinkRope.Name,
-					SetID: relicConfig[strconv.Itoa(v.RelicList[i].ID)].SetID,
-					Type:  6,
-					Star:  v.RelicList[i].ID/10000 - 1,
-					Level: v.RelicList[i].Level,
-				}
-				t.RoleData[k].Relics.Object.MainV = vlist{
-					Name:  na,
-					Value: Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
-				}
-				for _, vv := range v.RelicList[i].RelicSubAffix {
-					na = typeMap[affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].Property]
-					t.RoleData[k].Relics.Object.Vlist = append(t.RoleData[k].Relics.Object.Vlist, vlist{
-						Name:  na,
-						Value: Ftoone((float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value + float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value) * sto100(na)),
-						Adds:  vv.Cnt,
-					})
-				}
+				t.RoleData[k].Relics.Object = tRelicsdata
+				t.RoleData[k].Relics.Object.Name = yi[strconv.Itoa(mainSetID)].Pieces.LinkRope.Name
+				t.RoleData[k].Relics.Object.MainV = tVlist
+				t.RoleData[k].Relics.Object.Vlist = append(t.RoleData[k].Relics.Object.Vlist, tAffixVlist...)
 			}
 		}
 		//套装属性
