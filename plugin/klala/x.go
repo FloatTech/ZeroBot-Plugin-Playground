@@ -24,6 +24,7 @@ const (
 	wifesPath       = "data/klala/kkk/json/nickname.json"              //别名
 	wifeDataPath    = "data/klala/kkk/json/character_promotions.json"  //角色基础属性
 	wifeTreePath    = "data/klala/kkk/json/character_skill_trees.json" //角色行迹属性
+	wifeIntrodPath  = "data/klala/kkk/json/characters.json"            //角色介绍
 	lightsPath      = "data/klala/kkk/json/light_cone_promotions.json" //光锥属性
 	lightAffixPath  = "data/klala/kkk/json/light_cone_ranks.json"      //光锥副词条
 	lightJSONPath   = "data/klala/kkk/json/light_cones.json"           //光锥详情
@@ -115,6 +116,12 @@ func getRelicConfig() (m relicConfigMap) {
 
 func getWifeData() (m wifeData) {
 	txt, _ := os.ReadFile(wifeDataPath)
+	_ = json.Unmarshal(txt, &m)
+	return
+}
+
+func getWifeIntrod() (m wifeIntrod) {
+	txt, _ := os.ReadFile(wifeIntrodPath)
 	_ = json.Unmarshal(txt, &m)
 	return
 }
@@ -262,6 +269,7 @@ func (r *info) convertData() thisdata {
 	lightAffix := getLightAffix()
 	ywSetData := getYiwuSet()
 	wifeTree := getWifeTree()
+	wifeIntrods := getWifeIntrod()
 	t.UID = strconv.Itoa(r.PlayerDetailInfo.UID)
 	t.Nickname = r.PlayerDetailInfo.NickName
 	t.Level = r.PlayerDetailInfo.Level
@@ -269,11 +277,14 @@ func (r *info) convertData() thisdata {
 	r.mergeRole()
 	for k, v := range r.PlayerDetailInfo.DisplayAvatarList {
 		ywsuits := []int{}
+		introd := wifeIntrods[strconv.Itoa(v.AvatarID)]
 		t.RoleData = append(t.RoleData, ro{
-			ID:   v.AvatarID,
-			Star: v.EquipmentID.Rank + 4,
-			Name: wife.idmap("wife", strconv.Itoa(v.AvatarID)),
-			Rank: v.Rank,
+			ID:      v.AvatarID,
+			Star:    v.EquipmentID.Rank + 4,
+			Name:    wife.idmap("wife", strconv.Itoa(v.AvatarID)),
+			Rank:    v.Rank,
+			Path:    introd.Path,
+			Element: introd.Element,
 		})
 		//给基础值
 		thisWifeData := wifeData[strconv.Itoa(v.AvatarID)].Values[v.Promotion]
@@ -414,7 +425,6 @@ func (r *info) convertData() thisdata {
 					for _, vvv := range ywSetData[strconv.Itoa(kk)].Properties {
 						for _, vvvv := range vvv {
 							w.addList(typeMap[vvvv.Type], vvvv.Value)
-							break
 						}
 						break
 					}

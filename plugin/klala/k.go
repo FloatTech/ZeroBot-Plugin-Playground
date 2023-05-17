@@ -44,7 +44,8 @@ func init() { // 主函数
 		}
 		if key == "" {
 			return
-		} else if key == "更新" {
+		}
+		if key == "更新" {
 			if currentTime-lastExecutionTime < cds {
 				ctx.SendChain(message.Text("-全局时间冷却中,剩余时间", cds-currentTime+lastExecutionTime, "s"))
 				return
@@ -81,6 +82,7 @@ func init() { // 主函数
 		for i, v := range t.RoleData {
 			if key == v.Name {
 				n = i
+				break
 			}
 		}
 		if n == -1 { // 在返回数据中未找到想要的角色

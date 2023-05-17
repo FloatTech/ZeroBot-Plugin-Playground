@@ -104,7 +104,7 @@ type ro struct {
 	Name    string `json:"name"`
 	Star    int    `json:"star"`
 	Rank    int    `json:"rank"`
-	Type    string `json:"type"`    //命途
+	Path    string `json:"path"`    //命途
 	Element string `json:"element"` //元素属性
 	List    combat `json:"combat"`  //属性列表
 	Light   light  `json:"light"`
@@ -388,6 +388,44 @@ type wifeTrees map[string]struct {
 			Num int    `json:"num"`
 		} `json:"materials"`
 	} `json:"levels"`
+}
+
+type wifeIntrod map[string]struct {
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Rarity   string `json:"rarity"`
+	Element  string `json:"element"`
+	Path     string `json:"path"`
+	Eidolons []struct {
+		ID     string `json:"id"`
+		Name   string `json:"name"`
+		Effect string `json:"effect"`
+		Icon   string `json:"icon"`
+	} `json:"eidolons"`
+	Skills struct {
+		BasicAtk  introdData `json:"basic_atk"`
+		Skill     introdData `json:"skill"`
+		Ultimate  introdData `json:"ultimate"`
+		Talent    introdData `json:"talent"`
+		Technique introdData `json:"technique"`
+	} `json:"skills"`
+	VersionAdded      string   `json:"version_added"`
+	Icon              string   `json:"icon"`
+	ElementIcon       string   `json:"element_icon"`
+	PathIcon          string   `json:"path_icon"`
+	Preview           string   `json:"preview"`
+	Portrait          string   `json:"portrait"`
+	CharacterOverview []string `json:"character_overview"`
+	CharacterMaterial string   `json:"character_material"`
+}
+type introdData struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Tag         string `json:"tag"`
+	MaxLevel    int    `json:"max_level"`
+	Effect      string `json:"effect"`
+	ElementType string `json:"element_type"`
+	Icon        string `json:"icon"`
 }
 
 // 词条英文对应中文
