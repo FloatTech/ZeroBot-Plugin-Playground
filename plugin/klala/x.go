@@ -205,8 +205,8 @@ func (w *combat) addList(str string, val float64) {
 	}
 }
 
-// ywsuit 遗物套装判断
-func ywsuit(syws []int) map[int]int {
+// ywtz 遗物套装判断
+func ywtz(syws []int) map[int]int {
 	ywMap := make(map[int]int)
 	for _, v := range syws {
 		i := ywMap[v]
@@ -276,7 +276,7 @@ func (r *info) convertData() thisdata {
 	//合并助战角色
 	r.mergeRole()
 	for k, v := range r.PlayerDetailInfo.DisplayAvatarList {
-		ywsuits := []int{}
+		ywtzs := []int{}
 		introd := wifeIntrods[strconv.Itoa(v.AvatarID)]
 		t.RoleData = append(t.RoleData, ro{
 			ID:      v.AvatarID,
@@ -351,7 +351,7 @@ func (r *info) convertData() thisdata {
 			mainData := affixMain[strconv.Itoa(relicConfig[strconv.Itoa(v.RelicList[i].ID)].MainAffixGroup)][strconv.Itoa(v.RelicList[i].MainAffixID)]
 			na := typeMap[mainData.Property]
 			//遗物套装加成
-			ywsuits = append(ywsuits, mainSetID)
+			ywtzs = append(ywtzs, mainSetID)
 			//属性计算
 			{
 				w.addList(na, v.RelicList[i].Level*mainData.LevelAdd.Value+mainData.BaseValue.Value)
@@ -414,7 +414,7 @@ func (r *info) convertData() thisdata {
 		}
 		//套装属性
 		{
-			for kk, vv := range ywsuit(ywsuits) {
+			for kk, vv := range ywtz(ywtzs) {
 				if vv > 1 {
 					for _, vvv := range ywSetData[strconv.Itoa(kk)].Properties {
 						for _, vvvv := range vvv {

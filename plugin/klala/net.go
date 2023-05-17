@@ -20,7 +20,7 @@ func getRole(uid string) (body []byte, err error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36 MicroMessenger/7.0.20.1781(0x6700143B) NetType/WIFI MiniProgramEnv/Windows WindowsWechat/WMPF XWEB/6763")
+	req.Header.Add("user-agent", "Zerobot-Plugin-KKK")
 	req.Header.Add("Accept", "*/*")
 
 	res, err := client.Do(req)
