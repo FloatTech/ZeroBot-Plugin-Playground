@@ -441,6 +441,7 @@ func downdata(ctx *zero.Ctx) bool {
 		cmd.Dir = file.BOTPATH + "/data/klala"
 		_, err := cmd.CombinedOutput()
 		if err != nil {
+			ctx.SendChain(message.Text("-下载资源文件失败...", err))
 			return false
 		}
 		ctx.SendChain(message.Text("-下载资源文件成功..."))
@@ -448,12 +449,14 @@ func downdata(ctx *zero.Ctx) bool {
 	if file.IsNotExist("data/klala/user/uid") {
 		err := os.MkdirAll("data/klala/user/uid", 0755) // 递归创建文件夹
 		if err != nil {
+			ctx.SendChain(message.Text("-ERROR: ", err))
 			return false
 		}
 	}
 	if file.IsNotExist("data/klala/user/js") {
 		err := os.MkdirAll("data/klala/user/js", 0755) // 递归创建文件夹
 		if err != nil {
+			ctx.SendChain(message.Text("-ERROR: ", err))
 			return false
 		}
 	}
