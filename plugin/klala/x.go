@@ -415,18 +415,14 @@ func (r *info) convertData() thisdata {
 		//套装属性
 		{
 			for kk, vv := range ywsuit(ywsuits) {
-				if vv > 3 {
+				if vv > 1 {
 					for _, vvv := range ywSetData[strconv.Itoa(kk)].Properties {
 						for _, vvvv := range vvv {
 							w.addList(typeMap[vvvv.Type], vvvv.Value)
 						}
-					}
-				} else if vv > 1 {
-					for _, vvv := range ywSetData[strconv.Itoa(kk)].Properties {
-						for _, vvvv := range vvv {
-							w.addList(typeMap[vvvv.Type], vvvv.Value)
+						if vv < 3 {
+							break
 						}
-						break
 					}
 				}
 			}

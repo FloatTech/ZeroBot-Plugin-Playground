@@ -237,59 +237,25 @@ type yiwumap map[string]struct {
 		Pieces4 string `json:"pieces4"`
 	} `json:"effects"`
 	Pieces struct {
-		Head struct {
-			RelicType     string `json:"relic_type"`
-			RelicTypeText string `json:"relic_type_text"`
-			Name          string `json:"name"`
-			Description   string `json:"description"`
-			Backstory     string `json:"backstory"`
-			Icon          string `json:"icon"`
-		} `json:"head"`
-		Hands struct {
-			RelicType     string `json:"relic_type"`
-			RelicTypeText string `json:"relic_type_text"`
-			Name          string `json:"name"`
-			Description   string `json:"description"`
-			Backstory     string `json:"backstory"`
-			Icon          string `json:"icon"`
-		} `json:"hands"`
-		Body struct {
-			RelicType     string `json:"relic_type"`
-			RelicTypeText string `json:"relic_type_text"`
-			Name          string `json:"name"`
-			Description   string `json:"description"`
-			Backstory     string `json:"backstory"`
-			Icon          string `json:"icon"`
-		} `json:"body"`
-		Feet struct {
-			RelicType     string `json:"relic_type"`
-			RelicTypeText string `json:"relic_type_text"`
-			Name          string `json:"name"`
-			Description   string `json:"description"`
-			Backstory     string `json:"backstory"`
-			Icon          string `json:"icon"`
-		} `json:"feet"`
-		PlanarSphere struct {
-			RelicType     string `json:"relic_type"`
-			RelicTypeText string `json:"relic_type_text"`
-			Name          string `json:"name"`
-			Description   string `json:"description"`
-			Backstory     string `json:"backstory"`
-			Icon          string `json:"icon"`
-		} `json:"planar_sphere"`
-		LinkRope struct {
-			RelicType     string `json:"relic_type"`
-			RelicTypeText string `json:"relic_type_text"`
-			Name          string `json:"name"`
-			Description   string `json:"description"`
-			Backstory     string `json:"backstory"`
-			Icon          string `json:"icon"`
-		} `json:"link_rope"`
+		Head         ropeData `json:"head"`
+		Hands        ropeData `json:"hands"`
+		Body         ropeData `json:"body"`
+		Feet         ropeData `json:"feet"`
+		PlanarSphere ropeData `json:"planar_sphere"`
+		LinkRope     ropeData `json:"link_rope"`
 	} `json:"pieces"`
 	VersionAdded string `json:"version_added"`
 	Icon         string `json:"icon"`
 }
 
+type ropeData struct {
+	RelicType     string `json:"relic_type"`
+	RelicTypeText string `json:"relic_type_text"`
+	Name          string `json:"name"`
+	Description   string `json:"description"`
+	Backstory     string `json:"backstory"`
+	Icon          string `json:"icon"`
+}
 type wifeData map[string]struct {
 	ID     string `json:"id"`
 	Values []struct {

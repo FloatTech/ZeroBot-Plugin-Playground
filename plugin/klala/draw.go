@@ -226,7 +226,6 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 			//圣遗物属性 主词条
 			//间隔45,初始145
 			var xx, yy float64 //xx,yy词条相对位置,x,y文本框在全图位置
-			var x, y int
 			xx = 15
 			yy = 145
 			//主词条
@@ -242,16 +241,7 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 			three.DrawString("+"+strconv.Itoa(int(yw.Level)), 85, 90)                         //LV
 			three.SetHexColor("#98F5FF")                                                      //蓝色
 			for k := 0; k < len(yw.Vlist); k++ {
-				switch k {
-				case 0:
-					yy = 190
-				case 1:
-					yy = 235
-				case 2:
-					yy = 280
-				case 3:
-					yy = 325
-				}
+				yy += 45
 				if err := three.LoadFontFace(FontFile, 30); err != nil {
 					panic(err)
 				}
@@ -266,20 +256,7 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 				}
 				three.DrawStringAnchored("+"+yw.Vlist[k].Value+stofen(yw.Vlist[k].Name), 325, yy, 1, 0)
 			}
-			switch i {
-			case 0:
-				x, y = 20, 920
-			case 1:
-				x, y = 370, 920
-			case 2:
-				x, y = 720, 920
-			case 3:
-				x, y = 20, 1280
-			case 4:
-				x, y = 370, 1280
-			case 5:
-				x, y = 720, 1280
-			}
+			x, y := i%3*350+20, i/3*360+920
 			dc.DrawImage(yinsyw, x, y)
 			dc.DrawImage(three.Image(), x, y)
 		}
@@ -287,7 +264,7 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 	if err := dc.LoadFontFace(BaFile, 30); err != nil {
 		panic(err)
 	}
-	dc.DrawStringAnchored("Created By Zerobot-Plugin & Klala", 540, 1655, 0.5, 0.5)
+	dc.DrawStringAnchored("Created By Zerobot-Plugin & Klala || Data From LuLuApi", 540, 1655, 0.5, 0.5)
 	wg.Wait()
 	return dc.Image(), nil
 }
