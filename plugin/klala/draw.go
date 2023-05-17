@@ -151,32 +151,31 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 		two.DrawString("战技 ", 390, 60)
 		two.DrawString("终结 ", 90, 140)
 		two.DrawString("天赋 ", 390, 140)
-		//图标
-		if lpic, err := gg.LoadImage(lightPath + strconv.Itoa(t.RoleData[n].Light.ID) + ".png"); err == nil {
-			lpic = img.Size(lpic, 0, 160).Image()
-			two.DrawImage(lpic, 670, 20)
+		if t.RoleData[n].Light.ID != 0 {
+			//图标
+			if lpic, err := gg.LoadImage(lightPath + strconv.Itoa(t.RoleData[n].Light.ID) + ".png"); err == nil {
+				lpic = img.Size(lpic, 0, 160).Image()
+				two.DrawImage(lpic, 670, 20)
+			}
+			two.DrawString(t.RoleData[n].Light.Name, 830, 60)
+			//精炼
+			if refpic, err := gg.LoadImage(refinePath); err == nil {
+				refpic = adjustOpacity(refpic, 0.8)
+				refpic = img.Size(refpic, 140, 0).Image()
+				two.DrawImageAnchored(refpic, 970, 140, 0.5, 0.5)
+				two.DrawStringAnchored("ref:"+strconv.Itoa(t.RoleData[n].Light.Rank), 970, 140, 0.5, 0.5)
+			}
+			//星级
+			two.DrawImageAnchored(img.Size(drawStars("#FFCC00", "#FFE43A", t.RoleData[n].Light.Star), 0, 30).Image(), 1020, 80, 1, 0)
+			if err := two.LoadFontFace(FiFile, 30); err != nil {
+				panic(err)
+			}
+			two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Light.Level), 830, 150)
 		}
-		two.DrawString(t.RoleData[n].Light.Name, 830, 60)
-		//星级
-		two.DrawImageAnchored(img.Size(drawStars("#FFCC00", "#FFE43A", t.RoleData[n].Light.Star), 0, 30).Image(), 1020, 80, 1, 0)
-		if err := two.LoadFontFace(FiFile, 30); err != nil {
-			panic(err)
-		}
-		two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Light.Level), 830, 150)
 		two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Skill.A), 160, 60)
 		two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Skill.E), 460, 60)
 		two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Skill.Q), 160, 140)
 		two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Skill.T), 460, 140)
-		//精炼
-		if err := two.LoadFontFace(FiFile, 30); err != nil {
-			panic(err)
-		}
-		if refpic, err := gg.LoadImage(refinePath); err == nil {
-			refpic = adjustOpacity(refpic, 0.8)
-			refpic = img.Size(refpic, 140, 0).Image()
-			two.DrawImageAnchored(refpic, 970, 140, 0.5, 0.5)
-			two.DrawStringAnchored("ref:"+strconv.Itoa(t.RoleData[n].Light.Rank), 970, 140, 0.5, 0.5)
-		}
 		dc.DrawImage(yinlight, 20, 720)
 		dc.DrawImage(two.Image(), 20, 720)
 	}()

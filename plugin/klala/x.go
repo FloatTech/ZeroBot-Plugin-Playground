@@ -256,7 +256,7 @@ func (r *info) mergeRole() {
 	//未找到相同
 	r.PlayerDetailInfo.DisplayAvatarList = append(r.PlayerDetailInfo.DisplayAvatarList, r.PlayerDetailInfo.AssistAvatar)
 }
-func (r *info) convertData() thisdata {
+func (r *info) convertData() *thisdata {
 	t := new(thisdata)
 	wife := getWifeOrWq()
 	lights := getLights()
@@ -305,28 +305,30 @@ func (r *info) convertData() thisdata {
 			StatusProbability: 0,
 			StatusResistance:  0,
 		}
-		t.RoleData[k].Light = light{
-			Name:      wife.idmap("light", strconv.Itoa(v.EquipmentID.ID)),
-			ID:        v.EquipmentID.ID,
-			Star:      lights[strconv.Itoa(v.EquipmentID.ID)].Rarity,
-			Level:     v.EquipmentID.Level,
-			Promotion: v.EquipmentID.Promotion,
-			Rank:      v.EquipmentID.Rank,
-		}
 		w := &t.RoleData[k].List
-		lD := lightsData[strconv.Itoa(v.EquipmentID.ID)].Values[v.EquipmentID.Promotion]
-		{
-			//光锥基础属性
-			w.HpFinal += lD.Hp.Base + lD.Hp.Step*float64(v.EquipmentID.Level-1)
-			w.AttackFinal += lD.Atk.Base + lD.Atk.Step*float64(v.EquipmentID.Level-1)
-			w.DefenseFinal += lD.Def.Base + lD.Def.Step*float64(v.EquipmentID.Level-1)
-			w.HpBase += lD.Hp.Base + lD.Hp.Step*float64(v.EquipmentID.Level-1)
-			w.AttackBase += lD.Atk.Base + lD.Atk.Step*float64(v.EquipmentID.Level-1)
-			w.DefenseBase += lD.Def.Base + lD.Def.Step*float64(v.EquipmentID.Level-1)
-			//副词条
-			if b := lightAffix[strconv.Itoa(v.EquipmentID.ID)].Properties; len(b) > 0 {
-				for _, bb := range b[v.EquipmentID.Rank-1] {
-					w.addList(typeMap[bb.Type], bb.Value)
+		if v.EquipmentID.ID != 0 {
+			t.RoleData[k].Light = light{
+				Name:      wife.idmap("light", strconv.Itoa(v.EquipmentID.ID)),
+				ID:        v.EquipmentID.ID,
+				Star:      lights[strconv.Itoa(v.EquipmentID.ID)].Rarity,
+				Level:     v.EquipmentID.Level,
+				Promotion: v.EquipmentID.Promotion,
+				Rank:      v.EquipmentID.Rank,
+			}
+			lD := lightsData[strconv.Itoa(v.EquipmentID.ID)].Values[v.EquipmentID.Promotion]
+			{
+				//光锥基础属性
+				w.HpFinal += lD.Hp.Base + lD.Hp.Step*float64(v.EquipmentID.Level-1)
+				w.AttackFinal += lD.Atk.Base + lD.Atk.Step*float64(v.EquipmentID.Level-1)
+				w.DefenseFinal += lD.Def.Base + lD.Def.Step*float64(v.EquipmentID.Level-1)
+				w.HpBase += lD.Hp.Base + lD.Hp.Step*float64(v.EquipmentID.Level-1)
+				w.AttackBase += lD.Atk.Base + lD.Atk.Step*float64(v.EquipmentID.Level-1)
+				w.DefenseBase += lD.Def.Base + lD.Def.Step*float64(v.EquipmentID.Level-1)
+				//副词条
+				if b := lightAffix[strconv.Itoa(v.EquipmentID.ID)].Properties; len(b) > 0 {
+					for _, bb := range b[v.EquipmentID.Rank-1] {
+						w.addList(typeMap[bb.Type], bb.Value)
+					}
 				}
 			}
 		}
@@ -430,7 +432,7 @@ func (r *info) convertData() thisdata {
 
 	}
 
-	return *t
+	return t
 }
 func downdata(ctx *zero.Ctx) bool {
 	if file.IsNotExist("data/klala/kkk") {
