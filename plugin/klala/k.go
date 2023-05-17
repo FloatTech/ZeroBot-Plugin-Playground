@@ -22,6 +22,7 @@ var (
 	lastExecutionTime int64
 	cds               int64 = 5
 	initdata                = ctxext.DoOnceOnSuccess(downdata)
+	cryptic           string
 )
 
 func init() { // 主函数

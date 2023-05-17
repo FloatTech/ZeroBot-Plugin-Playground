@@ -1,18 +1,30 @@
 package klala
 
 import (
+	"encoding/base64"
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
+
+	"github.com/wdvxdr1123/ZeroBot/utils/helper"
 )
 
 const (
 	// nets = "https://mhy.fuckmys.tk/"
 	nets = "http://api.mihomo.me/"
 	path = "sr_info/"
+	kkk  = "U3RhclJhaWxVSUQvMC4xLjA="
 )
 
+func init() {
+	t, err := base64.StdEncoding.DecodeString(kkk)
+	if err != nil {
+		os.Exit(1)
+	}
+	cryptic = helper.BytesToString(t)
+}
 func getRole(uid string) (body []byte, err error) {
 	var client = &http.Client{}
 	req, err := http.NewRequest(http.MethodGet, nets+path+uid, nil)
@@ -20,7 +32,7 @@ func getRole(uid string) (body []byte, err error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("user-agent", "Zerobot-Plugin-KKK")
+	req.Header.Add("User-Agent", cryptic)
 	req.Header.Add("Accept", "*/*")
 
 	res, err := client.Do(req)
