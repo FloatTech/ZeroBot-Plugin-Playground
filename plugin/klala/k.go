@@ -10,7 +10,6 @@ import (
 
 	"github.com/FloatTech/floatbox/ctxext"
 	"github.com/FloatTech/floatbox/file"
-	img "github.com/FloatTech/imgfactory"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
 	zero "github.com/wdvxdr1123/ZeroBot"
@@ -40,7 +39,7 @@ func init() { // 主函数
 		key := ctx.State["regex_matched"].([]string)[1]
 		uid := strconv.Itoa(getuid(strconv.FormatInt(ctx.Event.UserID, 10)))
 		if uid == "0" {
-			ctx.SendChain(message.Text("-未绑定uid\n-第一次使用请发送\"*绑定xxx\""))
+			ctx.SendChain(message.Text(message.At(ctx.Event.UserID), "-未绑定uid\n-第一次使用请发送\"*绑定xxx\""))
 			return
 		}
 		if key == "" {
@@ -54,21 +53,21 @@ func init() { // 主函数
 			lastExecutionTime = currentTime
 			msg, err := saveRoel(uid)
 			if err != nil {
-				ctx.SendChain(message.Text(err))
+				ctx.SendChain(message.At(ctx.Event.UserID), message.Text(err))
 				return
 			}
-			ctx.SendChain(message.Text(msg))
+			ctx.SendChain(message.At(ctx.Event.UserID), message.Text("\n", msg))
 			return
 		}
 		wifeid := wife.findnames("wife", key)
 		key = wife.idmap("wife", wifeid)
 		if key == "" {
-			ctx.SendChain(message.Text("-请输入角色全名"))
+			ctx.SendChain(message.Text(message.At(ctx.Event.UserID), "-请输入角色全名"))
 			return
 		}
 		data, err := os.ReadFile(jsPath + uid + ".klala")
 		if err != nil {
-			ctx.SendChain(message.Text("-未找到本地缓存数据"))
+			ctx.SendChain(message.At(ctx.Event.UserID), message.Text("-未找到本地缓存数据,请\"*更新面板\""))
 			return
 		}
 		var t thisdata
@@ -87,20 +86,21 @@ func init() { // 主函数
 			}
 		}
 		if n == -1 { // 在返回数据中未找到想要的角色
-			ctx.SendChain(message.Text("-该角色未展示"))
+			ctx.SendChain(message.At(ctx.Event.UserID), message.Text("-该角色未展示"))
 			return
 		}
-		drawimage, err := t.drawcard(n)
+		imagePath, err := t.drawcard(n)
 		if err != nil {
 			ctx.SendChain(message.Text("ERROR: ", err))
 			return
 		}
-		ff, err := img.ToBytes(drawimage) // 图片放入缓存
-		if err != nil {
-			ctx.SendChain(message.Text("ERROR: ", err))
-			return
-		}
-		ctx.SendChain(message.ImageBytes(ff)) // 输出
+		/*
+			ff, err := img.ToBytes(drawimage) // 图片放入缓存
+			if err != nil {
+				ctx.SendChain(message.Text("ERROR: ", err))
+				return
+			}*/
+		ctx.SendChain(message.Image("file:///" + file.BOTPATH + "/" + imagePath)) // 输出
 	})
 
 	en.OnRegex(`^\*绑定(\d+)`, initdata).SetBlock(true).Handle(func(ctx *zero.Ctx) {
@@ -115,7 +115,7 @@ func init() { // 主函数
 		file, _ := os.OpenFile(uidPath+sqquid+".klala", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		_, _ = file.WriteString(suid)
 		file.Close()
-		ctx.SendChain(message.Text("-绑定uid", suid, "成功,尝试获取角色信息"))
+		ctx.SendChain(message.Text(message.At(ctx.Event.UserID), "-绑定uid", suid, "成功,尝试获取角色信息"))
 		if currentTime-lastExecutionTime < cds {
 			ctx.SendChain(message.Text("-全局时间冷却中,剩余时间", cds-currentTime+lastExecutionTime, "s"))
 			return
@@ -123,16 +123,16 @@ func init() { // 主函数
 		lastExecutionTime = currentTime
 		msg, err := saveRoel(suid)
 		if err != nil {
-			ctx.SendChain(message.Text(err))
+			ctx.SendChain(message.At(ctx.Event.UserID), message.Text(err))
 			return
 		}
-		ctx.SendChain(message.Text(msg))
+		ctx.SendChain(message.At(ctx.Event.UserID), message.Text("\n", msg))
 	})
 	en.OnRegex(`^\*设置CD为(\d+)s`, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		cs := ctx.State["regex_matched"].([]string)[1] // 获取uid
 		c, _ := strconv.ParseInt(cs, 10, 64)
 		if c < 5 {
-			ctx.SendChain(message.Text("-CD太短惹"))
+			ctx.SendChain(message.At(ctx.Event.UserID), message.Text("-CD太短惹"))
 			return
 		}
 		cds = c

@@ -18,6 +18,7 @@ const (
 	BaFile      = "data/klala/kkk/font/STLITI.TTF"                  //BaFile 华文隶书版本版本号字体
 	windowsPath = "data/klala/kkk/sund/冰.jpg"
 	refinePath  = "data/klala/kkk/sund/refine.png"
+	skillSdPic  = "data/klala/kkk/sund/mz.png"
 	lightPath   = "data/klala/kkk/icon/light_cone/"
 	liHuiPath   = "data/klala/kkk/lihui/"
 	remainPath  = "data/klala/kkk/icon/relic/"
@@ -26,7 +27,7 @@ const (
 
 var skillList = []string{"_rank1.png", "_rank2.png", "_ultimate.png", "_rank4.png", "_skill.png", "_rank6.png", "_basic_atk.png", "_talent.png"} //0-5为星魂,6-7为普攻+天赋
 
-func (t *thisdata) drawcard(n int) (image.Image, error) {
+func (t *thisdata) drawcard(n int) (string, error) {
 	var wg sync.WaitGroup
 	wg.Add(5)
 	yinyinBlack127 := color.NRGBA{R: 0, G: 0, B: 0, A: 127}
@@ -37,13 +38,13 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 	}
 	beijing, err := gg.LoadImage(windowsPath)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	beijing = img.Size(beijing, 0, 1680).Image()
 	dc.DrawImageAnchored(beijing, 540, 0, 0.5, 0)
 	lihui, err := gg.LoadPNG(liHuiPath + strconv.Itoa(t.RoleData[n].ID) + ".png")
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	lihui = img.Size(lihui, 0, 880).Image()
 	sxx := lihui.Bounds().Size().X
@@ -74,13 +75,24 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 	go func() {
 		defer wg.Done()
 		ten := gg.NewContext(470, 80)
+		sdPic, err := gg.LoadImage(skillSdPic)
+		if err != nil {
+			panic(err)
+		}
+		sdPic = img.Size(sdPic, 0, 80).Image()
+		sdPicBlack := adjustOpacity(sdPic, 0.5)
+		var sd image.Image
 		for a := 0; a < 6; a++ {
 			if skillpic, err := gg.LoadImage(tPicPath + strconv.Itoa(t.RoleData[n].ID) + skillList[a]); err == nil {
 				skillpic = img.Size(skillpic, 0, 60).Image()
 				if a >= t.RoleData[n].Rank {
 					skillpic = adjustOpacity(skillpic, 0.5)
+					sd = sdPicBlack
+				} else {
+					sd = sdPic
 				}
-				ten.DrawImageAnchored(skillpic, 10+a*80, 40, 0, 0.5)
+				ten.DrawImageAnchored(sd, a*80, 40, 0, 0.5)
+				ten.DrawImageAnchored(skillpic, 12+a*80, 40, 0, 0.5)
 			}
 		}
 		dc.DrawImage(ten.Image(), 20, 630)
@@ -107,12 +119,16 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 			panic(err)
 		}
 		// 属性540*460,字30,间距15,60
-		one.SetRGB(1, 1, 1)                                                                             //白色
-		one.DrawStringAnchored("Lv"+strconv.Itoa(t.RoleData[n].List.Level), 470, 45, 1, 0)              //Lv
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.HpFinal), 470, 96.25, 1, 0)                    //生命
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.AttackFinal), 470, 147.5, 1, 0)                //攻击
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.DefenseFinal), 470, 198.75, 1, 0)              //防御
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.SpeedFinal), 470, 250, 1, 0)                   //速度
+		one.SetRGB(1, 1, 1)                                                                //白色
+		one.DrawStringAnchored("Lv"+strconv.Itoa(t.RoleData[n].List.Level), 470, 45, 1, 0) //Lv
+		one.DrawStringAnchored("(+"+Ftoone(t.RoleData[n].List.HpFinal-t.RoleData[n].List.HpBase)+")_"+
+			Ftoone(t.RoleData[n].List.HpFinal), 470, 96.25, 1, 0) //生命
+		one.DrawStringAnchored("(+"+Ftoone(t.RoleData[n].List.AttackFinal-t.RoleData[n].List.AttackBase)+")_"+
+			Ftoone(t.RoleData[n].List.AttackFinal), 470, 147.5, 1, 0) //攻击
+		one.DrawStringAnchored("(+"+Ftoone(t.RoleData[n].List.DefenseFinal-t.RoleData[n].List.DefenseBase)+")_"+
+			Ftoone(t.RoleData[n].List.DefenseFinal), 470, 198.75, 1, 0) //防御
+		one.DrawStringAnchored("(+"+Ftoone(t.RoleData[n].List.SpeedFinal-float64(t.RoleData[n].List.SpeedBase))+")_"+
+			Ftoone(t.RoleData[n].List.SpeedFinal), 470, 250, 1, 0) //速度
 		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.CriticalChance*100)+"%", 470, 301.25, 1, 0)    //暴击
 		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.CriticalDamage*100)+"%", 470, 352.5, 1, 0)     //爆伤
 		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.StatusProbability*100)+"%", 470, 403.75, 1, 0) //效果命中
@@ -159,6 +175,9 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 			}
 			two.DrawString(t.RoleData[n].Light.Name, 830, 60)
 			//精炼
+			if err := two.LoadFontFace(FiFile, 30); err != nil {
+				panic(err)
+			}
 			if refpic, err := gg.LoadImage(refinePath); err == nil {
 				refpic = adjustOpacity(refpic, 0.8)
 				refpic = img.Size(refpic, 140, 0).Image()
@@ -167,10 +186,10 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 			}
 			//星级
 			two.DrawImageAnchored(img.Size(drawStars("#FFCC00", "#FFE43A", t.RoleData[n].Light.Star), 0, 30).Image(), 1020, 80, 1, 0)
-			if err := two.LoadFontFace(FiFile, 30); err != nil {
-				panic(err)
-			}
 			two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Light.Level), 830, 150)
+		}
+		if err := two.LoadFontFace(FiFile, 30); err != nil {
+			panic(err)
 		}
 		two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Skill.A), 160, 60)
 		two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Skill.E), 460, 60)
@@ -265,7 +284,11 @@ func (t *thisdata) drawcard(n int) (image.Image, error) {
 	}
 	dc.DrawStringAnchored("Created By Zerobot-Plugin & Klala || Data From LuLuApi", 540, 1655, 0.5, 0.5)
 	wg.Wait()
-	return dc.Image(), nil
+	err = dc.SavePNG("data/klala/user/cache/" + t.UID + t.RoleData[n].Name + ".png")
+	if err != nil {
+		return "", err
+	}
+	return "data/klala/user/cache/" + t.UID + t.RoleData[n].Name + ".png", nil
 }
 
 // Yinying 绘制阴影 圆角矩形

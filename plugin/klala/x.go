@@ -460,5 +460,12 @@ func downdata(ctx *zero.Ctx) bool {
 			return false
 		}
 	}
+	if file.IsNotExist("data/klala/user/cache") {
+		err := os.MkdirAll("data/klala/user/cache", 0755) // 递归创建文件夹
+		if err != nil {
+			ctx.SendChain(message.Text("-ERROR: ", err))
+			return false
+		}
+	}
 	return true
 }
