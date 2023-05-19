@@ -27,6 +27,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/deepdanbooru"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/draw" // 服务详情
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fadian"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/feifeilv"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fgopickup"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fyzhq"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/games"
