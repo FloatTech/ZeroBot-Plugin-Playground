@@ -37,12 +37,12 @@ func init() { // 主函数
 	en.OnRegex(preFix+`(.*)面板$`, initdata).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		wife := getWifeOrWq()
 		currentTime := time.Now().Unix()
-		key := ctx.State["regex_matched"].([]string)[1]
 		uid := strconv.Itoa(getuid(strconv.FormatInt(ctx.Event.UserID, 10)))
 		if uid == "0" {
 			ctx.SendChain(message.At(ctx.Event.UserID), message.Text("-未绑定uid\n-第一次使用请发送\"*绑定xxx\""))
 			return
 		}
+		key := ctx.State["regex_matched"].([]string)[1]
 		if key == "" {
 			return
 		}
