@@ -91,7 +91,7 @@ type LibraryData struct {
 	State      int    `json:"state"`
 }
 
-// TotalData 全体数据
+// LibraryTotalData 全体数据
 type LibraryTotalData struct {
 	Data  []LibraryData `json:"data"`
 	Total int           `json:"total"`
