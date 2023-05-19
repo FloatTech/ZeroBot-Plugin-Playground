@@ -53,7 +53,7 @@ func init() {
 		PrivateDataFolder: "grasspicture",
 		DisableOnDefault:  false,
 		Brief:             "草图",
-		Help:              "- 生草 | 来张草图\n- 草图信息\n- 草图投稿 (来个大佬解决问题)",
+		Help:              "- 生草 | 来张草图\n- 草图信息\n- 草图投稿 (来个大佬解决问题)\n开发文档: https://apifox.com/apidoc/shared-8a633395-412a-460a-87e0-b82012573873",
 	})
 	cachePath := engine.DataFolder() + "cache/"
 	_ = os.RemoveAll(cachePath)
