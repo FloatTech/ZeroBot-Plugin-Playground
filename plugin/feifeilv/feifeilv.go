@@ -10,12 +10,14 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/FloatTech/floatbox/binary"
 	"github.com/FloatTech/floatbox/web"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
+	"github.com/FloatTech/zbputils/ctxext"
 	"github.com/FloatTech/zbputils/img/text"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
@@ -24,10 +26,12 @@ import (
 const (
 	version     = "10000"
 	sample      = 1
+	act         = "getMsg"
 	textType    = "text"
 	feifeiURL   = "https://m.feifeilv.top"
 	configURL   = feifeiURL + "/api/config/get"
 	libraryURL  = feifeiURL + "/api/library/get"
+	msgURL      = feifeiURL + "/api/msg/get"
 	randomIndex = "/pagesImp/random/index"
 )
 
@@ -87,6 +91,7 @@ type LibraryData struct {
 	SupID      string `json:"supId"`
 	Type       string `json:"type"`
 	Content    string `json:"content"`
+	Source     string `json:"source"`
 	CreateTime int64  `json:"createTime"`
 	State      int    `json:"state"`
 }
@@ -97,12 +102,46 @@ type LibraryTotalData struct {
 	Total int           `json:"total"`
 }
 
+// MsgRequest 消息请求
+type MsgRequest struct {
+	Keywords  string `json:"keywords"`
+	Act       string `json:"act"`
+	PageIndex int    `json:"pageIndex"`
+	PageSize  int    `json:"pageSize"`
+	Version   string `json:"version"`
+	Time      string `json:"time"`
+}
+
+// MsgResponse 消息出参
+type MsgResponse struct {
+	Code int          `json:"code"`
+	Msg  string       `json:"msg"`
+	Data MsgTotalData `json:"data"`
+}
+
+// MsgData 消息
+type MsgData struct {
+	ID         string `json:"_id"`
+	Title      string `json:"title"`
+	Content    string `json:"content"`
+	Type       string `json:"type,omitempty"`
+	CreateTime int64  `json:"createTime,omitempty"`
+	Hot        int    `json:"hot"`
+	State      int    `json:"state"`
+}
+
+// MsgTotalData 消息统计
+type MsgTotalData struct {
+	Data  []MsgData `json:"data"`
+	Total int       `json:"total"`
+}
+
 func init() {
 	engine := control.Register("feifeilv", &ctrl.Options[*zero.Ctx]{
 		PrivateDataFolder: "feifeilv",
 		DisableOnDefault:  false,
 		Brief:             "可能媒用",
-		Help:              "- 可能媒用",
+		Help:              "- 可能媒用\n- 聊天话术 开场白 0",
 	})
 	cachePath := engine.DataFolder() + "cache/"
 	_ = os.RemoveAll(cachePath)
@@ -137,7 +176,13 @@ func init() {
 					ctx.SendChain(message.Text("ERROR: ", err))
 					return
 				}
-				ctx.SendChain(message.Text(library.Content))
+				var libraryTex string
+				if library.Source != "" {
+					libraryTex = library.Content + "\n——" + library.Source
+				} else {
+					libraryTex = library.Content
+				}
+				ctx.SendChain(message.Text(libraryTex))
 				return
 			case c := <-recv:
 				msg := c.Event.Message.ExtractPlainText()
@@ -155,10 +200,44 @@ func init() {
 					ctx.SendChain(message.Text("ERROR: ", err))
 					return
 				}
-				ctx.SendChain(message.Text(library.Content))
+				var libraryTex string
+				if library.Source != "" {
+					libraryTex = library.Content + "\n——" + library.Source
+				} else {
+					libraryTex = library.Content
+				}
+				ctx.SendChain(message.Text(libraryTex))
 				return
 			}
 		}
+	})
+	engine.OnRegex(`^聊天话术\s?(\S{1,25})\s?(\d*)$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+		keyword := ctx.State["regex_matched"].([]string)[1]
+		pagenum := ctx.State["regex_matched"].([]string)[2]
+		pageIndex, _ := strconv.Atoi(pagenum)
+		msg, err := getMsg(keyword, pageIndex, 10)
+		if err != nil {
+			ctx.SendChain(message.Text("ERROR: ", err))
+			return
+		}
+		m := make(message.Message, 0, 10)
+		tip := "关键词%v相关的对话一共有%v页, %v条, 目前是第%v页"
+		tagMap := make(map[string]struct{}, 0)
+		m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Text(fmt.Sprintf(tip, keyword, (msg.Data.Total-1)/10, msg.Data.Total, pageIndex))))
+		for _, v := range msg.Data.Data {
+			m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Text(v.Content)))
+			for _, t := range strings.Split(v.Type, ",") {
+				tagMap[t] = struct{}{}
+			}
+		}
+		tagList := make([]string, 0, len(tagMap))
+		for k := range tagMap {
+			if k != "" {
+				tagList = append(tagList, k)
+			}
+		}
+		m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Text("相关标签: ", strings.Join(tagList, ","))))
+		ctx.Send(m)
 	})
 
 }
@@ -228,4 +307,28 @@ func getTimestamp() string {
 	timestamp := strconv.FormatInt(time.Now().UnixNano()/int64(time.Millisecond), 10)
 	hash := md5.Sum([]byte(timestamp))
 	return fmt.Sprintf("%x", hash)
+}
+
+func getMsg(keyword string, pageIndex, pageSize int) (msg MsgResponse, err error) {
+	r := MsgRequest{
+		Keywords:  keyword,
+		Act:       act,
+		Version:   version,
+		PageIndex: pageIndex,
+		PageSize:  pageSize,
+		Time:      getTimestamp(),
+	}
+	b, err := json.Marshal(&r)
+	if err != nil {
+		return
+	}
+	data, err := web.PostData(msgURL, "application/json", bytes.NewBuffer(b))
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(data, &msg)
+	if err != nil {
+		return
+	}
+	return
 }
