@@ -33,13 +33,13 @@ func init() { // 主函数
 			"- *绑定xxx\n" +
 			"- *设置CD为xs",
 	})
-	en.OnRegex(`^\*(.*)面板$`, initdata).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(`^[*＊](.*)面板$`, initdata).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		wife := getWifeOrWq()
 		currentTime := time.Now().Unix()
 		key := ctx.State["regex_matched"].([]string)[1]
 		uid := strconv.Itoa(getuid(strconv.FormatInt(ctx.Event.UserID, 10)))
 		if uid == "0" {
-			ctx.SendChain(message.Text(message.At(ctx.Event.UserID), "-未绑定uid\n-第一次使用请发送\"*绑定xxx\""))
+			ctx.SendChain(message.At(ctx.Event.UserID), message.Text("-未绑定uid\n-第一次使用请发送\"*绑定xxx\""))
 			return
 		}
 		if key == "" {
@@ -62,7 +62,7 @@ func init() { // 主函数
 		wifeid := wife.findnames("wife", key)
 		key = wife.idmap("wife", wifeid)
 		if key == "" {
-			ctx.SendChain(message.Text(message.At(ctx.Event.UserID), "-请输入角色全名"))
+			ctx.SendChain(message.At(ctx.Event.UserID), message.Text("-请输入角色全名"))
 			return
 		}
 		data, err := os.ReadFile(jsPath + uid + ".klala")
@@ -103,7 +103,7 @@ func init() { // 主函数
 		ctx.SendChain(message.Image("file:///" + file.BOTPATH + "/" + imagePath)) // 输出
 	})
 
-	en.OnRegex(`^\*绑定(\d+)`, initdata).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(`^[*＊]绑定(?:星铁)?[Uu]?[Ii]?[Dd]?\s*(\d+)`, initdata).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		currentTime := time.Now().Unix()
 		suid := ctx.State["regex_matched"].([]string)[1] // 获取uid
 		int64uid, err := strconv.ParseInt(suid, 10, 64)
@@ -115,7 +115,7 @@ func init() { // 主函数
 		file, _ := os.OpenFile(uidPath+sqquid+".klala", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		_, _ = file.WriteString(suid)
 		file.Close()
-		ctx.SendChain(message.Text(message.At(ctx.Event.UserID), "-绑定uid", suid, "成功,尝试获取角色信息"))
+		ctx.SendChain(message.At(ctx.Event.UserID), message.Text("-绑定uid", suid, "成功,尝试获取角色信息"))
 		if currentTime-lastExecutionTime < cds {
 			ctx.SendChain(message.Text("-全局时间冷却中,剩余时间", cds-currentTime+lastExecutionTime, "s"))
 			return
@@ -128,7 +128,7 @@ func init() { // 主函数
 		}
 		ctx.SendChain(message.At(ctx.Event.UserID), message.Text("\n", msg))
 	})
-	en.OnRegex(`^\*设置CD为(\d+)s`, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(`^[*＊]设置CD为(\d+)s`, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		cs := ctx.State["regex_matched"].([]string)[1] // 获取uid
 		c, _ := strconv.ParseInt(cs, 10, 64)
 		if c < 5 {
@@ -138,7 +138,7 @@ func init() { // 主函数
 		cds = c
 		ctx.SendChain(message.Text("-设置CD为", cs, "S"))
 	})
-	en.OnRegex(`^\*(强制)?更新klala$`, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(`^[*＊](强制)?更新klala$`, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		var cmd *exec.Cmd
 		var p = file.BOTPATH + "/data/klala/"
 		if ctx.State["regex_matched"].([]string)[1] != "" {
