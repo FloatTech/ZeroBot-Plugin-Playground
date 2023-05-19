@@ -22,6 +22,7 @@ var (
 	cds               int64 = 5
 	initdata                = ctxext.DoOnceOnSuccess(downdata)
 	cryptic           string
+	preFix            = `^[*＊]`
 )
 
 func init() { // 主函数
@@ -33,7 +34,7 @@ func init() { // 主函数
 			"- *绑定xxx\n" +
 			"- *设置CD为xs",
 	})
-	en.OnRegex(`^[*＊](.*)面板$`, initdata).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(preFix+`(.*)面板$`, initdata).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		wife := getWifeOrWq()
 		currentTime := time.Now().Unix()
 		key := ctx.State["regex_matched"].([]string)[1]
@@ -94,16 +95,10 @@ func init() { // 主函数
 			ctx.SendChain(message.Text("ERROR: ", err))
 			return
 		}
-		/*
-			ff, err := img.ToBytes(drawimage) // 图片放入缓存
-			if err != nil {
-				ctx.SendChain(message.Text("ERROR: ", err))
-				return
-			}*/
 		ctx.SendChain(message.Image("file:///" + file.BOTPATH + "/" + imagePath)) // 输出
 	})
 
-	en.OnRegex(`^[*＊]绑定(?:星铁)?[Uu]?[Ii]?[Dd]?\s*(\d+)`, initdata).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(preFix+`绑定(?:星铁)?[Uu]?[Ii]?[Dd]?\s*(\d+)`, initdata).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		currentTime := time.Now().Unix()
 		suid := ctx.State["regex_matched"].([]string)[1] // 获取uid
 		int64uid, err := strconv.ParseInt(suid, 10, 64)
@@ -128,7 +123,7 @@ func init() { // 主函数
 		}
 		ctx.SendChain(message.At(ctx.Event.UserID), message.Text("\n", msg))
 	})
-	en.OnRegex(`^[*＊]设置CD为(\d+)s`, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(preFix+`设置CD为(\d+)s`, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		cs := ctx.State["regex_matched"].([]string)[1] // 获取uid
 		c, _ := strconv.ParseInt(cs, 10, 64)
 		if c < 5 {
@@ -138,7 +133,7 @@ func init() { // 主函数
 		cds = c
 		ctx.SendChain(message.Text("-设置CD为", cs, "S"))
 	})
-	en.OnRegex(`^[*＊](强制)?更新klala$`, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(preFix+`(强制)?更新klala$`, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		var cmd *exec.Cmd
 		var p = file.BOTPATH + "/data/klala/"
 		if ctx.State["regex_matched"].([]string)[1] != "" {

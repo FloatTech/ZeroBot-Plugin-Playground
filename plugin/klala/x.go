@@ -230,7 +230,7 @@ func saveRoel(uid string) (m string, err error) {
 	if len(t.RoleData) < 1 {
 		return "", errors.New("ERROR: 展柜无展示角色")
 	}
-	es, err := json.Marshal(&t)
+	es, err := json.Marshal(t)
 	if err != nil {
 		return "", errors.New("ERROR: " + err.Error())
 	}
@@ -240,8 +240,10 @@ func saveRoel(uid string) (m string, err error) {
 	var msg strings.Builder
 	msg.WriteString("-更新成功,您展示的角色为: ")
 	for _, v := range t.RoleData {
-		msg.WriteString("\n ")
-		msg.WriteString(v.Name)
+		if v.Name != "" {
+			msg.WriteString("\n ")
+			msg.WriteString(v.Name)
+		}
 	}
 	m = msg.String()
 	return

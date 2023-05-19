@@ -30,7 +30,7 @@ func init() { // 主函数
 			"- *xx材料|素材",
 		PrivateDataFolder: "klala",
 	})
-	en.OnRegex(`^[*＊](.*)(材料|素材|图鉴)$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	en.OnRegex(preFix + `(.*)(材料|素材|图鉴)$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		if file.IsNotExist(en.DataFolder() + "star-rail-atlas") {
 			ctx.SendChain(message.Text("请先发送\"更新图鉴\"!"))
 			return
