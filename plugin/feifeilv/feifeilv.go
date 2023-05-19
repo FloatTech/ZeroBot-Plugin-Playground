@@ -231,7 +231,7 @@ func init() {
 			}
 		}
 		tagList := make([]string, 0, len(tagMap))
-		for k, _ := range tagMap {
+		for k := range tagMap {
 			if k != "" {
 				tagList = append(tagList, k)
 			}
