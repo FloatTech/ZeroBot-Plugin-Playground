@@ -93,10 +93,10 @@ func init() { // 主函数
 			ctx.SendChain(message.Text("请先发送\"更新图鉴\"!"))
 			return
 		}
-		index := []string{"role.yaml", "lightcone.yaml", "material for role.yaml"}
-		var t [3][]byte
+		index := []string{"role.yaml", "lightcone.yaml", "material for role.yaml", "relic.yaml"}
+		var t [4][]byte
 		var err error
-		for i := 0; i < 3; i++ {
+		for i := 0; i < 4; i++ {
 			t[i], err = os.ReadFile(en.DataFolder() + "star-rail-atlas/index/" + index[i])
 			if err != nil {
 				ctx.SendChain(message.Text("获取路径文件失败", err))
@@ -107,6 +107,7 @@ func init() { // 主函数
 			ctxext.FakeSenderForwardNode(ctx, message.Text(string(t[0]))),
 			ctxext.FakeSenderForwardNode(ctx, message.Text(string(t[1]))),
 			ctxext.FakeSenderForwardNode(ctx, message.Text(string(t[2]))),
+			ctxext.FakeSenderForwardNode(ctx, message.Text(string(t[3]))),
 		})
 	})
 }
