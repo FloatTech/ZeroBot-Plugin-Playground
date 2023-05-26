@@ -270,7 +270,7 @@ func init() {
 				ctx.SendChain(message.Text("取消失败: ", err))
 				return
 			}
-			if t != ctx.Event.UserID {
+			if t != -ctx.Event.UserID {
 				ctx.SendChain(message.Text("取消失败: 你不是授权用户"))
 				return
 			}
