@@ -103,12 +103,11 @@ func init() { // 主函数
 				return
 			}
 		}
-		ctx.Send(message.Message{
-			ctxext.FakeSenderForwardNode(ctx, message.Text(string(t[0]))),
-			ctxext.FakeSenderForwardNode(ctx, message.Text(string(t[1]))),
-			ctxext.FakeSenderForwardNode(ctx, message.Text(string(t[2]))),
-			ctxext.FakeSenderForwardNode(ctx, message.Text(string(t[3]))),
-		})
+		var mess message.Message
+		for _, v := range t {
+			mess = append(mess, ctxext.FakeSenderForwardNode(ctx, message.Text(string(v))))
+		}
+		ctx.Send(mess)
 	})
 }
 
@@ -126,9 +125,7 @@ func (paths wikimap) findBook(word string) (path string, ok bool) {
 	return
 }
 func (paths wikimap) findHow(word string) (path string, ok bool) {
-	if path, ok = paths.Material[word]; ok {
-		return
-	}
+	path, ok = paths.Material[word]
 	return
 }
 

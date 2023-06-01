@@ -21,8 +21,8 @@ var (
 	lastExecutionTime int64
 	cds               int64 = 5
 	initdata                = ctxext.DoOnceOnSuccess(downdata)
-	cryptic           string
-	preFix            = `^[*＊]`
+	cryptic                 = "ZeroBot-KKK/1.0" //UA
+	preFix                  = `^[*＊]`           //前缀匹配
 )
 
 func init() { // 主函数
@@ -52,7 +52,7 @@ func init() { // 主函数
 				return
 			}
 			lastExecutionTime = currentTime
-			msg, err := saveRoel(uid)
+			msg, err := saveRole(uid)
 			if err != nil {
 				ctx.SendChain(message.At(ctx.Event.UserID), message.Text(err))
 				return
@@ -116,7 +116,7 @@ func init() { // 主函数
 			return
 		}
 		lastExecutionTime = currentTime
-		msg, err := saveRoel(suid)
+		msg, err := saveRole(suid)
 		if err != nil {
 			ctx.SendChain(message.At(ctx.Event.UserID), message.Text(err))
 			return

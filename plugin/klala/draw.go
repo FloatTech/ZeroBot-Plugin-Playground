@@ -3,12 +3,12 @@ package klala
 import (
 	"image"
 	"image/color"
-	"math"
 	"strconv"
 	"sync"
 
 	"github.com/FloatTech/gg"
-	img "github.com/FloatTech/imgfactory"
+	"github.com/lianhong2758/rosm"
+	"github.com/lianhong2758/rosm/draw"
 )
 
 const (
@@ -22,16 +22,16 @@ const (
 	lightPath   = "data/klala/kkk/icon/light_cone/"
 	liHuiPath   = "data/klala/kkk/lihui/"
 	remainPath  = "data/klala/kkk/icon/relic/"
-	tPicPath    = "data/klala/kkk/icon/skill/"
+	tPicPath    = "data/klala/kkk/icon/skill/"  
 )
 
 var skillList = []string{"_rank1.png", "_rank2.png", "_ultimate.png", "_rank4.png", "_skill.png", "_rank6.png", "_basic_atk.png", "_talent.png"} //0-5为星魂,6-7为普攻+天赋
 
 func (t *thisdata) drawcard(n int) (string, error) {
 	var wg sync.WaitGroup
-	wg.Add(5)
+	wg.Add(6)
 	yinyinBlack127 := color.NRGBA{R: 0, G: 0, B: 0, A: 127}
-	dc := gg.NewContext(1080, 1680)
+	dc := gg.NewContext(1080, 1860)
 	dc.SetRGB(1, 1, 1)
 	if err := dc.LoadFontFace(FontFile, 40); err != nil {
 		panic(err)
@@ -40,13 +40,13 @@ func (t *thisdata) drawcard(n int) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	beijing = img.Size(beijing, 0, 1680).Image()
+	beijing = draw.Size(beijing, 0, 1860)
 	dc.DrawImageAnchored(beijing, 540, 0, 0.5, 0)
 	lihui, err := gg.LoadPNG(liHuiPath + strconv.Itoa(t.RoleData[n].ID) + ".png")
 	if err != nil {
 		return "", err
 	}
-	lihui = img.Size(lihui, 0, 880).Image()
+	lihui = draw.Size(lihui, 0, 880)
 	sxx := lihui.Bounds().Size().X
 	dc.DrawImage(lihui, int(300-float64(sxx)/2), 0)
 	//昵称框图
@@ -67,7 +67,7 @@ func (t *thisdata) drawcard(n int) (string, error) {
 			panic(err)
 		}
 		zero.DrawStringAnchored("UID:"+t.UID+"-LV."+strconv.Itoa(t.Level), 505, 180, 1, 0)
-		newying := Yinying(540, 200, 16, color.NRGBA{R: 0, G: 0, B: 0, A: 106})
+		newying := draw.Shadow(540, 200, 16, color.NRGBA{R: 0, G: 0, B: 0, A: 106})
 		dc.DrawImage(newying, 505, 20)
 		dc.DrawImage(zero.Image(), 505, 20)
 	}()
@@ -79,14 +79,14 @@ func (t *thisdata) drawcard(n int) (string, error) {
 		if err != nil {
 			panic(err)
 		}
-		sdPic = img.Size(sdPic, 0, 80).Image()
-		sdPicBlack := adjustOpacity(sdPic, 0.5)
+		sdPic = draw.Size(sdPic, 0, 80)
+		sdPicBlack := draw.ChangeLucency(sdPic, 0.5)
 		var sd image.Image
 		for a := 0; a < 6; a++ {
 			if skillpic, err := gg.LoadImage(tPicPath + strconv.Itoa(t.RoleData[n].ID) + skillList[a]); err == nil {
-				skillpic = img.Size(skillpic, 0, 60).Image()
+				skillpic = draw.Size(skillpic, 0, 60)
 				if a >= t.RoleData[n].Rank {
-					skillpic = adjustOpacity(skillpic, 0.5)
+					skillpic = draw.ChangeLucency(skillpic, 0.5)
 					sd = sdPicBlack
 				} else {
 					sd = sdPic
@@ -121,25 +121,25 @@ func (t *thisdata) drawcard(n int) (string, error) {
 		// 属性540*460,字30,间距15,60
 		one.SetRGB(1, 1, 1)                                                                //白色
 		one.DrawStringAnchored("Lv"+strconv.Itoa(t.RoleData[n].List.Level), 470, 45, 1, 0) //Lv
-		one.DrawStringAnchored("(+"+Ftoone(t.RoleData[n].List.HpFinal-t.RoleData[n].List.HpBase)+")_"+
-			Ftoone(t.RoleData[n].List.HpFinal), 470, 96.25, 1, 0) //生命
-		one.DrawStringAnchored("(+"+Ftoone(t.RoleData[n].List.AttackFinal-t.RoleData[n].List.AttackBase)+")_"+
-			Ftoone(t.RoleData[n].List.AttackFinal), 470, 147.5, 1, 0) //攻击
-		one.DrawStringAnchored("(+"+Ftoone(t.RoleData[n].List.DefenseFinal-t.RoleData[n].List.DefenseBase)+")_"+
-			Ftoone(t.RoleData[n].List.DefenseFinal), 470, 198.75, 1, 0) //防御
-		one.DrawStringAnchored("(+"+Ftoone(t.RoleData[n].List.SpeedFinal-float64(t.RoleData[n].List.SpeedBase))+")_"+
-			Ftoone(t.RoleData[n].List.SpeedFinal), 470, 250, 1, 0) //速度
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.CriticalChance*100)+"%", 470, 301.25, 1, 0)    //暴击
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.CriticalDamage*100)+"%", 470, 352.5, 1, 0)     //爆伤
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.StatusProbability*100)+"%", 470, 403.75, 1, 0) //效果命中
-		one.DrawStringAnchored(Ftoone(t.RoleData[n].List.StatusResistance*100)+"%", 470, 455, 1, 0)     //效果抵抗
-		dc.DrawImage(Yinying(540, 470, 16, yinyinBlack127), 505, 240)                                   // 背景
+		one.DrawStringAnchored("(+"+rosm.Ftoone(t.RoleData[n].List.HpFinal-t.RoleData[n].List.HpBase)+")_"+
+			rosm.Ftoone(t.RoleData[n].List.HpFinal), 470, 96.25, 1, 0) //生命
+		one.DrawStringAnchored("(+"+rosm.Ftoone(t.RoleData[n].List.AttackFinal-t.RoleData[n].List.AttackBase)+")_"+
+			rosm.Ftoone(t.RoleData[n].List.AttackFinal), 470, 147.5, 1, 0) //攻击
+		one.DrawStringAnchored("(+"+rosm.Ftoone(t.RoleData[n].List.DefenseFinal-t.RoleData[n].List.DefenseBase)+")_"+
+			rosm.Ftoone(t.RoleData[n].List.DefenseFinal), 470, 198.75, 1, 0) //防御
+		one.DrawStringAnchored("(+"+rosm.Ftoone(t.RoleData[n].List.SpeedFinal-float64(t.RoleData[n].List.SpeedBase))+")_"+
+			rosm.Ftoone(t.RoleData[n].List.SpeedFinal), 470, 250, 1, 0) //速度
+		one.DrawStringAnchored(rosm.Ftoone(t.RoleData[n].List.CriticalChance*100)+"%", 470, 301.25, 1, 0)    //暴击
+		one.DrawStringAnchored(rosm.Ftoone(t.RoleData[n].List.CriticalDamage*100)+"%", 470, 352.5, 1, 0)     //爆伤
+		one.DrawStringAnchored(rosm.Ftoone(t.RoleData[n].List.StatusProbability*100)+"%", 470, 403.75, 1, 0) //效果命中
+		one.DrawStringAnchored(rosm.Ftoone(t.RoleData[n].List.StatusResistance*100)+"%", 470, 455, 1, 0)     //效果抵抗
+		dc.DrawImage(draw.Shadow(540, 470, 16, yinyinBlack127), 505, 240)                                    // 背景
 		dc.DrawImage(one.Image(), 505, 240)
 	}()
-	// 光锥
+	// 天赋
 	go func() {
 		defer wg.Done()
-		yinlight := Yinying(1040, 180, 16, yinyinBlack127)
+		yin := draw.Shadow(1040, 180, 16, yinyinBlack127)
 		two := gg.NewContext(1040, 180)
 		two.SetRGB(1, 1, 1) //白色
 		if err := two.LoadFontFace(FontFile, 30); err != nil {
@@ -159,7 +159,7 @@ func (t *thisdata) drawcard(n int) (string, error) {
 				talentname = skillList[7]
 			}
 			if tpic, err := gg.LoadImage(tPicPath + strconv.Itoa(t.RoleData[n].ID) + talentname); err == nil {
-				tpic = img.Size(tpic, 0, 80).Image()
+				tpic = draw.Size(tpic, 0, 80)
 				two.DrawImage(tpic, 10+ii%2*300, 10+ii/2*80)
 			}
 		}
@@ -167,27 +167,6 @@ func (t *thisdata) drawcard(n int) (string, error) {
 		two.DrawString("战技 ", 390, 60)
 		two.DrawString("终结 ", 90, 140)
 		two.DrawString("天赋 ", 390, 140)
-		if t.RoleData[n].Light.ID != 0 {
-			//图标
-			if lpic, err := gg.LoadImage(lightPath + strconv.Itoa(t.RoleData[n].Light.ID) + ".png"); err == nil {
-				lpic = img.Size(lpic, 0, 160).Image()
-				two.DrawImage(lpic, 670, 20)
-			}
-			two.DrawString(t.RoleData[n].Light.Name, 830, 60)
-			//精炼
-			if err := two.LoadFontFace(FiFile, 30); err != nil {
-				panic(err)
-			}
-			if refpic, err := gg.LoadImage(refinePath); err == nil {
-				refpic = adjustOpacity(refpic, 0.8)
-				refpic = img.Size(refpic, 140, 0).Image()
-				two.DrawImageAnchored(refpic, 970, 140, 0.5, 0.5)
-				two.DrawStringAnchored("ref:"+strconv.Itoa(t.RoleData[n].Light.Rank), 970, 140, 0.5, 0.5)
-			}
-			//星级
-			two.DrawImageAnchored(img.Size(drawStars("#FFCC00", "#FFE43A", t.RoleData[n].Light.Star), 0, 30).Image(), 1020, 80, 1, 0)
-			two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Light.Level), 830, 150)
-		}
 		if err := two.LoadFontFace(FiFile, 30); err != nil {
 			panic(err)
 		}
@@ -195,29 +174,68 @@ func (t *thisdata) drawcard(n int) (string, error) {
 		two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Skill.E), 460, 60)
 		two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Skill.Q), 160, 140)
 		two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Skill.T), 460, 140)
-		dc.DrawImage(yinlight, 20, 720)
-		dc.DrawImage(two.Image(), 20, 720)
+		//评分
+		if err := two.LoadFontFace(FontFile, 30); err != nil {
+			panic(err)
+		}
+		two.DrawString("该评分仅为娱乐评分", 700, 35)
+		two.DrawString("评分       评级", 700, 155)
+		if err := two.LoadFontFace(FiFile, 70); err != nil {
+			panic(err)
+		}
+		two.DrawStringAnchored(counts(t.RoleData[n].Scores, true), 930, 90, 0.5, 0.5)
+		two.DrawStringAnchored(rosm.Ftoone(t.RoleData[n].Scores), 730, 90, 0.5, 0.5)
+		dc.DrawImage(yin, 20, 725)
+		dc.DrawImage(two.Image(), 20, 725)
+	}()
+
+	//光锥
+	go func() {
+		defer wg.Done()
+		yinlight := draw.Shadow(1040, 170, 16, yinyinBlack127)
+		sex := gg.NewContext(1040, 170)
+		sex.SetRGB(1, 1, 1) //白色
+		if err := sex.LoadFontFace(FontFile, 30); err != nil {
+			panic(err)
+		}
+		if t.RoleData[n].Light.ID != 0 {
+			//图标
+			if lpic, err := gg.LoadImage(lightPath + strconv.Itoa(t.RoleData[n].Light.ID) + ".png"); err == nil {
+				lpic = draw.Size(lpic, 0, 160)
+				sex.DrawImage(lpic, 10, 20)
+			}
+			sex.DrawString(t.RoleData[n].Light.Name, 170, 60)
+			//精炼
+			if err := sex.LoadFontFace(FiFile, 30); err != nil {
+				panic(err)
+			}
+			if refpic, err := gg.LoadImage(refinePath); err == nil {
+				refpic = draw.ChangeLucency(refpic, 0.8)
+				refpic = draw.Size(refpic, 140, 0)
+				sex.DrawImageAnchored(refpic, 310, 140, 0.5, 0.5)
+				sex.DrawStringAnchored("ref:"+strconv.Itoa(t.RoleData[n].Light.Rank), 310, 140, 0.5, 0.5)
+			}
+			//星级
+			sex.DrawImageAnchored(draw.Size(draw.DrawStars("#FFCC00", "#FFE43A", t.RoleData[n].Light.Star), 0, 30), 360, 80, 1, 0)
+			sex.DrawString("LV."+strconv.Itoa(t.RoleData[n].Light.Level), 170, 150)
+			//简介
+			if err := sex.LoadFontFace(FontFile, 30); err != nil {
+				panic(err)
+			}
+			//	sex.DrawString(t.RoleData[n].Light.Vice, 400, 40)
+			sex.DrawStringWrapped(rosm.InstStringN(t.RoleData[n].Light.Vice, "\n", 20), 400, 30, 0, 0, 400, 1.3, gg.AlignLeft)
+		} else {
+			sex.DrawStringAnchored("未装备光锥", 820, 135, 0.5, 0.5)
+		}
+		dc.DrawImage(yinlight, 20, 920)
+		dc.DrawImage(sex.Image(), 20, 920)
 	}()
 	//遗物
 	go func() {
 		defer wg.Done()
-		yinsyw := Yinying(340, 350, 16, yinyinBlack127)
-		var yw relicsdata
-		for i := 0; i < 6; i++ {
-			switch i {
-			case 0:
-				yw = t.RoleData[n].Relics.Head
-			case 1:
-				yw = t.RoleData[n].Relics.Hand
-			case 2:
-				yw = t.RoleData[n].Relics.Body
-			case 3:
-				yw = t.RoleData[n].Relics.Foot
-			case 4:
-				yw = t.RoleData[n].Relics.Neck
-			default:
-				yw = t.RoleData[n].Relics.Object
-			}
+		yinsyw := draw.Shadow(340, 350, 16, yinyinBlack127)
+		for i, yw := range []relicsdata{t.RoleData[n].Relics.Head, t.RoleData[n].Relics.Hand, t.RoleData[n].Relics.Body, t.RoleData[n].Relics.Foot, t.RoleData[n].Relics.Neck, t.RoleData[n].Relics.Object} {
+			score := float64(0)
 			if yw.SetID == 0 {
 				continue
 			}
@@ -234,11 +252,11 @@ func (t *thisdata) drawcard(n int) (string, error) {
 			}
 			three.Stroke()
 			if tuyw, err := gg.LoadImage(remainPath + strconv.Itoa(yw.SetID) + "_" + strconv.Itoa(i%4) + ".png"); err == nil {
-				tuyw = img.Size(tuyw, 0, 90).Image()
+				tuyw = draw.Size(tuyw, 0, 90)
 				three.DrawImage(tuyw, 15, 15)
 			}
 			//星级
-			three.DrawImage(img.Size(drawStars("#FFCC00", "#FFE43A", yw.Star), 0, 20).Image(), 145, 60)
+			three.DrawImage(draw.Size(draw.DrawStars("#FFCC00", "#FFE43A", yw.Star), 0, 20), 145, 60)
 			//遗物name
 			three.DrawStringAnchored(yw.Name, 325, 50, 1, 0)
 			//圣遗物属性 主词条
@@ -251,6 +269,7 @@ func (t *thisdata) drawcard(n int) (string, error) {
 				panic(err)
 			}
 			three.DrawString(yw.MainV.Name, xx, yy) //"主"
+			three.DrawString("分", 195, 115)         //评分的分字
 			if err := three.LoadFontFace(FiFile, 30); err != nil {
 				panic(err)
 			}
@@ -258,7 +277,9 @@ func (t *thisdata) drawcard(n int) (string, error) {
 			three.DrawStringAnchored("+"+yw.MainV.Value+stofen(yw.MainV.Name), 325, yy, 1, 0) //主词条属性
 			three.DrawString("+"+strconv.Itoa(int(yw.Level)), 85, 90)                         //LV
 			three.SetHexColor("#98F5FF")                                                      //蓝色
+			score += yw.MainV.Score
 			for k := 0; k < len(yw.Vlist); k++ {
+				score += yw.Vlist[k].Score
 				yy += 45
 				if err := three.LoadFontFace(FontFile, 30); err != nil {
 					panic(err)
@@ -274,7 +295,14 @@ func (t *thisdata) drawcard(n int) (string, error) {
 				}
 				three.DrawStringAnchored("+"+yw.Vlist[k].Value+stofen(yw.Vlist[k].Name), 325, yy, 1, 0)
 			}
-			x, y := i%3*350+20, i/3*360+920
+			//分数
+			three.SetRGB(1, 1, 1) //白色
+			three.DrawStringAnchored(rosm.Ftoone(score), 190, 115, 1, 0)
+			if err := three.LoadFontFace(FiFile, 40); err != nil {
+				panic(err)
+			}
+			three.DrawStringAnchored("-"+counts(score, false), 285, 105, 0.5, 0)
+			x, y := i%3*350+20, i/3*360+1100
 			dc.DrawImage(yinsyw, x, y)
 			dc.DrawImage(three.Image(), x, y)
 		}
@@ -282,73 +310,11 @@ func (t *thisdata) drawcard(n int) (string, error) {
 	if err := dc.LoadFontFace(BaFile, 30); err != nil {
 		panic(err)
 	}
-	dc.DrawStringAnchored("Created By Zerobot-Plugin & Klala || Data From LuLuApi", 540, 1655, 0.5, 0.5)
+	dc.DrawStringAnchored("Created By Zerobot-Plugin & Klala || Data From MiHoMoApi", 540, 1835, 0.5, 0.5)
 	wg.Wait()
 	err = dc.SavePNG("data/klala/user/cache/" + t.UID + t.RoleData[n].Name + ".png")
 	if err != nil {
 		return "", err
 	}
 	return "data/klala/user/cache/" + t.UID + t.RoleData[n].Name + ".png", nil
-}
-
-// Yinying 绘制阴影 圆角矩形
-func Yinying(x int, y int, r float64, c color.Color) image.Image {
-	ctx := gg.NewContext(x, y)
-	ctx.SetColor(c)
-	ctx.DrawRoundedRectangle(0, 0, float64(x), float64(y), r)
-	ctx.Fill()
-	return ctx.Image()
-}
-
-// Polygon 画多边形
-func Polygon(n int) []gg.Point {
-	result := make([]gg.Point, n)
-	for i := 0; i < n; i++ {
-		a := float64(i)*2*math.Pi/float64(n) - math.Pi/2
-		result[i] = gg.Point{X: math.Cos(a), Y: math.Sin(a)}
-	}
-	return result
-}
-
-// drawStars 画星星
-func drawStars(side, all string, num int) image.Image {
-	dc := gg.NewContext(500, 80)
-	n := 5
-	points := Polygon(n)
-	for x, i := 40, 0; i < num; x += 80 {
-		dc.Push()
-		//s := rand.Float64()*S/4 + S/4
-		dc.Translate(float64(x), 45)
-		//	dc.Rotate(rand.Float64() * 1.5 * math.Pi) //旋转
-		dc.Scale(30, 30) //大小
-		for i := 0; i < n+1; i++ {
-			index := (i * 2) % n
-			p := points[index]
-			dc.LineTo(p.X, p.Y)
-		}
-		dc.SetLineWidth(10)
-		dc.SetHexColor(side) //线
-		dc.StrokePreserve()
-		dc.SetHexColor(all)
-		dc.Fill()
-		dc.Pop()
-		i++
-	}
-	return dc.Image()
-}
-
-// adjustOpacity 更改透明度
-func adjustOpacity(m image.Image, percentage float64) image.Image {
-	bounds := m.Bounds()
-	dx, dy := bounds.Dx(), bounds.Dy()
-	nimg := image.NewRGBA64(bounds)
-	for i := 0; i < dx; i++ {
-		for j := 0; j < dy; j++ {
-			r, g, b, a := m.At(i, j).RGBA()
-			opacity := uint16(float64(a) * percentage)
-			r, g, b, a = nimg.ColorModel().Convert(color.NRGBA64{R: uint16(r), G: uint16(g), B: uint16(b), A: opacity}).RGBA()
-			nimg.SetRGBA64(i, j, color.RGBA64{R: uint16(r), G: uint16(g), B: uint16(b), A: uint16(a)})
-		}
-	}
-	return nimg
 }

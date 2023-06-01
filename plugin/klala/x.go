@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/FloatTech/floatbox/file"
+	"github.com/lianhong2758/rosm"
+	"github.com/lianhong2758/rosm/web"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
@@ -28,6 +30,7 @@ const (
 	lightsPath      = "data/klala/kkk/json/light_cone_promotions.json" //光锥属性
 	lightAffixPath  = "data/klala/kkk/json/light_cone_ranks.json"      //光锥副词条
 	lightJSONPath   = "data/klala/kkk/json/light_cones.json"           //光锥详情
+	weightPath      = "data/klala/kkk/json/weight.json"                //评分权重
 )
 
 func getuid(sqquid string) (uid int) { // 获取对应游戏uid
@@ -150,13 +153,10 @@ func getWifeTree() (m wifeTrees) {
 	return
 }
 
-// Ftoone 保留一位小数并转化string
-func Ftoone(f float64) string {
-	// return strconv.FormatFloat(f, 'f', 1, 64)
-	if f == 0 {
-		return "0"
-	}
-	return strconv.FormatFloat(f, 'f', 1, 64)
+func getWeight() (m weightData) {
+	txt, _ := os.ReadFile(weightPath)
+	_ = json.Unmarshal(txt, &m)
+	return
 }
 
 // Stofen 判断词条分号
@@ -205,18 +205,32 @@ func (w *combat) addList(str string, val float64) {
 	}
 }
 
-// ywtz 遗物套装判断
-func ywtz(syws []int) map[int]int {
-	ywMap := make(map[int]int)
-	for _, v := range syws {
-		i := ywMap[v]
-		ywMap[v] = i + 1
+func counts(val float64, ismain bool) string {
+	if ismain {
+		val /= 6
 	}
-	ywMap[0] = 0
-	return ywMap
+	switch {
+	case val < 10:
+		return "D"
+	case val < 20:
+		return "C"
+	case val < 30:
+		return "B"
+	case val < 40:
+		return "A"
+	case val < 50:
+		return "S"
+	case val < 56:
+		return "SS"
+	case val < 60:
+		return "SSS"
+	default:
+		return "ACES"
+	}
 }
-func saveRoel(uid string) (m string, err error) {
-	data, err := getRole(uid)
+
+func saveRole(uid string) (m string, err error) {
+	data, err := web.GetData(nets+path+uid, cryptic)
 	if err != nil {
 		return "", err
 	}
@@ -272,12 +286,14 @@ func (r *info) convertData() *thisdata {
 	ywSetData := getYiwuSet()
 	wifeTree := getWifeTree()
 	wifeIntrods := getWifeIntrod()
+	weight := getWeight()
 	t.UID = strconv.Itoa(r.PlayerDetailInfo.UID)
 	t.Nickname = r.PlayerDetailInfo.NickName
 	t.Level = r.PlayerDetailInfo.Level
 	//合并助战角色
 	r.mergeRole()
 	for k, v := range r.PlayerDetailInfo.DisplayAvatarList {
+		score := float64(0)
 		ywtzs := []int{}
 		introd := wifeIntrods[strconv.Itoa(v.AvatarID)]
 		t.RoleData = append(t.RoleData, ro{
@@ -316,6 +332,7 @@ func (r *info) convertData() *thisdata {
 				Level:     v.EquipmentID.Level,
 				Promotion: v.EquipmentID.Promotion,
 				Rank:      v.EquipmentID.Rank,
+				Vice:      lights[strconv.Itoa(v.EquipmentID.ID)].Effects[v.EquipmentID.Rank-1],
 			}
 			lD := lightsData[strconv.Itoa(v.EquipmentID.ID)].Values[v.EquipmentID.Promotion]
 			{
@@ -340,6 +357,15 @@ func (r *info) convertData() *thisdata {
 			Q: v.BehaviorList[2].Level,
 			T: v.BehaviorList[3].Level,
 			F: v.BehaviorList[4].Level,
+		}
+		//星魂补足
+		if v.Rank > 2 {
+			t.RoleData[k].Skill.A++
+			t.RoleData[k].Skill.Q += 2
+		}
+		if v.Rank > 4 {
+			t.RoleData[k].Skill.E += 2
+			t.RoleData[k].Skill.T += 2
 		}
 		//遗迹属性加成
 		for _, vv := range v.BehaviorList {
@@ -372,16 +398,22 @@ func (r *info) convertData() *thisdata {
 			}
 			tVlist := vlist{
 				Name:  na,
-				Value: Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
+				Value: rosm.Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
+				Score: (v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na) * weight[strconv.Itoa(v.AvatarID)][na] * weiMap[na] / 4,
 			}
+			score += tVlist.Score
 			var tAffixVlist = []vlist{}
 			for _, vv := range v.RelicList[i].RelicSubAffix {
 				nb := typeMap[affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].Property]
+				nv := (float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value + float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value) * sto100(nb)
+				sco := weight[strconv.Itoa(v.AvatarID)][nb] * nv * weiMap[nb]
 				tAffixVlist = append(tAffixVlist, vlist{
 					Name:  nb,
-					Value: Ftoone((float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value + float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value) * sto100(nb)),
+					Value: rosm.Ftoone(nv),
 					Adds:  vv.Cnt,
+					Score: sco,
 				})
+				score += sco
 			}
 			switch v.RelicList[i].Type {
 			case 1:
@@ -416,9 +448,10 @@ func (r *info) convertData() *thisdata {
 				t.RoleData[k].Relics.Object.Vlist = append(t.RoleData[k].Relics.Object.Vlist, tAffixVlist...)
 			}
 		}
+		t.RoleData[k].Scores = score
 		//套装属性
 		{
-			for kk, vv := range ywtz(ywtzs) {
+			for kk, vv := range rosm.RecordSuit(ywtzs...) {
 				if vv > 1 {
 					for _, vvv := range ywSetData[strconv.Itoa(kk)].Properties {
 						for _, vvvv := range vvv {

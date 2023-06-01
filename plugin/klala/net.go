@@ -1,55 +1,10 @@
 package klala
 
-import (
-	"encoding/base64"
-	"errors"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"strconv"
-
-	"github.com/wdvxdr1123/ZeroBot/utils/helper"
-)
-
 const (
 	// nets = "https://mhy.fuckmys.tk/"
 	nets = "http://api.mihomo.me/"
 	path = "sr_info/"
-	kkk  = "U3RhclJhaWxVSUQvMC4xLjA="
 )
-
-func init() {
-	t, err := base64.StdEncoding.DecodeString(kkk)
-	if err != nil {
-		os.Exit(1)
-	}
-	cryptic = helper.BytesToString(t)
-}
-func getRole(uid string) (body []byte, err error) {
-	var client = &http.Client{}
-	req, err := http.NewRequest(http.MethodGet, nets+path+uid, nil)
-
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("User-Agent", cryptic)
-	req.Header.Add("Accept", "*/*")
-
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusBadRequest {
-		return nil, errors.New("获取数据失败, Code: " + strconv.Itoa(res.StatusCode))
-	}
-	body, err = ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-	return
-}
 
 type info struct {
 	PlayerDetailInfo struct {
@@ -112,16 +67,17 @@ type thisdata struct {
 	RoleData []ro   `json:"data"`
 }
 type ro struct {
-	ID      int    `json:"id"`
-	Name    string `json:"name"`
-	Star    int    `json:"star"`
-	Rank    int    `json:"rank"`
-	Path    string `json:"path"`    //命途
-	Element string `json:"element"` //元素属性
-	List    combat `json:"combat"`  //属性列表
-	Light   light  `json:"light"`
-	Skill   skill  `json:"skill"`  //技能
-	Relics  relics `json:"rolics"` //遗物
+	ID      int     `json:"id"`
+	Name    string  `json:"name"`
+	Star    int     `json:"star"`
+	Rank    int     `json:"rank"`
+	Path    string  `json:"path"`    //命途
+	Element string  `json:"element"` //元素属性
+	List    combat  `json:"combat"`  //属性列表
+	Light   light   `json:"light"`
+	Skill   skill   `json:"skill"`  //技能
+	Relics  relics  `json:"rolics"` //遗物
+	Scores  float64 `json:"scores"`
 }
 type combat struct {
 	AvatarID          int     `json:"avatarId"` //角色序号
@@ -149,6 +105,7 @@ type light struct {
 	Level     int    `json:"level"`
 	Promotion int    `json:"promotion"`
 	Rank      int    `json:"rank"`
+	Vice      string `json:"vice"`
 }
 
 type skill struct {
@@ -176,9 +133,10 @@ type relicsdata struct {
 	Vlist []vlist `json:"vlist"`
 }
 type vlist struct {
-	Name  string `json:"valname"`
-	Value string `json:"value"`
-	Adds  int    `json:"adds"`
+	Name  string  `json:"valname"`
+	Value string  `json:"value"`
+	Score float64 `json:"score"`
+	Adds  int     `json:"adds"`
 }
 type lightmap map[string]struct {
 	ID                string   `json:"id"`
@@ -406,6 +364,8 @@ type introdData struct {
 	Icon        string `json:"icon"`
 }
 
+type weightData map[string]map[string]float64
+
 // 词条英文对应中文
 var typeMap = map[string]string{
 	"MaxHP":                     "生命值",
@@ -461,4 +421,26 @@ var typeMap = map[string]string{
 	"QuantumResistanceDelta":    "量子属性抗性",
 	"ImaginaryResistanceDelta":  "虚数属性抗性",
 	"SpeedDelta":                "速度",
+}
+
+// 词条权重
+var weiMap = map[string]float64{
+	"大攻击":    1.35,
+	"大生命":    1.80,
+	"大防御":    0.72,
+	"暴击率":    2.4,
+	"暴击伤害":   1.2,
+	"能量恢复效率": 1.25,
+	"速度":     3,
+	"效果抵抗":   1.35,
+	"效果命中":   1.35,
+	"击破特攻":   1.35,
+	"量子属性伤害": 1.25,
+	"虚数属性伤害": 1.25,
+	"物理属性伤害": 1.25,
+	"火属性伤害":  1.25,
+	"冰属性伤害":  1.25,
+	"雷属性伤害":  1.25,
+	"风属性伤害":  1.25,
+	"治疗量加成":  1.25,
 }
