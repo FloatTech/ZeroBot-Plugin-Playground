@@ -3,6 +3,7 @@ package klala
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"strconv"
@@ -324,6 +325,13 @@ func (r *info) convertData() *thisdata {
 			StatusResistance:  0,
 		}
 		w := &t.RoleData[k].List
+		vice := lightAffix[strconv.Itoa(v.Equipment.Tid)].Desc
+		if viceData := lightAffix[strconv.Itoa(v.Equipment.Tid)].Params[v.Equipment.Rank-1]; len(viceData) > 0 {
+			for viceI := 0; viceI < len(viceData); viceI++ {
+				strings.Replace(vice, "#"+strconv.Itoa(viceI+1)+"[i]", fmt.Sprint(viceData[viceI]), 1)
+			}
+		}
+
 		if v.Equipment.Tid != 0 {
 			t.RoleData[k].Light = light{
 				Name:      wife.idmap("light", strconv.Itoa(v.Equipment.Tid)),
@@ -332,7 +340,7 @@ func (r *info) convertData() *thisdata {
 				Level:     v.Equipment.Level,
 				Promotion: v.Equipment.Promotion,
 				Rank:      v.Equipment.Rank,
-				Vice:      lights[strconv.Itoa(v.Equipment.Tid)].Effects[v.Equipment.Rank-1],
+				Vice:      vice,
 			}
 			lD := lightsData[strconv.Itoa(v.Equipment.Tid)].Values[v.Equipment.Promotion]
 			{

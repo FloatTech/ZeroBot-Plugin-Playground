@@ -169,15 +169,15 @@ type vlist struct {
 	Adds  int     `json:"adds"`
 }
 type lightmap map[string]struct {
-	ID                string   `json:"id"`
-	Name              string   `json:"name"`
-	Rarity            int      `json:"rarity"`
-	Path              string   `json:"path"`
-	EffectName        string   `json:"effect_name"`
-	Effects           []string `json:"effects"`
-	VersionAdded      string   `json:"version_added"`
-	Icon              string   `json:"icon"`
-	LightConeOverview []string `json:"light_cone_overview"`
+	ID            string   `json:"id"`
+	Name          string   `json:"name"`
+	Rarity        int      `json:"rarity"`
+	Path          string   `json:"path"`
+	Desc          string   `json:"desc"`
+	Icon          string   `json:"icon"`
+	Preview       string   `json:"preview"`
+	Portrait      string   `json:"portrait"`
+	GuideOverview []string `json:"guide_overview"`
 }
 
 // FindMap 各种简称map查询
