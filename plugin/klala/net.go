@@ -8,55 +8,85 @@ const (
 
 type info struct {
 	PlayerDetailInfo struct {
-		AssistAvatar        role   `json:"AssistAvatar"`
-		IsDisplayAvatarList bool   `json:"IsDisplayAvatarList"`
-		DisplayAvatarList   []role `json:"DisplayAvatarList"`
-		UID                 int    `json:"UID"`
-		CurFriendCount      int    `json:"CurFriendCount"`
-		WorldLevel          int    `json:"WorldLevel"`
-		NickName            string `json:"NickName"`
-		Birthday            int    `json:"Birthday"`
-		Level               int    `json:"Level"`
+		AssistAvatar        role   `json:"assistAvatarDetail"`
+		IsDisplayAvatarList bool   `json:"isDisplayAvatar"`
+		DisplayAvatarList   []role `json:"avatarDetailList"`
+		UID                 int    `json:"uid"`
+		CurFriendCount      int    `json:"friendCount"`
+		WorldLevel          int    `json:"worldLevel"`
+		NickName            string `json:"nickname"`
+		Level               int    `json:"level"`
 		PlayerSpaceInfo     struct {
 			ChallengeData struct {
-				PreMazeGroupIndex int `json:"PreMazeGroupIndex"`
-			} `json:"ChallengeData"`
-			PassAreaProgress int `json:"PassAreaProgress"`
-			LightConeCount   int `json:"LightConeCount"`
-			AvatarCount      int `json:"AvatarCount"`
-			AchievementCount int `json:"AchievementCount"`
-		} `json:"PlayerSpaceInfo"`
-		HeadIconID int `json:"HeadIconID"`
-	} `json:"PlayerDetailInfo"`
+				PreMazeGroupIndex int `json:"scheduleMaxLevel"`
+			} `json:"challengeInfo"`
+			PassAreaProgress int `json:"maxRogueChallengeScore"`
+			LightConeCount   int `json:"equipmentCount"`
+			AvatarCount      int `json:"avatarCount"`
+			AchievementCount int `json:"achievementCount"`
+		} `json:"recordInfo"`
+		HeadIconID int `json:"headIcon"`
+	} `json:"detailInfo"`
 }
 
+/*
+	type role struct {
+		Promotion    int `json:"promotion"` //角色晋阶
+		AvatarId     int `json:"avatarId"`
+		BehaviorList []struct {
+			BehaviorID int `json:"avatarId"`
+			Level      int `json:"promotion"`
+		} `json:"BehaviorList"`
+		AvatarID    int `json:"AvatarID"`
+		Level       int `json:"Level"`
+		EquipmentID struct {
+			Level     int `json:"Level"`
+			ID        int `json:"ID"`
+			Promotion int `json:"Promotion"`
+			Rank      int `json:"Rank"`
+		} `json:"EquipmentID"`
+		RelicList []struct {
+			RelicSubAffix []struct {
+				SubAffixID int `json:"SubAffixID"`
+				Cnt        int `json:"Cnt"`
+				Step       int `json:"Step"`
+			} `json:"RelicSubAffix"`
+			ID          int     `json:"ID"`
+			MainAffixID int     `json:"MainAffixID"`
+			Level       float64 `json:"Level,omitempty"`
+			Type        int     `json:"Type"`
+			EXP         int     `json:"EXP,omitempty"`
+		} `json:"RelicList"`
+	}
+*/
 type role struct {
-	BehaviorList []struct {
-		BehaviorID int `json:"BehaviorID"`
-		Level      int `json:"Level"`
-	} `json:"BehaviorList"`
-	AvatarID    int `json:"AvatarID"`
-	Level       int `json:"Level"`
-	EquipmentID struct {
-		Level     int `json:"Level"`
-		ID        int `json:"ID"`
-		Promotion int `json:"Promotion"`
-		Rank      int `json:"Rank"`
-	} `json:"EquipmentID"`
+	AvatarID      int `json:"avatarId"`
+	Promotion     int `json:"promotion"`
+	Exp           int `json:"exp,omitempt"`
+	Level         int `json:"level,omitempty"`
+	Rank          int `json:"rank,omitempt"`
+	SkillTreeList []struct {
+		PointID int `json:"pointId"`
+		Level   int `json:"level"`
+	} `json:"skillTreeList"`
 	RelicList []struct {
-		RelicSubAffix []struct {
-			SubAffixID int `json:"SubAffixID"`
-			Cnt        int `json:"Cnt"`
-			Step       int `json:"Step"`
-		} `json:"RelicSubAffix"`
-		ID          int     `json:"ID"`
-		MainAffixID int     `json:"MainAffixID"`
-		Level       float64 `json:"Level,omitempty"`
-		Type        int     `json:"Type"`
-		EXP         int     `json:"EXP,omitempty"`
-	} `json:"RelicList"`
-	Promotion int `json:"Promotion"` //角色晋阶
-	Rank      int `json:"Rank"`      //星魂
+		Exp          int `json:"exp,omitempty"`
+		Type         int `json:"type"`
+		Tid          int `json:"tid"`
+		SubAffixList []struct {
+			AffixID int `json:"affixId"`
+			Cnt     int `json:"cnt"`
+			Step    int `json:"step,omitempty"`
+		} `json:"subAffixList"`
+		Level       float64 `json:"level,omitempty"`
+		MainAffixID int     `json:"mainAffixId"`
+	} `json:"relicList"`
+	Equipment struct {
+		Level     int `json:"level"`
+		Tid       int `json:"tid"`
+		Promotion int `json:"promotion"`
+		Rank      int `json:"rank"`
+	} `json:"equipment"`
 }
 
 // 本地数据
@@ -69,7 +99,7 @@ type thisdata struct {
 type ro struct {
 	ID      int     `json:"id"`
 	Name    string  `json:"name"`
-	Star    int     `json:"star"`
+	Star    string  `json:"star"`
 	Rank    int     `json:"rank"`
 	Path    string  `json:"path"`    //命途
 	Element string  `json:"element"` //元素属性
