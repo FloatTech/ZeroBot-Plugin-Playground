@@ -328,7 +328,13 @@ func (r *info) convertData() *thisdata {
 		vice := lightAffix[strconv.Itoa(v.Equipment.Tid)].Desc
 		if viceData := lightAffix[strconv.Itoa(v.Equipment.Tid)].Params[v.Equipment.Rank-1]; len(viceData) > 0 {
 			for viceI := 0; viceI < len(viceData); viceI++ {
-				strings.Replace(vice, "#"+strconv.Itoa(viceI+1)+"[i]", fmt.Sprint(viceData[viceI]), 1)
+				d := ""
+				if strings.Contains(vice, "#"+strconv.Itoa(viceI+1)+"[i]%") {
+					d = fmt.Sprint(viceData[viceI] * 100)
+				} else {
+					d = fmt.Sprint(viceData[viceI])
+				}
+				vice = strings.Replace(vice, "#"+strconv.Itoa(viceI+1)+"[i]", d, 1)
 			}
 		}
 
