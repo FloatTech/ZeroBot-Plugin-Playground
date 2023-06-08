@@ -229,23 +229,15 @@ type relicConfigMap map[string]struct {
 }
 
 type yiwumap map[string]struct {
-	ID      string `json:"id"`
-	Name    string `json:"name"`
-	Type    string `json:"type"`
-	Effects struct {
-		Pieces2 string `json:"pieces2"`
-		Pieces4 string `json:"pieces4"`
-	} `json:"effects"`
-	Pieces struct {
-		Head         ropeData `json:"head"`
-		Hands        ropeData `json:"hands"`
-		Body         ropeData `json:"body"`
-		Feet         ropeData `json:"feet"`
-		PlanarSphere ropeData `json:"planar_sphere"`
-		LinkRope     ropeData `json:"link_rope"`
-	} `json:"pieces"`
-	VersionAdded string `json:"version_added"`
-	Icon         string `json:"icon"`
+	ID          string `json:"id"`
+	SetID       string `json:"set_id"`
+	Name        string `json:"name"`
+	Rarity      int    `json:"rarity"`
+	Type        string `json:"type"`
+	MaxLevel    int    `json:"max_level"`
+	MainAffixID string `json:"main_affix_id"`
+	SubAffixID  string `json:"sub_affix_id"`
+	Icon        string `json:"icon"`
 }
 
 type ropeData struct {

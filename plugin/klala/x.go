@@ -405,6 +405,7 @@ func (r *info) convertData() *thisdata {
 				}
 			}
 			tRelicsdata := relicsdata{
+				Name:  yi[strconv.Itoa(v.RelicList[i].Tid)].Name,
 				SetID: mainSetID,
 				Type:  v.RelicList[i].Type,
 				Star:  v.RelicList[i].Tid/10000 - 1,
@@ -432,32 +433,26 @@ func (r *info) convertData() *thisdata {
 			switch v.RelicList[i].Type {
 			case 1:
 				t.RoleData[k].Relics.Head = tRelicsdata
-				t.RoleData[k].Relics.Head.Name = yi[strconv.Itoa(mainSetID)].Pieces.Head.Name
 				t.RoleData[k].Relics.Head.MainV = tVlist
 				t.RoleData[k].Relics.Head.Vlist = append(t.RoleData[k].Relics.Head.Vlist, tAffixVlist...)
 			case 2:
 				t.RoleData[k].Relics.Hand = tRelicsdata
-				t.RoleData[k].Relics.Hand.Name = yi[strconv.Itoa(mainSetID)].Pieces.Hands.Name
 				t.RoleData[k].Relics.Hand.MainV = tVlist
 				t.RoleData[k].Relics.Hand.Vlist = append(t.RoleData[k].Relics.Hand.Vlist, tAffixVlist...)
 			case 3:
 				t.RoleData[k].Relics.Body = tRelicsdata
-				t.RoleData[k].Relics.Body.Name = yi[strconv.Itoa(mainSetID)].Pieces.Body.Name
 				t.RoleData[k].Relics.Body.MainV = tVlist
 				t.RoleData[k].Relics.Body.Vlist = append(t.RoleData[k].Relics.Body.Vlist, tAffixVlist...)
 			case 4:
 				t.RoleData[k].Relics.Foot = tRelicsdata
-				t.RoleData[k].Relics.Foot.Name = yi[strconv.Itoa(mainSetID)].Pieces.Feet.Name
 				t.RoleData[k].Relics.Foot.MainV = tVlist
 				t.RoleData[k].Relics.Foot.Vlist = append(t.RoleData[k].Relics.Foot.Vlist, tAffixVlist...)
 			case 5:
 				t.RoleData[k].Relics.Neck = tRelicsdata
-				t.RoleData[k].Relics.Neck.Name = yi[strconv.Itoa(mainSetID)].Pieces.PlanarSphere.Name
 				t.RoleData[k].Relics.Neck.MainV = tVlist
 				t.RoleData[k].Relics.Neck.Vlist = append(t.RoleData[k].Relics.Neck.Vlist, tAffixVlist...)
 			case 6:
 				t.RoleData[k].Relics.Object = tRelicsdata
-				t.RoleData[k].Relics.Object.Name = yi[strconv.Itoa(mainSetID)].Pieces.LinkRope.Name
 				t.RoleData[k].Relics.Object.MainV = tVlist
 				t.RoleData[k].Relics.Object.Vlist = append(t.RoleData[k].Relics.Object.Vlist, tAffixVlist...)
 			}
