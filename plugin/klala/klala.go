@@ -51,9 +51,9 @@ func init() { // 主函数
 		var ok bool
 		switch ctx.State["regex_matched"].([]string)[2] {
 		case "材料", "素材":
-			path, ok = paths.findHow(word)
+			path, ok = paths.findhow(word)
 		case "图鉴":
-			path, ok = paths.findBook(word)
+			path, ok = paths.findwhat(word)
 		}
 		if !ok {
 			ctx.SendChain(message.Text("未找到该", ctx.State["regex_matched"].([]string)[2]))
@@ -93,39 +93,38 @@ func init() { // 主函数
 			ctx.SendChain(message.Text("请先发送\"更新图鉴\"!"))
 			return
 		}
-		index := []string{"role.yaml", "lightcone.yaml", "material for role.yaml", "relic.yaml"}
-		var t [4][]byte
+		index := []string{"role.yaml", "lightcone.yaml", "material for role.yaml"}
+		var t [3][]byte
 		var err error
-		for i := 0; i < 4; i++ {
+		for i := 0; i < 3; i++ {
 			t[i], err = os.ReadFile(en.DataFolder() + "star-rail-atlas/index/" + index[i])
 			if err != nil {
 				ctx.SendChain(message.Text("获取路径文件失败", err))
 				return
 			}
 		}
-		var mess message.Message
-		for _, v := range t {
-			mess = append(mess, ctxext.FakeSenderForwardNode(ctx, message.Text(string(v))))
-		}
-		ctx.Send(mess)
+		ctx.Send(message.Message{
+			ctxext.FakeSenderForwardNode(ctx, message.Text(string(t[0]))),
+			ctxext.FakeSenderForwardNode(ctx, message.Text(string(t[1]))),
+			ctxext.FakeSenderForwardNode(ctx, message.Text(string(t[2]))),
+		})
 	})
 }
 
 // 寻找图鉴
-func (paths wikimap) findBook(word string) (path string, ok bool) {
+func (paths wikimap) findwhat(word string) (path string, ok bool) {
 	if path, ok = paths.Role[word]; ok {
 		return
 	}
 	if path, ok = paths.Light[word]; ok {
 		return
 	}
-	if path, ok = paths.Relic[word]; ok {
-		return
-	}
 	return
 }
-func (paths wikimap) findHow(word string) (path string, ok bool) {
-	path, ok = paths.Material[word]
+func (paths wikimap) findhow(word string) (path string, ok bool) {
+	if path, ok = paths.Material[word]; ok {
+		return
+	}
 	return
 }
 
@@ -133,5 +132,4 @@ type wikimap struct {
 	Light    map[string]string `json:"lightcone"`
 	Role     map[string]string `json:"role"`
 	Material map[string]string `json:"material for role"`
-	Relic    map[string]string `json:"relic"`
 }

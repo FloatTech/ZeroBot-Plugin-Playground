@@ -20,10 +20,9 @@ require (
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/gorilla/websocket v1.5.0
 	github.com/guohuiyuan/go-fyzhq v0.0.0-20220807135412-25c16c843e5a
-	github.com/lianhong2758/rosm v0.0.0-20230601130055-e16727696467
 	github.com/mmcdole/gofeed v1.2.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/playwright-community/playwright-go v0.2000.1
+	github.com/playwright-community/playwright-go v0.2000.1 
 	github.com/sirupsen/logrus v1.9.0
 	github.com/tidwall/gjson v1.14.4
 	github.com/wcharczuk/go-chart/v2 v2.1.0

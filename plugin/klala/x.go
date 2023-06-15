@@ -3,15 +3,12 @@ package klala
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 
 	"github.com/FloatTech/floatbox/file"
-	"github.com/lianhong2758/rosm"
-	"github.com/lianhong2758/rosm/web"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
@@ -31,7 +28,6 @@ const (
 	lightsPath      = "data/klala/kkk/json/light_cone_promotions.json" //光锥属性
 	lightAffixPath  = "data/klala/kkk/json/light_cone_ranks.json"      //光锥副词条
 	lightJSONPath   = "data/klala/kkk/json/light_cones.json"           //光锥详情
-	weightPath      = "data/klala/kkk/json/weight.json"                //评分权重
 )
 
 func getuid(sqquid string) (uid int) { // 获取对应游戏uid
@@ -154,10 +150,13 @@ func getWifeTree() (m wifeTrees) {
 	return
 }
 
-func getWeight() (m weightData) {
-	txt, _ := os.ReadFile(weightPath)
-	_ = json.Unmarshal(txt, &m)
-	return
+// Ftoone 保留一位小数并转化string
+func Ftoone(f float64) string {
+	// return strconv.FormatFloat(f, 'f', 1, 64)
+	if f == 0 {
+		return "0"
+	}
+	return strconv.FormatFloat(f, 'f', 1, 64)
 }
 
 // Stofen 判断词条分号
@@ -206,32 +205,18 @@ func (w *combat) addList(str string, val float64) {
 	}
 }
 
-func counts(val float64, ismain bool) string {
-	if ismain {
-		val /= 6
+// ywtz 遗物套装判断
+func ywtz(syws []int) map[int]int {
+	ywMap := make(map[int]int)
+	for _, v := range syws {
+		i := ywMap[v]
+		ywMap[v] = i + 1
 	}
-	switch {
-	case val < 10:
-		return "D"
-	case val < 20:
-		return "C"
-	case val < 30:
-		return "B"
-	case val < 40:
-		return "A"
-	case val < 50:
-		return "S"
-	case val < 56:
-		return "SS"
-	case val < 60:
-		return "SSS"
-	default:
-		return "ACES"
-	}
+	ywMap[0] = 0
+	return ywMap
 }
-
-func saveRole(uid string) (m string, err error) {
-	data, err := web.GetData(nets+path+uid, cryptic)
+func saveRoel(uid string) (m string, err error) {
+	data, err := getRole(uid)
 	if err != nil {
 		return "", err
 	}
@@ -287,19 +272,17 @@ func (r *info) convertData() *thisdata {
 	ywSetData := getYiwuSet()
 	wifeTree := getWifeTree()
 	wifeIntrods := getWifeIntrod()
-	weight := getWeight()
 	t.UID = strconv.Itoa(r.PlayerDetailInfo.UID)
 	t.Nickname = r.PlayerDetailInfo.NickName
 	t.Level = r.PlayerDetailInfo.Level
 	//合并助战角色
 	r.mergeRole()
 	for k, v := range r.PlayerDetailInfo.DisplayAvatarList {
-		score := float64(0)
 		ywtzs := []int{}
 		introd := wifeIntrods[strconv.Itoa(v.AvatarID)]
 		t.RoleData = append(t.RoleData, ro{
 			ID:      v.AvatarID,
-			Star:    introd.Rarity,
+			Star:    v.EquipmentID.Rank + 4,
 			Name:    wife.idmap("wife", strconv.Itoa(v.AvatarID)),
 			Rank:    v.Rank,
 			Path:    introd.Path,
@@ -325,142 +308,117 @@ func (r *info) convertData() *thisdata {
 			StatusResistance:  0,
 		}
 		w := &t.RoleData[k].List
-		vice := lightAffix[strconv.Itoa(v.Equipment.Tid)].Desc
-		if viceData := lightAffix[strconv.Itoa(v.Equipment.Tid)].Params[v.Equipment.Rank-1]; len(viceData) > 0 {
-			for viceI := 0; viceI < len(viceData); viceI++ {
-				d := ""
-				if strings.Contains(vice, "#"+strconv.Itoa(viceI+1)+"[i]%") {
-					d = fmt.Sprint(viceData[viceI] * 100)
-				} else {
-					d = fmt.Sprint(viceData[viceI])
-				}
-				vice = strings.Replace(vice, "#"+strconv.Itoa(viceI+1)+"[i]", d, 1)
-			}
-		}
-
-		if v.Equipment.Tid != 0 {
+		if v.EquipmentID.ID != 0 {
 			t.RoleData[k].Light = light{
-				Name:      wife.idmap("light", strconv.Itoa(v.Equipment.Tid)),
-				ID:        v.Equipment.Tid,
-				Star:      lights[strconv.Itoa(v.Equipment.Tid)].Rarity,
-				Level:     v.Equipment.Level,
-				Promotion: v.Equipment.Promotion,
-				Rank:      v.Equipment.Rank,
-				Vice:      vice,
+				Name:      wife.idmap("light", strconv.Itoa(v.EquipmentID.ID)),
+				ID:        v.EquipmentID.ID,
+				Star:      lights[strconv.Itoa(v.EquipmentID.ID)].Rarity,
+				Level:     v.EquipmentID.Level,
+				Promotion: v.EquipmentID.Promotion,
+				Rank:      v.EquipmentID.Rank,
 			}
-			lD := lightsData[strconv.Itoa(v.Equipment.Tid)].Values[v.Equipment.Promotion]
+			lD := lightsData[strconv.Itoa(v.EquipmentID.ID)].Values[v.EquipmentID.Promotion]
 			{
 				//光锥基础属性
-				w.HpFinal += lD.Hp.Base + lD.Hp.Step*float64(v.Equipment.Level-1)
-				w.AttackFinal += lD.Atk.Base + lD.Atk.Step*float64(v.Equipment.Level-1)
-				w.DefenseFinal += lD.Def.Base + lD.Def.Step*float64(v.Equipment.Level-1)
-				w.HpBase += lD.Hp.Base + lD.Hp.Step*float64(v.Equipment.Level-1)
-				w.AttackBase += lD.Atk.Base + lD.Atk.Step*float64(v.Equipment.Level-1)
-				w.DefenseBase += lD.Def.Base + lD.Def.Step*float64(v.Equipment.Level-1)
+				w.HpFinal += lD.Hp.Base + lD.Hp.Step*float64(v.EquipmentID.Level-1)
+				w.AttackFinal += lD.Atk.Base + lD.Atk.Step*float64(v.EquipmentID.Level-1)
+				w.DefenseFinal += lD.Def.Base + lD.Def.Step*float64(v.EquipmentID.Level-1)
+				w.HpBase += lD.Hp.Base + lD.Hp.Step*float64(v.EquipmentID.Level-1)
+				w.AttackBase += lD.Atk.Base + lD.Atk.Step*float64(v.EquipmentID.Level-1)
+				w.DefenseBase += lD.Def.Base + lD.Def.Step*float64(v.EquipmentID.Level-1)
 				//副词条
-				if b := lightAffix[strconv.Itoa(v.Equipment.Tid)].Properties; len(b) > 0 {
-					for _, bb := range b[v.Equipment.Rank-1] {
+				if b := lightAffix[strconv.Itoa(v.EquipmentID.ID)].Properties; len(b) > 0 {
+					for _, bb := range b[v.EquipmentID.Rank-1] {
 						w.addList(typeMap[bb.Type], bb.Value)
 					}
 				}
 			}
 		}
 		t.RoleData[k].Skill = skill{
-			A: v.SkillTreeList[0].Level,
-			E: v.SkillTreeList[1].Level,
-			Q: v.SkillTreeList[2].Level,
-			T: v.SkillTreeList[3].Level,
-			F: v.SkillTreeList[4].Level,
-		}
-		//星魂补足
-		if v.Rank > 2 {
-			t.RoleData[k].Skill.A++
-			t.RoleData[k].Skill.Q += 2
-		}
-		if v.Rank > 4 {
-			t.RoleData[k].Skill.E += 2
-			t.RoleData[k].Skill.T += 2
+			A: v.BehaviorList[0].Level,
+			E: v.BehaviorList[1].Level,
+			Q: v.BehaviorList[2].Level,
+			T: v.BehaviorList[3].Level,
+			F: v.BehaviorList[4].Level,
 		}
 		//遗迹属性加成
-		for _, vv := range v.SkillTreeList {
-			if vv.PointID%1000 > 200 {
-				for _, vvv := range wifeTree[strconv.Itoa(vv.PointID)].Levels[0].Properties {
+		for _, vv := range v.BehaviorList {
+			if vv.BehaviorID%1000 > 200 {
+				for _, vvv := range wifeTree[strconv.Itoa(vv.BehaviorID)].Levels[0].Properties {
 					w.addList(typeMap[vvv.Type], vvv.Value)
 				}
 			}
 		}
 		for i := 0; i < len(v.RelicList); i++ {
-			affixID := strconv.Itoa(v.RelicList[i].Tid - 10000)
-			mainSetID := relicConfig[strconv.Itoa(v.RelicList[i].Tid)].SetID
-			mainData := affixMain[strconv.Itoa(relicConfig[strconv.Itoa(v.RelicList[i].Tid)].MainAffixGroup)][strconv.Itoa(v.RelicList[i].MainAffixID)]
+			affixID := strconv.Itoa(v.RelicList[i].ID - 10000)
+			mainSetID := relicConfig[strconv.Itoa(v.RelicList[i].ID)].SetID
+			mainData := affixMain[strconv.Itoa(relicConfig[strconv.Itoa(v.RelicList[i].ID)].MainAffixGroup)][strconv.Itoa(v.RelicList[i].MainAffixID)]
 			na := typeMap[mainData.Property]
 			//遗物套装加成
 			ywtzs = append(ywtzs, mainSetID)
 			//属性计算
 			{
 				w.addList(na, v.RelicList[i].Level*mainData.LevelAdd.Value+mainData.BaseValue.Value)
-				for _, vv := range v.RelicList[i].SubAffixList {
-					nnn := typeMap[affix[affixID[0:1]][strconv.Itoa(vv.AffixID)].Property]
-					w.addList(nnn, float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.AffixID)].BaseValue.Value+float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.AffixID)].StepValue.Value)
+				for _, vv := range v.RelicList[i].RelicSubAffix {
+					nnn := typeMap[affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].Property]
+					w.addList(nnn, float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value+float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value)
 				}
 			}
 			tRelicsdata := relicsdata{
-				Name:  yi[strconv.Itoa(v.RelicList[i].Tid)].Name,
 				SetID: mainSetID,
 				Type:  v.RelicList[i].Type,
-				Star:  v.RelicList[i].Tid/10000 - 1,
+				Star:  v.RelicList[i].ID/10000 - 1,
 				Level: v.RelicList[i].Level,
 			}
 			tVlist := vlist{
 				Name:  na,
-				Value: rosm.Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
-				Score: (v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na) * weight[strconv.Itoa(v.AvatarID)][na] * weiMap[na] / 4,
+				Value: Ftoone((v.RelicList[i].Level*mainData.LevelAdd.Value + mainData.BaseValue.Value) * sto100(na)),
 			}
-			score += tVlist.Score
 			var tAffixVlist = []vlist{}
-			for _, vv := range v.RelicList[i].SubAffixList {
-				nb := typeMap[affix[affixID[0:1]][strconv.Itoa(vv.AffixID)].Property]
-				nv := (float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.AffixID)].BaseValue.Value + float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.AffixID)].StepValue.Value) * sto100(nb)
-				sco := weight[strconv.Itoa(v.AvatarID)][nb] * nv * weiMap[nb]
+			for _, vv := range v.RelicList[i].RelicSubAffix {
+				nb := typeMap[affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].Property]
 				tAffixVlist = append(tAffixVlist, vlist{
 					Name:  nb,
-					Value: rosm.Ftoone(nv),
+					Value: Ftoone((float64(vv.Cnt)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].BaseValue.Value + float64(vv.Step)*affix[affixID[0:1]][strconv.Itoa(vv.SubAffixID)].StepValue.Value) * sto100(nb)),
 					Adds:  vv.Cnt,
-					Score: sco,
 				})
-				score += sco
 			}
 			switch v.RelicList[i].Type {
 			case 1:
 				t.RoleData[k].Relics.Head = tRelicsdata
+				t.RoleData[k].Relics.Head.Name = yi[strconv.Itoa(mainSetID)].Pieces.Head.Name
 				t.RoleData[k].Relics.Head.MainV = tVlist
 				t.RoleData[k].Relics.Head.Vlist = append(t.RoleData[k].Relics.Head.Vlist, tAffixVlist...)
 			case 2:
 				t.RoleData[k].Relics.Hand = tRelicsdata
+				t.RoleData[k].Relics.Hand.Name = yi[strconv.Itoa(mainSetID)].Pieces.Hands.Name
 				t.RoleData[k].Relics.Hand.MainV = tVlist
 				t.RoleData[k].Relics.Hand.Vlist = append(t.RoleData[k].Relics.Hand.Vlist, tAffixVlist...)
 			case 3:
 				t.RoleData[k].Relics.Body = tRelicsdata
+				t.RoleData[k].Relics.Body.Name = yi[strconv.Itoa(mainSetID)].Pieces.Body.Name
 				t.RoleData[k].Relics.Body.MainV = tVlist
 				t.RoleData[k].Relics.Body.Vlist = append(t.RoleData[k].Relics.Body.Vlist, tAffixVlist...)
 			case 4:
 				t.RoleData[k].Relics.Foot = tRelicsdata
+				t.RoleData[k].Relics.Foot.Name = yi[strconv.Itoa(mainSetID)].Pieces.Feet.Name
 				t.RoleData[k].Relics.Foot.MainV = tVlist
 				t.RoleData[k].Relics.Foot.Vlist = append(t.RoleData[k].Relics.Foot.Vlist, tAffixVlist...)
 			case 5:
 				t.RoleData[k].Relics.Neck = tRelicsdata
+				t.RoleData[k].Relics.Neck.Name = yi[strconv.Itoa(mainSetID)].Pieces.PlanarSphere.Name
 				t.RoleData[k].Relics.Neck.MainV = tVlist
 				t.RoleData[k].Relics.Neck.Vlist = append(t.RoleData[k].Relics.Neck.Vlist, tAffixVlist...)
 			case 6:
 				t.RoleData[k].Relics.Object = tRelicsdata
+				t.RoleData[k].Relics.Object.Name = yi[strconv.Itoa(mainSetID)].Pieces.LinkRope.Name
 				t.RoleData[k].Relics.Object.MainV = tVlist
 				t.RoleData[k].Relics.Object.Vlist = append(t.RoleData[k].Relics.Object.Vlist, tAffixVlist...)
 			}
 		}
-		t.RoleData[k].Scores = score
 		//套装属性
 		{
-			for kk, vv := range rosm.RecordSuit(ywtzs...) {
+			for kk, vv := range ywtz(ywtzs) {
 				if vv > 1 {
 					for _, vvv := range ywSetData[strconv.Itoa(kk)].Properties {
 						for _, vvvv := range vvv {
