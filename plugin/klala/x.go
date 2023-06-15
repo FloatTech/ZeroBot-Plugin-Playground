@@ -16,18 +16,18 @@ import (
 const (
 	jsPath          = "data/klala/user/js/"
 	uidPath         = "data/klala/user/uid/"
-	affixMainFile   = "data/klala/kkk/json/RelicMainAffixConfig.json"  //主词条属性
-	affixFile       = "data/klala/kkk/json/RelicSubAffixConfig.json"   //副词条属性
-	relicConfigPath = "data/klala/kkk/json/RelicConfig.json"           //遗物对应属性
-	ywSetPath       = "data/klala/kkk/json/relic_sets.json"            //遗物Set属性
-	yiWuPath        = "data/klala/kkk/json/relics.json"                //遗物介绍
-	wifesPath       = "data/klala/kkk/json/nickname.json"              //别名
-	wifeDataPath    = "data/klala/kkk/json/character_promotions.json"  //角色基础属性
-	wifeTreePath    = "data/klala/kkk/json/character_skill_trees.json" //角色行迹属性
-	wifeIntrodPath  = "data/klala/kkk/json/characters.json"            //角色介绍
-	lightsPath      = "data/klala/kkk/json/light_cone_promotions.json" //光锥属性
-	lightAffixPath  = "data/klala/kkk/json/light_cone_ranks.json"      //光锥副词条
-	lightJSONPath   = "data/klala/kkk/json/light_cones.json"           //光锥详情
+	affixMainFile   = "data/klala/kkk/json/RelicMainAffixConfig.json"  // 主词条属性
+	affixFile       = "data/klala/kkk/json/RelicSubAffixConfig.json"   // 副词条属性
+	relicConfigPath = "data/klala/kkk/json/RelicConfig.json"           // 遗物对应属性
+	ywSetPath       = "data/klala/kkk/json/relic_sets.json"            // 遗物Set属性
+	yiWuPath        = "data/klala/kkk/json/relics.json"                // 遗物介绍
+	wifesPath       = "data/klala/kkk/json/nickname.json"              // 别名
+	wifeDataPath    = "data/klala/kkk/json/character_promotions.json"  // 角色基础属性
+	wifeTreePath    = "data/klala/kkk/json/character_skill_trees.json" // 角色行迹属性
+	wifeIntrodPath  = "data/klala/kkk/json/characters.json"            // 角色介绍
+	lightsPath      = "data/klala/kkk/json/light_cone_promotions.json" // 光锥属性
+	lightAffixPath  = "data/klala/kkk/json/light_cone_ranks.json"      // 光锥副词条
+	lightJSONPath   = "data/klala/kkk/json/light_cones.json"           // 光锥详情
 )
 
 func getuid(sqquid string) (uid int) { // 获取对应游戏uid
@@ -255,7 +255,7 @@ func (r *info) mergeRole() {
 			return
 		}
 	}
-	//未找到相同
+	// 未找到相同
 	r.PlayerDetailInfo.DisplayAvatarList = append(r.PlayerDetailInfo.DisplayAvatarList, r.PlayerDetailInfo.AssistAvatar)
 }
 func (r *info) convertData() *thisdata {
@@ -275,7 +275,7 @@ func (r *info) convertData() *thisdata {
 	t.UID = strconv.Itoa(r.PlayerDetailInfo.UID)
 	t.Nickname = r.PlayerDetailInfo.NickName
 	t.Level = r.PlayerDetailInfo.Level
-	//合并助战角色
+	// 合并助战角色
 	r.mergeRole()
 	for k, v := range r.PlayerDetailInfo.DisplayAvatarList {
 		ywtzs := []int{}
@@ -288,7 +288,7 @@ func (r *info) convertData() *thisdata {
 			Path:    introd.Path,
 			Element: introd.Element,
 		})
-		//给基础值
+		// 给基础值
 		thisWifeData := wifeData[strconv.Itoa(v.AvatarID)].Values[v.Promotion]
 		t.RoleData[k].List = combat{
 			AvatarID:          v.AvatarID,
@@ -319,14 +319,14 @@ func (r *info) convertData() *thisdata {
 			}
 			lD := lightsData[strconv.Itoa(v.EquipmentID.ID)].Values[v.EquipmentID.Promotion]
 			{
-				//光锥基础属性
+				// 光锥基础属性
 				w.HpFinal += lD.Hp.Base + lD.Hp.Step*float64(v.EquipmentID.Level-1)
 				w.AttackFinal += lD.Atk.Base + lD.Atk.Step*float64(v.EquipmentID.Level-1)
 				w.DefenseFinal += lD.Def.Base + lD.Def.Step*float64(v.EquipmentID.Level-1)
 				w.HpBase += lD.Hp.Base + lD.Hp.Step*float64(v.EquipmentID.Level-1)
 				w.AttackBase += lD.Atk.Base + lD.Atk.Step*float64(v.EquipmentID.Level-1)
 				w.DefenseBase += lD.Def.Base + lD.Def.Step*float64(v.EquipmentID.Level-1)
-				//副词条
+				// 副词条
 				if b := lightAffix[strconv.Itoa(v.EquipmentID.ID)].Properties; len(b) > 0 {
 					for _, bb := range b[v.EquipmentID.Rank-1] {
 						w.addList(typeMap[bb.Type], bb.Value)
@@ -341,7 +341,7 @@ func (r *info) convertData() *thisdata {
 			T: v.BehaviorList[3].Level,
 			F: v.BehaviorList[4].Level,
 		}
-		//遗迹属性加成
+		// 遗迹属性加成
 		for _, vv := range v.BehaviorList {
 			if vv.BehaviorID%1000 > 200 {
 				for _, vvv := range wifeTree[strconv.Itoa(vv.BehaviorID)].Levels[0].Properties {
@@ -354,9 +354,9 @@ func (r *info) convertData() *thisdata {
 			mainSetID := relicConfig[strconv.Itoa(v.RelicList[i].ID)].SetID
 			mainData := affixMain[strconv.Itoa(relicConfig[strconv.Itoa(v.RelicList[i].ID)].MainAffixGroup)][strconv.Itoa(v.RelicList[i].MainAffixID)]
 			na := typeMap[mainData.Property]
-			//遗物套装加成
+			// 遗物套装加成
 			ywtzs = append(ywtzs, mainSetID)
-			//属性计算
+			// 属性计算
 			{
 				w.addList(na, v.RelicList[i].Level*mainData.LevelAdd.Value+mainData.BaseValue.Value)
 				for _, vv := range v.RelicList[i].RelicSubAffix {
@@ -416,7 +416,7 @@ func (r *info) convertData() *thisdata {
 				t.RoleData[k].Relics.Object.Vlist = append(t.RoleData[k].Relics.Object.Vlist, tAffixVlist...)
 			}
 		}
-		//套装属性
+		// 套装属性
 		{
 			for kk, vv := range ywtz(ywtzs) {
 				if vv > 1 {
@@ -431,7 +431,6 @@ func (r *info) convertData() *thisdata {
 				}
 			}
 		}
-
 	}
 
 	return t

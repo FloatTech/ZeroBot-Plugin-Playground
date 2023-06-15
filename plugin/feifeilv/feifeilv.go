@@ -239,7 +239,6 @@ func init() {
 		m = append(m, ctxext.FakeSenderForwardNode(ctx, message.Text("相关标签: ", strings.Join(tagList, ","))))
 		ctx.Send(m)
 	})
-
 }
 
 func getAllTool() (tools []ToolList, err error) {
