@@ -26,18 +26,15 @@ var (
 		DisableOnDefault: false,
 		Brief:            "chatgpt",
 		Help: "-@bot chatgpt [对话内容]\n" +
-			"添加预设xxx xxx\n" +
-			"设置(默认)预设xxx\n" +
-			"删除本群预设\n" +
-			"查看预设列表\n" +
-			// "余额查询\n" +
-			"(私聊发送)设置OpenAI apikey [apikey]\n" +
-			"(私聊发送)删除apikey\n" +
-			"(群聊发送)(授权|取消)(本群|全局)使用apikey\n" +
-			"注:先私聊设置自己的key,再授权群聊使用,不会泄露key的\n" +
-			"---------------以下WF-apikey专用-------------------\n" +
-			"-@bot ?? [对话内容](?中英文都可以,暂时不支持连续对话)\n" +
-			"(私聊发送)设置 WFkey [apikey](主人权限)\n",
+			"- 添加预设xxx xxx\n" +
+			"- 设置(默认)预设xxx\n" +
+			"- 删除本群预设\n" +
+			"- 查看预设列表\n" +
+			"- 余额查询\n" +
+			"- (私聊发送)设置OpenAI apikey [apikey]\n" +
+			"- (私聊发送)删除apikey\n" +
+			"- (群聊发送)(授权|取消)(本群|全局)使用apikey\n" +
+			"注:先私聊设置自己的key,再授权群聊使用,不会泄露key的\n",
 		PrivateDataFolder: "chatgpt",
 	})
 )
@@ -270,7 +267,7 @@ func init() {
 				ctx.SendChain(message.Text("取消失败: ", err))
 				return
 			}
-			if t != ctx.Event.UserID {
+			if t != -ctx.Event.UserID {
 				ctx.SendChain(message.Text("取消失败: 你不是授权用户"))
 				return
 			}
