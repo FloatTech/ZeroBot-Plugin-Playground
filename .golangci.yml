@@ -1,4 +1,30 @@
 linters-settings:
+  depguard:
+    rules:
+      main:
+        files:
+          - $all
+          - "!$test"
+        allow:
+          - $gostd
+          - github.com/FloatTech
+          - github.com/wdvxdr1123
+          - github.com/fumiama
+          - github.com/tidwall
+          - jaytaylor.com/html2text
+          - github.com/glebarez
+          - github.com/sirupsen
+          - github.com/gorilla
+          - github.com/guohuiyuan
+          - github.com/MoYoez
+          - github.com/disintegration
+          - github.com/playwright-community
+          - github.com/mmcdole
+          - github.com/go-resty
+          - github.com/patrickmn
+          - github.com/golang
+          - github.com/wcharczuk
+
   errcheck:
     ignore: fmt:.*
     ignoretests: true
@@ -62,7 +88,7 @@ run:
   tests: false
   skip-dirs:
     - order
-  go: '1.18'
+  go: '1.20'
 
 # output configuration options
 output:
