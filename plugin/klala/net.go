@@ -3,7 +3,7 @@ package klala
 import (
 	"encoding/base64"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -44,7 +44,7 @@ func getRole(uid string) (body []byte, err error) {
 	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusBadRequest {
 		return nil, errors.New("获取数据失败, Code: " + strconv.Itoa(res.StatusCode))
 	}
-	body, err = ioutil.ReadAll(res.Body)
+	body, err = io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}
