@@ -20,7 +20,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/arcaea"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/asoularticle"
+	//_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/asoularticle"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chatgpt"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chinesebqb"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/cybercat"
@@ -34,6 +34,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/grasspicture"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/klala" // 星穹铁道面板/图鉴插件
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/kokomi"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/miaox"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/moegozh"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/movies"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/ottoshout"
