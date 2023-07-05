@@ -1,4 +1,4 @@
-package aimgr
+package miaox
 
 import (
 	"context"
@@ -33,9 +33,12 @@ var help = `
 - 删除凭证 + [key]
 - 添加凭证 + [key]:[value]
 - 切换AI + [AI类型：openai-api、openai-web、claude、bing-(c|b|p|s)]
+- 作画 + [tags]
+tips：
+  配置项采用web方式配置：请访问 http://127.0.0.1:8082 查看
 `
 var (
-	engine = control.Register("aimgr", &ctrl.Options[*zero.Ctx]{
+	engine = control.Register("miaox", &ctrl.Options[*zero.Ctx]{
 		Help:              help,
 		Brief:             "AI适配器",
 		DisableOnDefault:  false,
