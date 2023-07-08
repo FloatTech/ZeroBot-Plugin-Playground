@@ -163,5 +163,4 @@ func init() {
 			}
 			ctx.SendChain(message.ReplyWithMessage(ctx.Event.Message[0].Data["id"], message.Text(text))...)
 		})
-
 }

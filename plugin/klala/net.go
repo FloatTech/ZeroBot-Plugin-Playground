@@ -100,8 +100,8 @@ type role struct {
 		Type        int     `json:"Type"`
 		EXP         int     `json:"EXP,omitempty"`
 	} `json:"RelicList"`
-	Promotion int `json:"Promotion"` //角色晋阶
-	Rank      int `json:"Rank"`      //星魂
+	Promotion int `json:"Promotion"` // 角色晋阶
+	Rank      int `json:"Rank"`      // 星魂
 }
 
 // 本地数据
@@ -116,30 +116,30 @@ type ro struct {
 	Name    string `json:"name"`
 	Star    int    `json:"star"`
 	Rank    int    `json:"rank"`
-	Path    string `json:"path"`    //命途
-	Element string `json:"element"` //元素属性
-	List    combat `json:"combat"`  //属性列表
+	Path    string `json:"path"`    // 命途
+	Element string `json:"element"` // 元素属性
+	List    combat `json:"combat"`  // 属性列表
 	Light   light  `json:"light"`
-	Skill   skill  `json:"skill"`  //技能
-	Relics  relics `json:"rolics"` //遗物
+	Skill   skill  `json:"skill"`  // 技能
+	Relics  relics `json:"rolics"` // 遗物
 }
 type combat struct {
-	AvatarID          int     `json:"avatarId"` //角色序号
+	AvatarID          int     `json:"avatarId"` // 角色序号
 	Level             int     `json:"level"`
-	Promotion         int     `json:"promotion"`         //突破次数
-	HpBase            float64 `json:"hpBase"`            //hp白值
-	HpFinal           float64 `json:"hpFinal"`           //总和
-	AttackBase        float64 `json:"attackBase"`        //akt白值
-	AttackFinal       float64 `json:"attackFinal"`       //akt总和
-	DefenseBase       float64 `json:"defenseBase"`       //防御白值
-	DefenseFinal      float64 `json:"defenseFinal"`      //防御
-	SpeedBase         int     `json:"speedBase"`         //速度白值
-	SpeedFinal        float64 `json:"speedFinal"`        //速度
-	CriticalChance    float64 `json:"criticalChance"`    //暴击率
-	CriticalDamage    float64 `json:"criticalDamage"`    //暴击伤害
-	HealRatio         int     `json:"healRatio"`         //治疗
-	StatusProbability float64 `json:"statusProbability"` //效果命中
-	StatusResistance  float64 `json:"statusResistance"`  //效果抵抗
+	Promotion         int     `json:"promotion"`         // 突破次数
+	HpBase            float64 `json:"hpBase"`            // hp白值
+	HpFinal           float64 `json:"hpFinal"`           // 总和
+	AttackBase        float64 `json:"attackBase"`        // akt白值
+	AttackFinal       float64 `json:"attackFinal"`       // akt总和
+	DefenseBase       float64 `json:"defenseBase"`       // 防御白值
+	DefenseFinal      float64 `json:"defenseFinal"`      // 防御
+	SpeedBase         int     `json:"speedBase"`         // 速度白值
+	SpeedFinal        float64 `json:"speedFinal"`        // 速度
+	CriticalChance    float64 `json:"criticalChance"`    // 暴击率
+	CriticalDamage    float64 `json:"criticalDamage"`    // 暴击伤害
+	HealRatio         int     `json:"healRatio"`         // 治疗
+	StatusProbability float64 `json:"statusProbability"` // 效果命中
+	StatusResistance  float64 `json:"statusResistance"`  // 效果抵抗
 }
 
 type light struct {
@@ -167,7 +167,7 @@ type relics struct {
 	Object relicsdata `json:"object"`
 }
 type relicsdata struct {
-	SetID int     `json:"relicId"` //套装id
+	SetID int     `json:"relicId"` // 套装id
 	Name  string  `json:"name"`
 	Star  int     `json:"star"`
 	Type  int     `json:"type"`

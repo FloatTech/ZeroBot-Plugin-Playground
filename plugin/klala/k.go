@@ -77,7 +77,7 @@ func init() { // 主函数
 			ctx.SendChain(message.Text("ERROR: ", err))
 			return
 		}
-		//获取角色序列
+		// 获取角色序列
 		var n = -1
 		// 匹配角色
 		for i, v := range t.RoleData {
@@ -103,7 +103,7 @@ func init() { // 主函数
 		suid := ctx.State["regex_matched"].([]string)[1] // 获取uid
 		int64uid, err := strconv.ParseInt(suid, 10, 64)
 		if suid == "" || int64uid < 100000000 || int64uid > 1000000000 || err != nil {
-			//ctx.SendChain(message.Text("-请输入正确的uid"))
+			// ctx.SendChain(message.Text("-请输入正确的uid"))
 			return
 		}
 		sqquid := strconv.Itoa(int(ctx.Event.UserID))
