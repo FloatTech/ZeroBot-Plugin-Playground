@@ -47,7 +47,7 @@ func init() {
 			stauts = "从工作回来休息中\n	为你赚了" + strconv.Itoa(money)
 		}
 		now := time.Now().Hour()
-		if !cmd && ((now < 6 || (now > 8 && now < 11) || (now > 14 && now < 17) || now > 21) && (userInfo.Satiety > 50 || rand.Intn(3) != 1)) {
+		if !cmd && ((now < 6 || (now > 8 && now < 11) || (now > 14 && now < 17) || now > 21) && (userInfo.Satiety > 50 || rand.Intn(3) == 1)) {
 			if userInfo.Satiety > 50 {
 				ctx.SendChain(message.Text("猫猫拍了拍饱饱的肚子表示并不饿呢"))
 				return
@@ -63,7 +63,7 @@ func init() {
 			if ctx.State["regex_matched"].([]string)[2] != "" {
 				food, _ = strconv.ParseFloat(ctx.State["regex_matched"].([]string)[2], 64)
 			} else {
-				food = 1.0 + math.Max(userInfo.Food-1, 0)/5*rand.Float64()
+				food = math.Max(1.0+math.Max(userInfo.Food-1, 0)/5*rand.Float64(), (100-userInfo.Satiety)*userInfo.Weight/200)
 			}
 			switch {
 			case userInfo.Food == 0 || userInfo.Food < food:
@@ -132,7 +132,7 @@ func init() {
 			}
 			ctx.SendChain(message.Reply(id), message.Text("猫猫", userInfo.Name, "和你的感情淡了,选择了离家出走"))
 			return
-		case userInfo.Weight <= 0 && time.Since(time.Unix(userInfo.LastTime, 0)).Hours() > 72: // 三天不喂食就死
+		case userInfo.Weight <= 0 && subtime > 72: // 三天不喂食就死
 			if err = catdata.delcat(gidStr, uidStr); err != nil {
 				ctx.SendChain(message.Text("[ERROR]:", err))
 				return
@@ -299,7 +299,7 @@ func (data *catInfo) settleOfSatiety(food float64) catInfo {
 // 体重结算
 func (data *catInfo) settleOfWeight() catInfo {
 	if data.Weight < 0 {
-		satiety := math.Min(-data.Weight*7, data.Satiety)
+		satiety := math.Min((-data.Weight)*7, data.Satiety)
 		data.Weight += satiety
 		data.Satiety -= satiety
 	}
@@ -308,6 +308,11 @@ func (data *catInfo) settleOfWeight() catInfo {
 		data.Weight += (data.Satiety - 50) / 100
 	case data.Satiety < 0:
 		data.Weight += data.Satiety / 10
+		if data.Weight < 0 {
+			needFood := math.Min(-data.Weight*5, data.Food)
+			data.Food -= needFood
+			data.Weight += needFood / 5
+		}
 	}
 	return *data
 }
@@ -323,6 +328,12 @@ func (data *catInfo) settleOfData() catInfo {
 		data.Mood = 100
 	} else if data.Mood < 0 {
 		data.Mood = 0
+	}
+	if data.Weight < 0 {
+		data.Weight = -5
+	}
+	if data.Food < 0 {
+		data.Food = 0
 	}
 	return *data
 }
