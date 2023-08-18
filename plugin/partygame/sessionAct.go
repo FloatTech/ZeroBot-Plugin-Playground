@@ -183,7 +183,6 @@ func (cls Session) openFire() bool {
 // 打乱参与人顺序
 func (cls Session) rotateUser() {
 	// 随机打乱数组
-	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(cls.Users), func(i, j int) { cls.Users[i], cls.Users[j] = cls.Users[j], cls.Users[i] })
 	saveItem(dataPath, cls)
 }
@@ -193,7 +192,6 @@ func (cls Session) rotateRoulette() []int {
 	// 创建6个仓位的左轮弹夹
 	cartridges := []int{1, 0, 0, 0, 0, 0}
 	// 随机打乱数组
-	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(cartridges), func(i, j int) { cartridges[i], cartridges[j] = cartridges[j], cartridges[i] })
 	return cartridges
 }

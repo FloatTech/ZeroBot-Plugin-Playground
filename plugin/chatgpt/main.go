@@ -4,7 +4,6 @@ package chatgpt
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -22,24 +21,20 @@ type sessionKey struct {
 }
 
 var (
-	wfkey  string
 	cache  = ttl.NewCache[sessionKey, []chatMessage](time.Minute * 15)
 	engine = control.Register("chatgpt", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "chatgpt",
 		Help: "-@bot chatgpt [对话内容]\n" +
-			"添加预设xxx xxx\n" +
-			"设置(默认)预设xxx\n" +
-			"删除本群预设\n" +
-			"查看预设列表\n" +
-			// "余额查询\n" +
-			"(私聊发送)设置OpenAI apikey [apikey]\n" +
-			"(私聊发送)删除apikey\n" +
-			"(群聊发送)(授权|取消)(本群|全局)使用apikey\n" +
-			"注:先私聊设置自己的key,再授权群聊使用,不会泄露key的\n" +
-			"---------------以下WF-apikey专用-------------------\n" +
-			"-@bot ?? [对话内容](?中英文都可以,暂时不支持连续对话)\n" +
-			"(私聊发送)设置 WFkey [apikey](主人权限)\n",
+			"- 添加预设xxx xxx\n" +
+			"- 设置(默认)预设xxx\n" +
+			"- 删除本群预设\n" +
+			"- 查看预设列表\n" +
+			"- 余额查询\n" +
+			"- (私聊发送)设置OpenAI apikey [apikey]\n" +
+			"- (私聊发送)删除apikey\n" +
+			"- (群聊发送)(授权|取消)(本群|全局)使用apikey\n" +
+			"注:先私聊设置自己的key,再授权群聊使用,不会泄露key的\n",
 		PrivateDataFolder: "chatgpt",
 	})
 )
@@ -272,7 +267,7 @@ func init() {
 				ctx.SendChain(message.Text("取消失败: ", err))
 				return
 			}
-			if t != ctx.Event.UserID {
+			if t != -ctx.Event.UserID {
 				ctx.SendChain(message.Text("取消失败: 你不是授权用户"))
 				return
 			}
@@ -283,24 +278,4 @@ func init() {
 			}
 			ctx.SendChain(message.Text("取消成功"))
 		})
-	// AI-GPT-WF接口专用
-	engine.OnRegex(`^设置\s?WFkey\s*(.*)$`, zero.OnlyPrivate, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
-		file, _ := os.OpenFile(engine.DataFolder()+"apikey.txt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-		_, err := file.WriteString(ctx.State["regex_matched"].([]string)[1])
-		file.Close()
-		if err != nil {
-			ctx.SendChain(message.Text("保存apikey失败"))
-			return
-		}
-		wfkey = ctx.State["regex_matched"].([]string)[1]
-		ctx.SendChain(message.Text("保存apikey成功"))
-	})
-	engine.OnRegex(`^(?:\?\?|？？)([\s\S]*)$`, zero.OnlyToMe, wfinit).SetBlock(false).Handle(func(ctx *zero.Ctx) {
-		reply, err := completionsWF(ctx.State["regex_matched"].([]string)[1], wfkey)
-		if err != nil {
-			ctx.SendChain(message.Text("请求ChatGPT-WF失败: ", err))
-			return
-		}
-		ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(reply))
-	})
 }
