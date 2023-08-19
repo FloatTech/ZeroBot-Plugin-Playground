@@ -19,7 +19,6 @@ import (
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/arcaea"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/asoularticle"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chatgpt"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chinesebqb"
@@ -43,6 +42,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/qqclean"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/recall" // SGK2401
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/slash"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/subweibo"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/tgyj"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vote"

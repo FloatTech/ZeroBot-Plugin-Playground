@@ -12,7 +12,6 @@ require (
 	github.com/FloatTech/ttl v0.0.0-20220715042055-15612be72f5b
 	github.com/FloatTech/zbpctrl v1.5.3-0.20230316111343-dd078fa43fe3
 	github.com/FloatTech/zbputils v1.6.2-0.20230320041820-731f824ff8f4
-	github.com/MoYoez/Arcaea_auaAPI v0.0.0-20230403123758-2b7aba395359
 	github.com/disintegration/imaging v1.6.2
 	github.com/fumiama/jieba v0.0.0-20221203025406-36c17a10b565
 	github.com/glebarez/sqlite v1.6.0
