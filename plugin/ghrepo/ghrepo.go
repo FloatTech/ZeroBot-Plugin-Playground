@@ -6,7 +6,9 @@ import (
 
 	"github.com/FloatTech/floatbox/binary"
 	"github.com/FloatTech/floatbox/web"
-	log "github.com/sirupsen/logrus"
+	ctrl "github.com/FloatTech/zbpctrl"
+	"github.com/FloatTech/zbputils/control"
+	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
@@ -18,7 +20,12 @@ const (
 )
 
 func init() {
-	zero.OnPrefix("https://github.com/").SetBlock(true).
+	en := control.Register("ghrepo", &ctrl.Options[*zero.Ctx]{
+		DisableOnDefault: false,
+		Brief:            "GitHub 仓库链接解析",
+		Help:             "群内接收到 GitHub 仓库链接时自动解析并发送仓库信息的图片。",
+	})
+	en.OnPrefix("https://github.com/").SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			repoInfo := ctx.Event.Message.ExtractPlainText()[19:]
 			// 去除域名后内容过短，忽略消息
@@ -35,9 +42,10 @@ func init() {
 				return
 			}
 			// 检查仓库是否存在
+			// TODO: 此处 API 调用存在限制，加 token 之后会获得更多的调用次数
 			data, err := web.GetData(repoAPI + repoInfo)
 			if err != nil {
-				log.Errorln("[github]", "Fail to check repo status", err)
+				logrus.Errorln("[github]", "Fail to check repo status", err)
 				return
 			}
 			repoStatusMessage := gjson.Get(binary.BytesToString(data), "message").String()
@@ -48,7 +56,7 @@ func init() {
 			// 下载仓库图片
 			imageData, err := web.GetData(imageAPI + repoInfo)
 			if err != nil {
-				log.Errorln("[github]", "Fail to download repo image", err)
+				logrus.Errorln("[github]", "Fail to download repo image", err)
 				return
 			}
 			// 发送仓库图片
