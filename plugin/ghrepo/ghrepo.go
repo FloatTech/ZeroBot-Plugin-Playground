@@ -1,4 +1,5 @@
-package github
+// Package ghrepo GitHub 仓库链接解析
+package ghrepo
 
 import (
 	b64 "encoding/base64"
