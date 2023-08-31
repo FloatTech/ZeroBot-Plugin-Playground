@@ -67,5 +67,4 @@ func init() {
 			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(ctx.CardOrNickName(ctx.Event.UserID)+" "+getPatternInfo+"了 "+ctx.CardOrNickName(sender)))
 		}
 	})
-
 }
