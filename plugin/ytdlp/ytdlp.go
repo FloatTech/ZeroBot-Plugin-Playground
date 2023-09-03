@@ -59,7 +59,7 @@ func init() {
 			ctx.Send(fmt.Sprintf("视频标题：%s视频大小：%s即将开始下载视频，请稍候。", videoTitle, videoFileSize))
 			fileName := fmt.Sprintf("%d_%d.mp4", ctx.Event.Sender.ID, time.Now().Unix())
 			videoFilePath := path.Join(tempFileDir, fileName)
-			cmdDownload := exec.Command("yt-dlp", url, "-o", videoFilePath)
+			cmdDownload := exec.Command("yt-dlp", url, "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best", "-o", videoFilePath)
 			downloadLogInByte, err := cmdDownload.Output()
 			downloadLog := string(downloadLogInByte)
 			if err != nil {
@@ -77,5 +77,6 @@ func init() {
 				}
 				ctx.Send(fmt.Sprintln("文件上传失败。", errMsg))
 			}
+			os.Remove(videoFilePath)
 		})
 }
