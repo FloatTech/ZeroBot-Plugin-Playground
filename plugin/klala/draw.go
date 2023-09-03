@@ -242,7 +242,7 @@ func (t *thisdata) drawcard(n int) (string, error) {
 			// 遗物name
 			three.DrawStringAnchored(yw.Name, 325, 50, 1, 0)
 			// 圣遗物属性 主词条
-			//间隔45,初始145
+			// 间隔45,初始145
 			var xx, yy float64 // xx,yy词条相对位置,x,y文本框在全图位置
 			xx = 15
 			yy = 145
