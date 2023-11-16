@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	api = "http://8.134.179.136/genshin/"
+	api = "http://47.93.28.113/genshin/"
 )
 
 func init() {
