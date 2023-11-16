@@ -12,7 +12,7 @@ import (
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
-const url = "http://8.134.179.136/vtbwife?id="
+const url = "http://47.93.28.113/vtbwife?id="
 
 func init() { // 插件主体
 	engine := control.Register("vtbwife", &ctrl.Options[*zero.Ctx]{
