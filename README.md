@@ -25,8 +25,3 @@
 - [小锅饭版本](https://github.com/FloatTech/ZeroBot-Plugin-Playground/blob/main/example/xiaoguofan/example.go)
 - [小锅饭的ZerobotCourse](https://github.com/guohuiyuan/ZerobotCourse)
 - [夹子的版本(半成品)](https://github.com/FloatTech/ZeroBot-Plugin-Playground/tree/main/tutorial)
-
-## 联系方式
-你可以通过此二维码添加该QQ群以方便交流。
-
-[![二维码](.github/qrcode.png "二维码")](https://jq.qq.com/?_wv=1027&k=IywkLqoL "二维码")
