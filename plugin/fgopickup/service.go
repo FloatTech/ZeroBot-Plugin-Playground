@@ -18,11 +18,11 @@ func (s *service) getPickupDetail(pickupID int) (pickupDetailRes, error) {
 	if err != nil {
 		return res, err
 	}
-	servantIds, err := dao.selectServantIDsByPickupID(pickupID)
+	servantIDs, err := dao.selectServantIDsByPickupID(pickupID)
 	if err != nil {
 		return res, err
 	}
-	servants, err := dao.selectServantsByIDs(servantIds)
+	servants, err := dao.selectServantsByIDs(servantIDs)
 	if err != nil {
 		return res, err
 	}

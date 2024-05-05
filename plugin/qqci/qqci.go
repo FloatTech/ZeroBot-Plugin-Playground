@@ -44,7 +44,7 @@ func init() {
 	_ = os.RemoveAll(cachePath)
 	_ = os.MkdirAll(cachePath, 0755)
 	adb = initialize(engine.DataFolder() + "qqci.db")
-	getdb := fcext.DoOnceOnSuccess(func(ctx *zero.Ctx) bool {
+	getdb := fcext.DoOnceOnSuccess(func(_ *zero.Ctx) bool {
 		_, _ = engine.GetLazyData("makefile.tpl", true)
 		_, _ = engine.GetLazyData("load.tpl", true)
 		return true

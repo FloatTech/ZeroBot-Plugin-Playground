@@ -100,7 +100,7 @@ func init() { // 主函数
 		tab := "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n"
 		tmp.WriteString("\t\t\t\t  <---------服务详情--------->   \t\t\t\t")
 		// managers.ForEach(func(key string, service *ctrl.Control[*zero.Ctx]) bool {
-		control.ForEachByPrio(func(p int, service *ctrl.Control[*zero.Ctx]) bool {
+		control.ForEachByPrio(func(_ int, service *ctrl.Control[*zero.Ctx]) bool {
 			key := service.Service
 			i++
 			if i > end+1 && lenmap > 5 {

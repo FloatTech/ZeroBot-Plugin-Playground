@@ -165,7 +165,7 @@ func init() {
 			return
 		}
 	})
-	engine.OnFullMatch("我是什么职位", customrule2).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+	engine.OnFullMatch("我是什么职位", customrule2).SetBlock(true).Handle(func(_ *zero.Ctx) {
 	})
 }
 
