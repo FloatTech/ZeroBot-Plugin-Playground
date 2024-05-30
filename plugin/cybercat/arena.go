@@ -104,10 +104,10 @@ func init() {
 				ctx.SendChain(message.At(winer.User), message.Text("你家的喵喵为你赢得了", money))
 			}
 			winer.ArenaTime = now
-			err = catdata.insert(gidStr, winer)
+			err = catdata.insert(gidStr, &winer)
 			if err == nil {
 				loser.ArenaTime = now
-				err = catdata.insert(gidStr, loser)
+				err = catdata.insert(gidStr, &loser)
 			}
 			if err != nil {
 				ctx.SendChain(message.Text("[ERROR]:", err))
@@ -124,10 +124,10 @@ func init() {
 		if fatLine {
 			ctx.SendChain(message.Reply(id), message.Text(duelInfo.Name, "和", userInfo.Name, "之间并没有PK的意愿呢\nPK结束"))
 			userInfo.ArenaTime = now
-			err = catdata.insert(gidStr, userInfo)
+			err = catdata.insert(gidStr, &userInfo)
 			if err == nil {
 				duelInfo.ArenaTime = now
-				err = catdata.insert(gidStr, duelInfo)
+				err = catdata.insert(gidStr, &duelInfo)
 			}
 			if err != nil {
 				ctx.SendChain(message.Text("[ERROR]:", err))
@@ -156,10 +156,10 @@ func init() {
 				message.Text("\n", loser.Name, "在PK中受伤了\n在医疗中心治愈过程中体重降低至", strconv.FormatFloat(loser.Weight, 'f', 2, 64)))
 		}
 		userInfo.ArenaTime = time.Now().Unix()
-		err = catdata.insert(gidStr, winer)
+		err = catdata.insert(gidStr, &winer)
 		if err == nil {
 			duelInfo.ArenaTime = time.Now().Unix()
-			err = catdata.insert(gidStr, loser)
+			err = catdata.insert(gidStr, &loser)
 		}
 		if err != nil {
 			ctx.SendChain(message.Text("[ERROR]:", err))

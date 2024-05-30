@@ -92,7 +92,7 @@ func init() {
 				userInfo.Mood = 0
 			}
 			if rand.Intn(10) < 6 && subtime < 2 && userInfo.Satiety > 90 {
-				if err = catdata.insert(gidStr, userInfo); err != nil {
+				if err = catdata.insert(gidStr, &userInfo); err != nil {
 					ctx.SendChain(message.Text("[ERROR]:", err))
 					return
 				}
@@ -157,7 +157,7 @@ func init() {
 		userInfo.LastTime = time.Now().Unix()
 		userInfo.Mood += int(userInfo.Satiety)/5 - int(userInfo.Weight)/10
 		userInfo = userInfo.settleOfData()
-		if err = catdata.insert(gidStr, userInfo); err != nil {
+		if err = catdata.insert(gidStr, &userInfo); err != nil {
 			ctx.SendChain(message.Text("[ERROR]:", err))
 			return
 		}
@@ -165,7 +165,7 @@ func init() {
 			stauts = "完全没有饱"
 		}
 		ctx.SendChain(message.Reply(id), message.Text(userInfo.Name, "当前信息如下:\n"),
-			message.Image(userInfo.Picurl),
+			message.Image(userInfo.Avatar()),
 			message.Text("品种: "+userInfo.Type,
 				"\n饱食度: ", strconv.FormatFloat(userInfo.Satiety, 'f', 0, 64),
 				"\n心情: ", userInfo.Mood,
@@ -226,7 +226,7 @@ func init() {
 			workTime, _ = strconv.Atoi(ctx.State["regex_matched"].([]string)[2])
 		}
 		userInfo.Work = time.Now().Unix()*10 + int64(workTime)
-		if err = catdata.insert(gidStr, userInfo); err != nil {
+		if err = catdata.insert(gidStr, &userInfo); err != nil {
 			ctx.SendChain(message.Text("[ERROR]:", err))
 			return
 		}
@@ -279,7 +279,7 @@ func init() {
 			userInfo.Mood += rand.Intn(100)
 		}
 		userInfo = userInfo.settleOfData()
-		if err = catdata.insert(gidStr, userInfo); err != nil {
+		if err = catdata.insert(gidStr, &userInfo); err != nil {
 			ctx.SendChain(message.Text("[ERROR]:", err))
 			return
 		}
@@ -359,7 +359,7 @@ func (data *catInfo) settleOfWork(gid string) (int, bool) {
 	data.Mood += mood
 	data.Work = time.Now().Unix() * 10
 	data.LastTime = time.Unix(data.LastTime, 0).Add(time.Duration(workTime) * time.Hour).Unix()
-	if catdata.insert(gid, *data) != nil {
+	if catdata.insert(gid, data) != nil {
 		return 0, true
 	}
 	getmoney := 10 + rand.Intn(10*int(workTime))

@@ -11,6 +11,7 @@ import (
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
 	"github.com/FloatTech/zbputils/ctxext"
+	"github.com/FloatTech/zbputils/img/pool"
 	"github.com/tidwall/gjson"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
@@ -18,7 +19,7 @@ import (
 
 const apiURL = "https://api.thecatapi.com/v1/images/"
 
-var catType = map[string]string{
+var typeEN2ZH = map[string]string{
 	"Abyssinian": "阿比西尼亚猫", "Aegean": "爱琴猫", "American Bobtail": "美国短尾猫", "American Curl": "美国卷耳猫", "American Shorthairs": "美洲短毛猫", "American Wirehair": "美国硬毛猫",
 	"Arabian Mau": "美英猫", "Australian Mist": "澳大利亚雾猫", "Balinese": "巴厘岛猫", "Bambino": "班比诺猫", "Bengal": "孟加拉虎", "Birman": "比尔曼猫", "Bombay": "孟买猫", "British Longhair": "英国长毛猫",
 	"British Shorthair": "英国短毛猫", "Burmese": "缅甸猫", "Burmilla": "博美拉猫", "California Spangled": "加州闪亮猫", "Chantilly-Tiffany": "查达利/蒂法尼猫", "Chartreux": "夏特鲁斯猫", "Chausie": "非洲狮子猫",
@@ -30,7 +31,7 @@ var catType = map[string]string{
 	"Somali": "索马里猫", "Sphynx": "斯芬克斯猫", "Tonkinese": "东京猫", "Toyger": "玩具虎猫", "Turkish Angora": "土耳其安哥拉猫",
 	"Turkish Van": "土耳其梵猫", "York Chocolate": "约克巧克力猫", "Cymic": "金力克长毛猫"}
 
-var catBreeds = map[string]string{
+var typeZH2Breeds = map[string]string{
 	"阿比西尼亚猫": "abys", "爱琴猫": "aege", "美国短尾猫": "abob", "美国卷耳猫": "acur", "美洲短毛猫": "asho", "美国硬毛猫": "awir", "美英猫": "amau", "澳大利亚雾猫": "amis", "巴厘岛猫": "bali",
 	"班比诺猫": "bamb", "孟加拉虎": "beng", "比尔曼猫": "birm", "孟买猫": "bomb", "英国长毛猫": "bslo", "英国短毛猫": "bsho", "缅甸猫": "bure", "博美拉猫": "buri", "加州闪亮猫": "cspa",
 	"查达利/蒂法尼猫": "ctif", "夏特鲁斯猫": "char", "非洲狮子猫": "chau", "奇多猫": "chee", "重点色短毛猫": "csho", "康沃尔-雷克斯猫": "crex", "威尔士猫": "cymr", "塞浦路斯猫": "cypr",
@@ -57,6 +58,14 @@ type catInfo struct {
 	ArenaTime int64   // 上次PK时间
 	Food      float64 // 食物数量
 	Picurl    string  // 猫猫图片
+}
+
+func (inf *catInfo) Avatar() string {
+	nti, err := pool.NewNTImage(inf.Picurl)
+	if err != nil {
+		return inf.Picurl
+	}
+	return nti.String()
 }
 
 var (
@@ -95,7 +104,7 @@ func init() {
 	engine.OnRegex(`^吸(.*猫)$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		typeOfcat := ctx.State["regex_matched"].([]string)[1]
 		if typeOfcat == "猫" {
-			typeName, temperament, description, url, err := getCatAPI()
+			typeName, temperament, description, url, err := suineko()
 			if err != nil {
 				ctx.SendChain(message.Text("[ERROR]: ", err))
 				return
@@ -104,7 +113,7 @@ func init() {
 				"\n气质:\n", temperament, "\n描述:\n", description))
 			return
 		}
-		breeds, ok := catBreeds[typeOfcat]
+		breeds, ok := typeZH2Breeds[typeOfcat]
 		if !ok {
 			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("没有相关该品种的猫图"))
 			return
@@ -118,7 +127,7 @@ func init() {
 	})
 }
 
-func getCatAPI() (typeName, temperament, description, url string, err error) {
+func suineko() (typeName, temperament, description, url string, err error) {
 	data, err := web.GetData(apiURL + "search?has_breeds=1")
 	if err != nil {
 		return
@@ -129,7 +138,7 @@ func getCatAPI() (typeName, temperament, description, url string, err error) {
 		return
 	}
 	name := gjson.ParseBytes(picdata).Get("breeds.0.name").String()
-	return catType[name], gjson.ParseBytes(picdata).Get("breeds.0.temperament").String(), gjson.ParseBytes(picdata).Get("breeds.0.description").String(), gjson.ParseBytes(picdata).Get("url").String(), nil
+	return typeEN2ZH[name], gjson.ParseBytes(picdata).Get("breeds.0.temperament").String(), gjson.ParseBytes(picdata).Get("breeds.0.description").String(), gjson.ParseBytes(picdata).Get("url").String(), nil
 }
 
 func getPicByBreed(catBreed string) (url string, err error) {
@@ -140,7 +149,7 @@ func getPicByBreed(catBreed string) (url string, err error) {
 	return gjson.ParseBytes(data).Get("0.url").String(), nil
 }
 
-func (sql *catdb) insert(gid string, dbInfo catInfo) error {
+func (sql *catdb) insert(gid string, dbInfo *catInfo) error {
 	sql.Lock()
 	defer sql.Unlock()
 	err := sql.db.Create(gid, &catInfo{})
