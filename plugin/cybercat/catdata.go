@@ -60,7 +60,7 @@ type catInfo struct {
 	Picurl    string  // 猫猫图片
 }
 
-func (inf *catInfo) Avatar() string {
+func (inf *catInfo) avatar() string {
 	nti, err := pool.NewNTImage(inf.Picurl)
 	if err != nil {
 		return inf.Picurl
