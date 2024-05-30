@@ -67,9 +67,9 @@ func init() {
 		}
 		device := pw.Devices["Pixel 5"]
 		context, err := browser.NewContext(playwright.BrowserNewContextOptions{
-			Geolocation: &playwright.BrowserNewContextOptionsGeolocation{
-				Longitude: playwright.Float(12.492507),
-				Latitude:  playwright.Float(41.889938),
+			Geolocation: &playwright.Geolocation{
+				Longitude: 12.492507,
+				Latitude:  41.889938,
 			},
 			Permissions:       []string{"geolocation"},
 			Viewport:          device.Viewport,
@@ -96,13 +96,13 @@ func init() {
 		x := float64(0)
 		y := float64(0)
 		fullpage := true
-		clip := (*playwright.PageScreenshotOptionsClip)(nil)
+		clip := (*playwright.Rect)(nil)
 		if width != 0 && height != 0 {
-			clip = &playwright.PageScreenshotOptionsClip{
-				X:      &x,
-				Y:      &y,
-				Width:  &width,
-				Height: &height,
+			clip = &playwright.Rect{
+				X:      x,
+				Y:      y,
+				Width:  width,
+				Height: height,
 			}
 		}
 		if _, err = page.Screenshot(playwright.PageScreenshotOptions{
