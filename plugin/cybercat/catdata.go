@@ -156,7 +156,7 @@ func (sql *catdb) insert(gid string, dbInfo *catInfo) error {
 	if err != nil {
 		return err
 	}
-	return sql.db.Insert(gid, &dbInfo)
+	return sql.db.Insert(gid, dbInfo)
 }
 
 func (sql *catdb) find(gid, uid string) (dbInfo catInfo, err error) {
