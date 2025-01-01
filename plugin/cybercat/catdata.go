@@ -60,17 +60,51 @@ type catInfo struct {
 	Picurl    string  // 猫猫图片
 }
 
-func (inf *catInfo) avatar() string {
-	nti, err := pool.NewNTImage(inf.Picurl)
-	if err != nil {
-		return inf.Picurl
-	}
-	return nti.String()
+func (c *catInfo) avatar(Gid int64) string {
+    cache := "data/cybercat/cache" // 指定缓存路径
+	cache = path.Join(engine.DataFolder(), "cache")
+    imgname := fmt.Sprintf("%d_%d", c.User, Gid)
+    imgfile := filepath.Join(cache, c.Type+imgname+".png")
+    aimgfile := filepath.Join(file.BOTPATH, imgfile)
+
+	if _, err := os.Stat(cache); os.IsNotExist(err) {
+        err := os.MkdirAll(cache, 0755)
+        if err != nil {
+            fmt.Println("Error creating cache directory:", err)
+            return err.Error()
+        }
+    }
+    if file.IsNotExist(aimgfile) {
+        breed := c.Type
+        data, err := web.GetData(apiURL + "search?has_breeds=" + breed)
+        if err != nil {
+            fmt.Println("Error fetching avatar URL:", err)
+            return err.Error() // 返回错误信息
+        }
+        imgurl := gjson.ParseBytes(data).Get("0.url").String()
+        imgdata, err := web.GetData(imgurl)
+        if err != nil {
+            return "错误：未能解析图片URL"
+        }
+        var f *os.File
+        f, err = os.Create(aimgfile) // 使用 aimgfile 作为文件路径
+        if err != nil {
+            fmt.Println("Error creating file:", err)
+            return err.Error() // 返回错误信息
+        }
+        defer f.Close()
+        _, err = f.Write([]byte(imgdata)) // 写入图片数据
+        if err != nil {
+            fmt.Println("Error writing file:", err)
+            return err.Error() // 返回错误信息
+        }
+    }
+    return "file:///" + aimgfile // 返回文件协议的完整路径
 }
 
 var (
-	catdata = &catdb{
-		db: &sql.Sqlite{},
+	    dbpath = "data/cybercat/catdata.db"
+	    catdata = &catdb{db: sql.New(dbpath),
 	}
 	engine = control.Register("cybercat", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
