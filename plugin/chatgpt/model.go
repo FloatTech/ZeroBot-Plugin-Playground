@@ -14,8 +14,8 @@ import (
 )
 
 type model struct {
-	sql *sql.Sqlite
 	sync.RWMutex
+	sql.Sqlite
 }
 
 type mode struct {
@@ -39,30 +39,29 @@ type gtoqq struct {
 }
 
 var (
-	db    = &model{sql: &sql.Sqlite{}}
+	db    = &model{Sqlite: sql.New(engine.DataFolder() + "chatgpt.db")}
 	getdb = fcext.DoOnceOnSuccess(func(ctx *zero.Ctx) bool {
-		db.sql.DBPath = engine.DataFolder() + "chatgpt.db"
-		err := db.sql.Open(time.Hour * 24)
+		err := db.Open(time.Hour * 24)
 		if err != nil {
 			ctx.SendChain(message.Text("ERROR: ", err))
 			return false
 		}
-		err = db.sql.Create("mode", &mode{})
+		err = db.Create("mode", &mode{})
 		if err != nil {
 			ctx.SendChain(message.Text("ERROR: ", err))
 			return false
 		}
-		err = db.sql.Create("note", &note{})
+		err = db.Create("note", &note{})
 		if err != nil {
 			ctx.SendChain(message.Text("ERROR: ", err))
 			return false
 		}
-		err = db.sql.Create("key", &key{})
+		err = db.Create("key", &key{})
 		if err != nil {
 			ctx.SendChain(message.Text("ERROR: ", err))
 			return false
 		}
-		err = db.sql.Create("gtoqq", &gtoqq{})
+		err = db.Create("gtoqq", &gtoqq{})
 		if err != nil {
 			ctx.SendChain(message.Text("ERROR: ", err))
 			return false
@@ -78,7 +77,7 @@ func (db *model) insertmode(modename, content string) (err error) {
 		Mode:    modename,
 		Content: content,
 	}
-	err = db.sql.Insert("mode", &m)
+	err = db.Insert("mode", &m)
 	if err != nil {
 		return
 	}
@@ -89,7 +88,7 @@ func (db *model) findmode(modename string) (content string, err error) {
 	db.Lock()
 	defer db.Unlock()
 	var m mode
-	err = db.sql.Find("mode", &m, "where mode = '"+modename+"'")
+	err = db.Find("mode", &m, "where mode = '"+modename+"'")
 	if err != nil {
 		return
 	}
@@ -107,20 +106,20 @@ func (db *model) changemode(gid int64, modename string) (err error) {
 	}
 	db.Lock()
 	defer db.Unlock()
-	return db.sql.Insert("note", &n)
+	return db.Insert("note", &n)
 }
 
 func (db *model) delgroupmode(gid int64) (err error) {
 	db.Lock()
 	defer db.Unlock()
-	return db.sql.Del("note", "where groupid = "+strconv.FormatInt(gid, 10))
+	return db.Del("note", "where groupid = "+strconv.FormatInt(gid, 10))
 }
 
 func (db *model) findgroupmode(gid int64) (content string, err error) {
 	db.Lock()
 	defer db.Unlock()
 	var m mode
-	err = db.sql.Find("note", &m, "where groupid = "+strconv.FormatInt(gid, 10))
+	err = db.Find("note", &m, "where groupid = "+strconv.FormatInt(gid, 10))
 	if err != nil {
 		return
 	}
@@ -133,7 +132,7 @@ func (db *model) findformode() (string, error) {
 	var sb strings.Builder
 	sb.WriteString("当前所有预设:")
 	var m mode
-	err := db.sql.FindFor("mode", &m, "", func() error {
+	err := db.FindFor("mode", &m, "", func() error {
 		sb.WriteString("\n")
 		sb.WriteString(m.Mode)
 		return nil
@@ -151,20 +150,20 @@ func (db *model) insertkey(qquid int64, content string) (err error) {
 		QQuid:   qquid,
 		Content: content,
 	}
-	return db.sql.Insert("key", &m)
+	return db.Insert("key", &m)
 }
 
 func (db *model) delkey(gid int64) (err error) {
 	db.Lock()
 	defer db.Unlock()
-	return db.sql.Del("key", "where qquid = "+strconv.FormatInt(gid, 10))
+	return db.Del("key", "where qquid = "+strconv.FormatInt(gid, 10))
 }
 
 func (db *model) findkey(gid int64) (content string, err error) {
 	db.Lock()
 	defer db.Unlock()
 	var m key
-	err = db.sql.Find("key", &m, "where qquid = "+strconv.FormatInt(gid, 10))
+	err = db.Find("key", &m, "where qquid = "+strconv.FormatInt(gid, 10))
 	if err != nil {
 		return "", errors.New("账号未绑定OpenAI-apikey,请私聊设置key后使用")
 	}
@@ -175,7 +174,7 @@ func (db *model) insertgkey(qquid, guid int64) (err error) {
 	db.Lock()
 	defer db.Unlock()
 	var n key
-	err = db.sql.Find("key", &n, "where qquid = "+strconv.FormatInt(qquid, 10))
+	err = db.Find("key", &n, "where qquid = "+strconv.FormatInt(qquid, 10))
 	if err != nil || n.Content == "" {
 		return errors.New("授权账号未绑定OpenAI-apikey,请私聊设置key以后使用")
 	}
@@ -183,20 +182,20 @@ func (db *model) insertgkey(qquid, guid int64) (err error) {
 		GroupID: guid,
 		QQuid:   qquid,
 	}
-	return db.sql.Insert("gtoqq", &m)
+	return db.Insert("gtoqq", &m)
 }
 
 func (db *model) delgkey(gid int64) (err error) {
 	db.Lock()
 	defer db.Unlock()
-	return db.sql.Del("gtoqq", "where groupid = "+strconv.FormatInt(gid, 10))
+	return db.Del("gtoqq", "where groupid = "+strconv.FormatInt(gid, 10))
 }
 
 func (db *model) findgtoqq(gid int64) (qquid int64, err error) {
 	db.Lock()
 	defer db.Unlock()
 	var m gtoqq
-	err = db.sql.Find("gtoqq", &m, "where groupid = "+strconv.FormatInt(gid, 10))
+	err = db.Find("gtoqq", &m, "where groupid = "+strconv.FormatInt(gid, 10))
 	if err != nil {
 		return 0, errors.New("没有用户授权key")
 	}
@@ -207,12 +206,12 @@ func (db *model) findgkey(gid int64) (content string, err error) {
 	db.Lock()
 	defer db.Unlock()
 	var m gtoqq
-	err = db.sql.Find("gtoqq", &m, "where groupid = "+strconv.FormatInt(gid, 10))
+	err = db.Find("gtoqq", &m, "where groupid = "+strconv.FormatInt(gid, 10))
 	if err != nil {
 		return "", errors.New("未设置OpenAI-apikey,请私聊设置key以后授权本群使用")
 	}
 	var n key
-	err = db.sql.Find("key", &n, "where qquid = "+strconv.FormatInt(m.QQuid, 10))
+	err = db.Find("key", &n, "where qquid = "+strconv.FormatInt(m.QQuid, 10))
 	if err != nil || n.Content == "" {
 		return "", errors.New("授权账号未绑定OpenAI-apikey,请私聊设置key以后使用")
 	}

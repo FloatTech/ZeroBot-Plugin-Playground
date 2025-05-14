@@ -92,7 +92,7 @@ func newRssDetailsMsg(ctx *zero.Ctx, view *domain.RssClientView) (message.Messag
 }
 
 // fakeSenderForwardNode 伪造一个发送者为RssHub订阅姬的消息节点
-func fakeSenderForwardNode(userID int64, msgs ...message.MessageSegment) message.MessageSegment {
+func fakeSenderForwardNode(userID int64, msgs ...message.Segment) message.Segment {
 	return message.CustomNode(
 		"RssHub订阅姬",
 		userID,

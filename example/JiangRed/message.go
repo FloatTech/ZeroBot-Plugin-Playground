@@ -170,7 +170,7 @@ func init() {
 }
 
 // randText 随机文本
-func randText(text ...string) message.MessageSegment {
+func randText(text ...string) message.Segment {
 	return message.Text(text[rand.Intn(len(text))])
 }
 

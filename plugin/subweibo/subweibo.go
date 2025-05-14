@@ -19,6 +19,17 @@ import (
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
+var engine = control.Register("weiboMessage", &ctrl.Options[*zero.Ctx]{
+	DisableOnDefault: false,
+	Brief:            "订阅微博消息",
+	Help: "- 开启订阅 [UID] 开始接收订阅消息\n" +
+		"- 关闭订阅 停止接收消息，并且清空缓存\n" +
+		"- 订阅微博 [UID] 订阅xxx的微博消息\n" +
+		"- 退订微博 [UID] 停止订阅xxx的微博消息\n" +
+		"- 查看订阅 查看当前所有订阅",
+	PrivateDataFolder: "subweibo",
+})
+
 type channelItem struct {
 	ChannelKey  string `json:"channelKey"`
 	ChannelName string `json:"channelName"`
@@ -33,7 +44,7 @@ var (
 	//  15天清除一次缓存清除订阅信息,  flush cache 后会产生会重复发message
 	cacheMap       = cache.New(5*time.Minute, 360*time.Hour)
 	messageSwitch  = false
-	db             = &sql.Sqlite{}
+	db             = sql.New(engine.DataFolder() + "weibo.db")
 	weiboMsgLocker sync.RWMutex
 )
 
@@ -169,7 +180,7 @@ func running(ctx *zero.Ctx) {
 				}
 				ok := db.CanFind("weiboMsg", "WHERE id="+strconv.FormatInt(weiboMsgBoxData.id, 10))
 				if !ok {
-					_ = dataBuild(weiboMsgBoxData.id, weiboMsgBoxData.scheme, weiboMsgBoxData.username, weiboMsgBoxData.createdAt).throw(db)
+					_ = dataBuild(weiboMsgBoxData.id, weiboMsgBoxData.scheme, weiboMsgBoxData.username, weiboMsgBoxData.createdAt).throw(&db)
 					if weiboMsgBoxData.retweetedText == "" {
 						ctx.Send(message.Message{
 							message.Text(weiboMsgBoxData.createdAt.String() + "\n" + weiboMsgBoxData.username + "发布了微博:\n" + trimHTML(weiboMsgBoxData.msgText) + "\n\nURL:" + weiboMsgBoxData.scheme),
@@ -187,7 +198,7 @@ func running(ctx *zero.Ctx) {
 					} else {
 						ok = db.CanFind("weiboMsg", "WHERE id="+strconv.FormatInt(weiboMsgBoxData.retweetedID, 10))
 						if !ok {
-							_ = dataBuild(weiboMsgBoxData.retweetedID, weiboMsgBoxData.scheme, weiboMsgBoxData.username, weiboMsgBoxData.createdAt).throw(db)
+							_ = dataBuild(weiboMsgBoxData.retweetedID, weiboMsgBoxData.scheme, weiboMsgBoxData.username, weiboMsgBoxData.createdAt).throw(&db)
 							ctx.Send(message.Message{
 								message.Text(weiboMsgBoxData.createdAt.String() + "\n" + weiboMsgBoxData.username + "  转发了  " + weiboMsgBoxData.retweetedUserName + "  的微博:\n" + trimHTML(weiboMsgBoxData.retweetedText) + "\n评论了:\n" + trimHTML(weiboMsgBoxData.msgText) + "\nURL:" + weiboMsgBoxData.scheme),
 							})
@@ -243,18 +254,7 @@ func selectAllSubChannelsInfo(ctx *zero.Ctx) {
 }
 
 func init() {
-	engine := control.Register("weiboMessage", &ctrl.Options[*zero.Ctx]{
-		DisableOnDefault: false,
-		Brief:            "订阅微博消息",
-		Help: "- 开启订阅 [UID] 开始接收订阅消息\n" +
-			"- 关闭订阅 停止接收消息，并且清空缓存\n" +
-			"- 订阅微博 [UID] 订阅xxx的微博消息\n" +
-			"- 退订微博 [UID] 停止订阅xxx的微博消息\n" +
-			"- 查看订阅 查看当前所有订阅",
-		PrivateDataFolder: "subweibo",
-	})
 	go func() {
-		db.DBPath = engine.DataFolder() + "weibo.db"
 		err := db.Open(time.Hour * 24)
 		if err != nil {
 			panic(err)

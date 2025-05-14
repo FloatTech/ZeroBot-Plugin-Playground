@@ -1,32 +1,5 @@
 linters-settings:
-  depguard:
-    rules:
-      main:
-        files:
-          - $all
-          - "!$test"
-        allow:
-          - $gostd
-          - github.com/FloatTech
-          - github.com/wdvxdr1123
-          - github.com/fumiama
-          - github.com/tidwall
-          - jaytaylor.com/html2text
-          - github.com/glebarez
-          - github.com/sirupsen
-          - github.com/gorilla
-          - github.com/guohuiyuan
-          - github.com/MoYoez
-          - github.com/disintegration
-          - github.com/playwright-community
-          - github.com/mmcdole
-          - github.com/go-resty
-          - github.com/patrickmn
-          - github.com/golang
-          - github.com/wcharczuk
-
   errcheck:
-    ignore: fmt:.*
     ignoretests: true
 
   goimports:
@@ -44,11 +17,10 @@ linters:
   fast: false
   enable:
     - bodyclose
-    #- deadcode
-    - depguard
+    #- depguard
     - dogsled
     - errcheck
-    - exportloopref
+    #- exportloopref
     - exhaustive
     #- funlen
     #- goconst
@@ -65,13 +37,11 @@ linters:
     - nolintlint
     - rowserrcheck
     - staticcheck
-    #- structcheck
     - stylecheck
     - typecheck
     - unconvert
     - unparam
     - unused
-    #- varcheck
     - whitespace
     - prealloc
     - predeclared
@@ -102,3 +72,4 @@ issues:
   exclude-use-default: false
   exclude:
     - "Error return value of .((os.)?std(out|err)..*|.*Close|.*Seek|.*Flush|os.Remove(All)?|.*print(f|ln)?|os.(Un)?Setenv). is not check"
+    - 'identifier ".*" contain non-ASCII character: U\+.*'

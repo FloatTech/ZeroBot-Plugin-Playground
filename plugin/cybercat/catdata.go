@@ -2,16 +2,20 @@
 package cybercat
 
 import (
+	"fmt"
+	"os"
+	"path"
+	"path/filepath"
 	"sync"
 	"time"
 
 	fcext "github.com/FloatTech/floatbox/ctxext"
+	"github.com/FloatTech/floatbox/file"
 	"github.com/FloatTech/floatbox/web"
 	sql "github.com/FloatTech/sqlite"
 	ctrl "github.com/FloatTech/zbpctrl"
 	"github.com/FloatTech/zbputils/control"
 	"github.com/FloatTech/zbputils/ctxext"
-	"github.com/FloatTech/zbputils/img/pool"
 	"github.com/tidwall/gjson"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
@@ -42,8 +46,8 @@ var typeZH2Breeds = map[string]string{
 	"玩具虎猫": "toyg", "土耳其安哥拉猫": "tang", "土耳其梵猫": "tvvan", "约克巧克力猫": "ycho", "金力克长毛猫": "cymi"}
 
 type catdb struct {
-	db *sql.Sqlite
 	sync.RWMutex
+	sql.Sqlite
 }
 
 type catInfo struct {
@@ -61,51 +65,48 @@ type catInfo struct {
 }
 
 func (c *catInfo) avatar(Gid int64) string {
-    cache := "data/cybercat/cache" // 指定缓存路径
-    cache = path.Join(engine.DataFolder(), "cache")
-    imgname := fmt.Sprintf("%d_%d", c.User, Gid)
-    imgfile := filepath.Join(cache, c.Type+imgname+".png")
-    aimgfile := filepath.Join(file.BOTPATH, imgfile)
+	cache := "data/cybercat/cache" // 指定缓存路径
+	cache = path.Join(engine.DataFolder(), "cache")
+	imgname := fmt.Sprintf("%d_%d", c.User, Gid)
+	imgfile := filepath.Join(cache, c.Type+imgname+".png")
+	aimgfile := filepath.Join(file.BOTPATH, imgfile)
 
 	if _, err := os.Stat(cache); os.IsNotExist(err) {
-        err := os.MkdirAll(cache, 0755)
-        if err != nil {
-            fmt.Println("Error creating cache directory:", err)
-            return err.Error()
-        }
-    }
-    if file.IsNotExist(aimgfile) {
-        breed := c.Type
-        data, err := web.GetData(apiURL + "search?has_breeds=" + breed)
-        if err != nil {
-            fmt.Println("Error fetching avatar URL:", err)
-            return err.Error() // 返回错误信息
-        }
-        imgurl := gjson.ParseBytes(data).Get("0.url").String()
-        imgdata, err := web.GetData(imgurl)
-        if err != nil {
-            return "错误：未能解析图片URL"
-        }
-        var f *os.File
-        f, err = os.Create(aimgfile) // 使用 aimgfile 作为文件路径
-        if err != nil {
-            fmt.Println("Error creating file:", err)
-            return err.Error() // 返回错误信息
-        }
-        defer f.Close()
-        _, err = f.Write([]byte(imgdata)) // 写入图片数据
-        if err != nil {
-            fmt.Println("Error writing file:", err)
-            return err.Error() // 返回错误信息
-        }
-    }
-    return "file:///" + aimgfile // 返回文件协议的完整路径
+		err := os.MkdirAll(cache, 0755)
+		if err != nil {
+			fmt.Println("Error creating cache directory:", err)
+			return err.Error()
+		}
+	}
+	if file.IsNotExist(aimgfile) {
+		breed := c.Type
+		data, err := web.GetData(apiURL + "search?has_breeds=" + breed)
+		if err != nil {
+			fmt.Println("Error fetching avatar URL:", err)
+			return err.Error() // 返回错误信息
+		}
+		imgurl := gjson.ParseBytes(data).Get("0.url").String()
+		imgdata, err := web.GetData(imgurl)
+		if err != nil {
+			return "错误：未能解析图片URL"
+		}
+		var f *os.File
+		f, err = os.Create(aimgfile) // 使用 aimgfile 作为文件路径
+		if err != nil {
+			fmt.Println("Error creating file:", err)
+			return err.Error() // 返回错误信息
+		}
+		defer f.Close()
+		_, err = f.Write([]byte(imgdata)) // 写入图片数据
+		if err != nil {
+			fmt.Println("Error writing file:", err)
+			return err.Error() // 返回错误信息
+		}
+	}
+	return "file:///" + aimgfile // 返回文件协议的完整路径
 }
 
 var (
-	    dbpath = "data/cybercat/catdata.db"
-	    catdata = &catdb{db: sql.New(dbpath),
-	}
 	engine = control.Register("cybercat", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "云养猫",
@@ -123,9 +124,9 @@ var (
 			"\n6.品种为猫娘的猫猫可以使用“上传猫猫照片”更换图片",
 		PrivateDataFolder: "cybercat",
 	}).ApplySingle(ctxext.DefaultSingle)
-	getdb = fcext.DoOnceOnSuccess(func(ctx *zero.Ctx) bool {
-		catdata.db.DBPath = engine.DataFolder() + "catdata.db"
-		err := catdata.db.Open(time.Hour * 24)
+	catdata = &catdb{Sqlite: sql.New(engine.DataFolder() + "catdata.db")}
+	getdb   = fcext.DoOnceOnSuccess(func(ctx *zero.Ctx) bool {
+		err := catdata.Open(time.Hour * 24)
 		if err != nil {
 			ctx.SendChain(message.Text("[ERROR]:", err))
 			return false
@@ -186,50 +187,50 @@ func getPicByBreed(catBreed string) (url string, err error) {
 func (sql *catdb) insert(gid string, dbInfo *catInfo) error {
 	sql.Lock()
 	defer sql.Unlock()
-	err := sql.db.Create(gid, &catInfo{})
+	err := sql.Create(gid, &catInfo{})
 	if err != nil {
 		return err
 	}
-	return sql.db.Insert(gid, dbInfo)
+	return sql.Insert(gid, dbInfo)
 }
 
 func (sql *catdb) find(gid, uid string) (dbInfo catInfo, err error) {
 	sql.Lock()
 	defer sql.Unlock()
-	err = sql.db.Create(gid, &catInfo{})
+	err = sql.Create(gid, &catInfo{})
 	if err != nil {
 		return
 	}
-	if !sql.db.CanFind(gid, "where user = "+uid) {
+	if !sql.CanFind(gid, "where user = "+uid) {
 		return catInfo{}, nil // 规避没有该用户数据的报错
 	}
-	err = sql.db.Find(gid, &dbInfo, "where user = "+uid)
+	err = sql.Find(gid, &dbInfo, "where user = "+uid)
 	return
 }
 
 func (sql *catdb) del(gid, uid string) error {
 	sql.Lock()
 	defer sql.Unlock()
-	return sql.db.Del(gid, "where user = "+uid)
+	return sql.Del(gid, "where user = "+uid)
 }
 
 func (sql *catdb) delcat(gid, uid string) error {
 	sql.Lock()
 	defer sql.Unlock()
 	dbInfo := catInfo{}
-	_ = sql.db.Find(gid, &dbInfo, "where user = "+uid)
+	_ = sql.Find(gid, &dbInfo, "where user = "+uid)
 	newInfo := catInfo{
 		User: dbInfo.User,
 		Food: dbInfo.Food,
 	}
-	return sql.db.Insert(gid, &newInfo)
+	return sql.Insert(gid, &newInfo)
 }
 
 func (sql *catdb) getGroupdata(gid string) (list []catInfo, err error) {
 	sql.RLock()
 	defer sql.RUnlock()
 	info := catInfo{}
-	err = sql.db.FindFor(gid, &info, "order by Weight DESC", func() error {
+	err = sql.FindFor(gid, &info, "order by Weight DESC", func() error {
 		if info.Name != "" {
 			list = append(list, info)
 		}
