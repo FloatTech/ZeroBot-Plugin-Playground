@@ -157,7 +157,7 @@ func init() {
 		userInfo.LastTime = time.Now().Unix()
 		userInfo.Mood += int(userInfo.Satiety)/5 - int(userInfo.Weight)/10
 		userInfo = userInfo.settleOfData()
-		avatarResult := userInfo.avatar(ctx.Event.GroupID) 
+		avatarResult := userInfo.avatar(ctx.Event.GroupID)
 		if err = catdata.insert(gidStr, &userInfo); err != nil {
 			ctx.SendChain(message.Text("[ERROR]:", err))
 			return
