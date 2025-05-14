@@ -12,10 +12,10 @@ import (
 )
 
 const (
-	NameFont    = "data/klala/kkk/font/NZBZ.ttf"                    // NameFont 名字字体
-	FontFile    = "data/klala/kkk/font/SourceHanMonoSC-HeavyIt.ttf" // FontFile 汉字字体
-	FiFile      = "data/klala/kkk/font/tttgbnumber.ttf"             // FiFile 其余字体(数字英文)
-	BaFile      = "data/klala/kkk/font/STLITI.TTF"                  // BaFile 华文隶书版本版本号字体
+	nameFont    = "data/klala/kkk/font/NZBZ.ttf"                    // 名字字体
+	sinoFile    = "data/klala/kkk/font/SourceHanMonoSC-HeavyIt.ttf" // 汉字字体
+	digenFile   = "data/klala/kkk/font/tttgbnumber.ttf"             // 其余字体(数字英文)
+	baFile      = "data/klala/kkk/font/STLITI.TTF"                  // 华文隶书版本版本号字体
 	windowsPath = "data/klala/kkk/sund/冰.jpg"
 	refinePath  = "data/klala/kkk/sund/refine.png"
 	skillSdPic  = "data/klala/kkk/sund/mz.png"
@@ -33,7 +33,7 @@ func (t *thisdata) drawcard(n int) (string, error) {
 	yinyinBlack127 := color.NRGBA{R: 0, G: 0, B: 0, A: 127}
 	dc := gg.NewContext(1080, 1680)
 	dc.SetRGB(1, 1, 1)
-	if err := dc.LoadFontFace(FontFile, 40); err != nil {
+	if err := dc.LoadFontFace(sinoFile, 40); err != nil {
 		panic(err)
 	}
 	beijing, err := gg.LoadImage(windowsPath)
@@ -55,15 +55,15 @@ func (t *thisdata) drawcard(n int) (string, error) {
 		zero := gg.NewContext(540, 200)
 		zero.SetRGB(1, 1, 1) // 白色
 		// 角色名字
-		if err := zero.LoadFontFace(NameFont, 80); err != nil {
+		if err := zero.LoadFontFace(nameFont, 80); err != nil {
 			panic(err)
 		}
 		zero.DrawStringAnchored(t.RoleData[n].Name, 505, 130, 1, 0)
-		if err := zero.LoadFontFace(FontFile, 30); err != nil {
+		if err := zero.LoadFontFace(sinoFile, 30); err != nil {
 			panic(err)
 		}
 		zero.DrawStringAnchored("昵称:"+t.Nickname, 505, 40, 1, 0)
-		if err := zero.LoadFontFace(FiFile, 30); err != nil {
+		if err := zero.LoadFontFace(digenFile, 30); err != nil {
 			panic(err)
 		}
 		zero.DrawStringAnchored("UID:"+t.UID+"-LV."+strconv.Itoa(t.Level), 505, 180, 1, 0)
@@ -101,7 +101,7 @@ func (t *thisdata) drawcard(n int) (string, error) {
 	go func() {
 		defer wg.Done()
 		one := gg.NewContext(540, 470)
-		if err := one.LoadFontFace(FontFile, 30); err != nil {
+		if err := one.LoadFontFace(sinoFile, 30); err != nil {
 			panic(err)
 		}
 		one.SetRGB(1, 1, 1) // 白色
@@ -115,7 +115,7 @@ func (t *thisdata) drawcard(n int) (string, error) {
 		one.DrawString("效果命中:", 70, 403.75)
 		one.DrawString("效果抵抗:", 70, 455)
 		// 值,一一对f应
-		if err := one.LoadFontFace(FiFile, 30); err != nil {
+		if err := one.LoadFontFace(digenFile, 30); err != nil {
 			panic(err)
 		}
 		// 属性540*460,字30,间距15,60
@@ -142,7 +142,7 @@ func (t *thisdata) drawcard(n int) (string, error) {
 		yinlight := Yinying(1040, 180, 16, yinyinBlack127)
 		two := gg.NewContext(1040, 180)
 		two.SetRGB(1, 1, 1) // 白色
-		if err := two.LoadFontFace(FontFile, 30); err != nil {
+		if err := two.LoadFontFace(sinoFile, 30); err != nil {
 			panic(err)
 		}
 		// 天赋
@@ -175,7 +175,7 @@ func (t *thisdata) drawcard(n int) (string, error) {
 			}
 			two.DrawString(t.RoleData[n].Light.Name, 830, 60)
 			// 精炼
-			if err := two.LoadFontFace(FiFile, 30); err != nil {
+			if err := two.LoadFontFace(digenFile, 30); err != nil {
 				panic(err)
 			}
 			if refpic, err := gg.LoadImage(refinePath); err == nil {
@@ -188,7 +188,7 @@ func (t *thisdata) drawcard(n int) (string, error) {
 			two.DrawImageAnchored(img.Size(drawStars("#FFCC00", "#FFE43A", t.RoleData[n].Light.Star), 0, 30).Image(), 1020, 80, 1, 0)
 			two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Light.Level), 830, 150)
 		}
-		if err := two.LoadFontFace(FiFile, 30); err != nil {
+		if err := two.LoadFontFace(digenFile, 30); err != nil {
 			panic(err)
 		}
 		two.DrawString("LV."+strconv.Itoa(t.RoleData[n].Skill.A), 160, 60)
@@ -223,7 +223,7 @@ func (t *thisdata) drawcard(n int) (string, error) {
 			}
 			// 字图层
 			three := gg.NewContext(340, 350)
-			if err := three.LoadFontFace(FontFile, 30); err != nil {
+			if err := three.LoadFontFace(sinoFile, 30); err != nil {
 				panic(err)
 			}
 			// 字号30,间距50
@@ -247,11 +247,11 @@ func (t *thisdata) drawcard(n int) (string, error) {
 			xx = 15
 			yy = 145
 			// 主词条
-			if err := three.LoadFontFace(FontFile, 30); err != nil {
+			if err := three.LoadFontFace(sinoFile, 30); err != nil {
 				panic(err)
 			}
 			three.DrawString(yw.MainV.Name, xx, yy) // "主"
-			if err := three.LoadFontFace(FiFile, 30); err != nil {
+			if err := three.LoadFontFace(digenFile, 30); err != nil {
 				panic(err)
 			}
 			// 主词条属性
@@ -260,7 +260,7 @@ func (t *thisdata) drawcard(n int) (string, error) {
 			three.SetHexColor("#98F5FF")                                                      // 蓝色
 			for k := 0; k < len(yw.Vlist); k++ {
 				yy += 45
-				if err := three.LoadFontFace(FontFile, 30); err != nil {
+				if err := three.LoadFontFace(sinoFile, 30); err != nil {
 					panic(err)
 				}
 				three.DrawString(yw.Vlist[k].Name+func(i int) (s string) { // 副词条名
@@ -269,7 +269,7 @@ func (t *thisdata) drawcard(n int) (string, error) {
 					}
 					return s
 				}(yw.Vlist[k].Adds-1), xx, yy)
-				if err := three.LoadFontFace(FiFile, 30); err != nil {
+				if err := three.LoadFontFace(digenFile, 30); err != nil {
 					panic(err)
 				}
 				three.DrawStringAnchored("+"+yw.Vlist[k].Value+stofen(yw.Vlist[k].Name), 325, yy, 1, 0)
@@ -279,7 +279,7 @@ func (t *thisdata) drawcard(n int) (string, error) {
 			dc.DrawImage(three.Image(), x, y)
 		}
 	}()
-	if err := dc.LoadFontFace(BaFile, 30); err != nil {
+	if err := dc.LoadFontFace(baFile, 30); err != nil {
 		panic(err)
 	}
 	dc.DrawStringAnchored("Created By Zerobot-Plugin & Klala || Data From LuLuApi", 540, 1655, 0.5, 0.5)

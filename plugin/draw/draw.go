@@ -247,17 +247,17 @@ func (mp *mpic) createPic(one *gg.Context, lt *location) (image.Image, error) {
 		}
 		imRY := imgs[0].Bounds().Dy() + 100 // 右边 图像的高度
 		imLY := imgs[1].Bounds().Dy() + 5   // 左边 图像的高度
-		max := 0
+		m := 0
 		if mp.isDisplay {
 			imLY += mp.h + 5
 		}
 		if imRY > imLY {
-			max = imRY
+			m = imRY
 		} else {
-			max = imLY
+			m = imLY
 		}
-		if max > one.H() {
-			imgtmp := gg.NewContext(one.W(), max+int(mp.fontSize)) // 高度
+		if m > one.H() {
+			imgtmp := gg.NewContext(one.W(), m+int(mp.fontSize)) // 高度
 			imgtmp.SetRGB255(255, 255, 255)
 			imgtmp.Clear()
 			imgtmp.DrawImage(one.Image(), 0, 0)

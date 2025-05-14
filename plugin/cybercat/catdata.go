@@ -64,10 +64,9 @@ type catInfo struct {
 	Picurl    string  // 猫猫图片
 }
 
-func (c *catInfo) avatar(Gid int64) string {
-	cache := "data/cybercat/cache" // 指定缓存路径
-	cache = path.Join(engine.DataFolder(), "cache")
-	imgname := fmt.Sprintf("%d_%d", c.User, Gid)
+func (c *catInfo) avatar(gid int64) string {
+	cache := path.Join(engine.DataFolder(), "cache")
+	imgname := fmt.Sprintf("%d_%d", c.User, gid)
 	imgfile := filepath.Join(cache, c.Type+imgname+".png")
 	aimgfile := filepath.Join(file.BOTPATH, imgfile)
 
@@ -97,7 +96,7 @@ func (c *catInfo) avatar(Gid int64) string {
 			return err.Error() // 返回错误信息
 		}
 		defer f.Close()
-		_, err = f.Write([]byte(imgdata)) // 写入图片数据
+		_, err = f.Write(imgdata) // 写入图片数据
 		if err != nil {
 			fmt.Println("Error writing file:", err)
 			return err.Error() // 返回错误信息
