@@ -157,6 +157,7 @@ func init() {
 		userInfo.LastTime = time.Now().Unix()
 		userInfo.Mood += int(userInfo.Satiety)/5 - int(userInfo.Weight)/10
 		userInfo = userInfo.settleOfData()
+		avatarResult := userInfo.avatar(ctx.Event.GroupID) 
 		if err = catdata.insert(gidStr, &userInfo); err != nil {
 			ctx.SendChain(message.Text("[ERROR]:", err))
 			return
@@ -165,7 +166,7 @@ func init() {
 			stauts = "完全没有饱"
 		}
 		ctx.SendChain(message.Reply(id), message.Text(userInfo.Name, "当前信息如下:\n"),
-			message.Image(userInfo.avatar()),
+			message.Image(avatarResult),
 			message.Text("品种: "+userInfo.Type,
 				"\n饱食度: ", strconv.FormatFloat(userInfo.Satiety, 'f', 0, 64),
 				"\n心情: ", userInfo.Mood,
