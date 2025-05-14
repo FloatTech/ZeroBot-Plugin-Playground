@@ -64,10 +64,10 @@ type catInfo struct {
 	Picurl    string  // 猫猫图片
 }
 
-func (c *catInfo) avatar(gid int64) string {
+func (inf *catInfo) avatar(gid int64) string {
 	cache := path.Join(engine.DataFolder(), "cache")
-	imgname := fmt.Sprintf("%d_%d", c.User, gid)
-	imgfile := filepath.Join(cache, c.Type+imgname+".png")
+	imgname := fmt.Sprintf("%d_%d", inf.User, gid)
+	imgfile := filepath.Join(cache, inf.Type+imgname+".png")
 	aimgfile := filepath.Join(file.BOTPATH, imgfile)
 
 	if _, err := os.Stat(cache); os.IsNotExist(err) {
@@ -78,7 +78,7 @@ func (c *catInfo) avatar(gid int64) string {
 		}
 	}
 	if file.IsNotExist(aimgfile) {
-		breed := c.Type
+		breed := inf.Type
 		data, err := web.GetData(apiURL + "search?has_breeds=" + breed)
 		if err != nil {
 			fmt.Println("Error fetching avatar URL:", err)
