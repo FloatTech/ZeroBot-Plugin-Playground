@@ -62,7 +62,7 @@ type catInfo struct {
 
 func (c *catInfo) avatar(Gid int64) string {
     cache := "data/cybercat/cache" // 指定缓存路径
-	cache = path.Join(engine.DataFolder(), "cache")
+    cache = path.Join(engine.DataFolder(), "cache")
     imgname := fmt.Sprintf("%d_%d", c.User, Gid)
     imgfile := filepath.Join(cache, c.Type+imgname+".png")
     aimgfile := filepath.Join(file.BOTPATH, imgfile)
