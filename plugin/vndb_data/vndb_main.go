@@ -1,4 +1,4 @@
-package vndbData
+package vndb_data
 
 import (
 	"errors"
