@@ -16,7 +16,7 @@ func init() {
     engine := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
         DisableOnDefault:  false,
         Brief:             "群广播-发送消息到所有群聊喵",
-        Help:              "此插件仅拱Bot管理员使用；\n支持黑名???单添加/移除/查看\n用法:\n广播+内容\n广播黑名单添加 123456789\n广播黑名单移除 123456789\n广播黑名单列表",
+        Help:              "此插件仅拱Bot管理员使用；\n支持黑名单添加/移除/查看\n用法:\n广播+内容\n广播黑名单添加 123456789\n广播黑名单移除 123456789\n广播黑名单列表",
         PrivateDataFolder: "allmessage",
     })
 
