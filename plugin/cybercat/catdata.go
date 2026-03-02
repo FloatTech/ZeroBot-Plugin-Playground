@@ -51,6 +51,14 @@ type catdb struct {
 	sql.Sqlite
 }
 
+type breedInfo struct {
+    TypeName    string
+    Temperament string
+    Description string
+    ImageURL    string
+    Err         error
+}
+
 type catInfo struct {
 	User      int64   // 主人
 	Name      string  // 喵喵名称
@@ -116,12 +124,12 @@ func (inf *catInfo) avatar(gid int64) string {
     }
 
     // 4. 后备方案：随机猫图
-    _, _, _, url, err := suineko()//nolint:dogsled
-    if err == nil && url != "" {
-        if err := downloadAndSave(url, aimgfile); err == nil {
-            return "file:///" + aimgfile
-        }
-    }
+    result := suineko()
+	if result.Err == nil && result.ImageURL != "" {
+		if err := downloadAndSave(result.ImageURL, aimgfile); err == nil {
+			return "file:///" + aimgfile
+		}
+	}
 
     // 5. 最终后备：透明PNG（避免报错）
     return "base64://iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
@@ -177,44 +185,55 @@ var (
 )
 
 func init() {
-	engine.OnRegex(`^吸(.*猫)$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
-		typeOfcat := ctx.State["regex_matched"].([]string)[1]
-		if typeOfcat == "猫" {
-			typeName, temperament, description, url, err := suineko()
-			if err != nil {
-				ctx.SendChain(message.Text("[ERROR]: ", err))
-				return
-			}
-			ctx.SendChain(message.Image(url), message.Text("品种: ", typeName,
-				"\n气质:\n", temperament, "\n描述:\n", description))
-			return
-		}
-		breeds, ok := typeZH2Breeds[typeOfcat]
-		if !ok {
-			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("没有相关该品种的猫图"))
-			return
-		}
-		picurl, err := getPicByBreed(breeds)
-		if err != nil {
-			ctx.SendChain(message.Text("[ERROR]: ", err))
-			return
-		}
-		ctx.SendChain(message.Text("品种: ", typeOfcat), message.Image(picurl))
-	})
+    engine.OnRegex(`^吸(.*猫)$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+        typeOfcat := ctx.State["regex_matched"].([]string)[1]
+        if typeOfcat == "猫" {
+            result := suineko()
+            if result.Err != nil {
+                ctx.SendChain(message.Text("[ERROR]: ", result.Err))
+                return
+            }
+            ctx.SendChain(
+                message.Image(result.ImageURL),
+                message.Text("品种: ", result.TypeName,
+                    "\n气质:\n", result.Temperament,
+                    "\n描述:\n", result.Description),
+            )
+            return
+        }
+        breeds, ok := typeZH2Breeds[typeOfcat]
+        if !ok {
+            ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("没有相关该品种的猫图"))
+            return
+        }
+        picurl, err := getPicByBreed(breeds)
+        if err != nil {
+            ctx.SendChain(message.Text("[ERROR]: ", err))
+            return
+        }
+        ctx.SendChain(message.Text("品种: ", typeOfcat), message.Image(picurl))
+    })
 }
 
-func suineko() (typeName, temperament, description, url string, err error) {
-	data, err := web.GetData(apiURL + "search?has_breeds=1")
-	if err != nil {
-		return
-	}
-	picID := gjson.ParseBytes(data).Get("0.id").String()
-	picdata, err := web.GetData(apiURL + picID)
-	if err != nil {
-		return
-	}
-	name := gjson.ParseBytes(picdata).Get("breeds.0.name").String()
-	return typeEN2ZH[name], gjson.ParseBytes(picdata).Get("breeds.0.temperament").String(), gjson.ParseBytes(picdata).Get("breeds.0.description").String(), gjson.ParseBytes(picdata).Get("url").String(), nil
+
+func suineko() breedInfo {
+    data, err := web.GetData(apiURL + "search?has_breeds=1")
+    if err != nil {
+        return breedInfo{Err: err}
+    }
+    picID := gjson.ParseBytes(data).Get("0.id").String()
+    picdata, err := web.GetData(apiURL + picID)
+    if err != nil {
+        return breedInfo{Err: err}
+    }
+    name := gjson.ParseBytes(picdata).Get("breeds.0.name").String()
+    return breedInfo{
+        TypeName:    typeEN2ZH[name],
+        Temperament: gjson.ParseBytes(picdata).Get("breeds.0.temperament").String(),
+        Description: gjson.ParseBytes(picdata).Get("breeds.0.description").String(),
+        ImageURL:    gjson.ParseBytes(picdata).Get("url").String(),
+        Err:         nil,
+    }
 }
 
 func getPicByBreed(catBreed string) (url string, err error) {
