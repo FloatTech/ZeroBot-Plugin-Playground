@@ -17,7 +17,6 @@ require (
 	github.com/glebarez/sqlite v1.11.0
 	github.com/go-resty/resty/v2 v2.16.5
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
-	github.com/gorilla/websocket v1.5.3
 	github.com/guohuiyuan/go-fyzhq v0.0.0-20220807135412-25c16c843e5a
 	github.com/mmcdole/gofeed v1.3.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
@@ -28,7 +27,6 @@ require (
 	github.com/wdvxdr1123/ZeroBot v1.8.2-0.20250330133859-27c25d9412b5
 	golang.org/x/sys v0.30.0
 	gorm.io/gorm v1.26.1
-	jaytaylor.com/html2text v0.0.0-20230321000545-74c2419ad056
 )
 
 require (
@@ -55,17 +53,13 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/mmcdole/goxpp v1.1.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mozillazg/go-pinyin v0.20.0 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
-	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/vcaesar/cedar v0.20.2 // indirect
