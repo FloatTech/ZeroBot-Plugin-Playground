@@ -116,7 +116,7 @@ func (inf *catInfo) avatar(gid int64) string {
     }
 
     // 4. 后备方案：随机猫图
-    _, _, _, url, err := suineko()
+    _, _, _, url, err := suineko()//nolint:dogsled
     if err == nil && url != "" {
         if err := downloadAndSave(url, aimgfile); err == nil {
             return "file:///" + aimgfile
