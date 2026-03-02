@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
-	"strconv"
+    "strconv"
 
 	fcext "github.com/FloatTech/floatbox/ctxext"
 	"github.com/FloatTech/floatbox/file"
@@ -93,7 +93,7 @@ func (inf *catInfo) avatar(gid int64) string {
     if ok {
         // 构建请求URL（使用 breed_ids 参数）
         url := apiURL + "search?breed_ids=" + breedID + "&limit=1"
-        // 建议添加 API 密钥（从配置读取）
+        // 添加 API 密钥
         if apiKey := getCatAPIKey(); apiKey != "" {
             url += "&api_key=" + apiKey
         }
@@ -142,9 +142,9 @@ func downloadAndSave(url, filepath string) error {
     return err
 }
 
-// getCatAPIKey 从环境变量或配置获取API密钥（需自行实现）
+// getCatAPIKey API密钥
 func getCatAPIKey() string {
-    return "live_jjmlzq8FSiuFko40Utf43EfniNWYY1MtBaCej1Fy2YRDW9nMEmtgJwOMiZzs6fXc" // 替换为真实密钥
+    return "live_jjmlzq8FSiuFko40Utf43EfniNWYY1MtBaCej1Fy2YRDW9nMEmtgJwOMiZzs6fXc" // 替换为真实免费密钥
 }
 
 var (
