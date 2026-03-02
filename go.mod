@@ -1,4 +1,4 @@
-module github.com/FloatTech/ZeroBot-Plugin-Playground
+module github.com/ltou14/ZeroBot-Plugin-Playground
 
 go 1.20
 
