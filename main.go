@@ -19,18 +19,15 @@ import (
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/asoularticle"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/anotherfortune"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chatgpt"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chinesebqb"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/cybercat"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/deepdanbooru"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/draw" // 服务详情
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fadian"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/feifeilv"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fgopickup"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fyzhq"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/games"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/grasspicture"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/klala" // 星穹铁道面板/图鉴插件
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/kokomi"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/moegozh"
@@ -46,8 +43,6 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/subweibo"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/tgyj"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vote"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vtbwife" // 抽vtbwife
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/wantquotes"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/youdaotranslate"
 
 	// 程序主体

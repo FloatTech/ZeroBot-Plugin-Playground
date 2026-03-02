@@ -21,8 +21,7 @@ var (
 	// RSSHubMirrors RSSHub镜像站地址列表，第一个为默认地址
 	rssHubMirrors = []string{
 		"https://rsshub.rssforever.com",
-		"https://rss.itggg.cn",
-		"https://rsshub.feeded.xyz",
+		"https://rss.injahow.cn",
 	}
 )
 

@@ -18,7 +18,6 @@ import (
 	"github.com/tidwall/gjson"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
-	"github.com/wdvxdr1123/ZeroBot/utils/helper"
 )
 
 type card struct {
@@ -46,11 +45,11 @@ var (
 )
 
 func init() {
-	engine := control.Register("AnotherFortune", &ctrl.Options[*zero.Ctx]{
+	engine := control.Register("anotherfortune", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault:  false,
 		Brief:             "另一个今日人品",
 		Help:              "仿照鱼子酱的今日人品w",
-		PrivateDataFolder: "AnotherFortune",
+		PrivateDataFolder: "anotherfortune",
 	})
 	signTF = make(map[string](int))
 	egg = make(map[string](int))
@@ -74,10 +73,6 @@ func init() {
 		Handle(func(ctx *zero.Ctx) {
 			var mutex sync.RWMutex // 添加读写锁以保证稳定性
 			mutex.Lock()
-			yiyan, err := web.GetData("http://ovooa.com/API/yiyan/api.php")
-			if err != nil {
-				return
-			} // 获取一言
 			p := rand.Intn(2)
 			i := rand.Intn(78)
 			card := cardMap[(strconv.Itoa(i))]
@@ -134,8 +129,6 @@ func init() {
 					message.Text(fmt.Sprintf("\n%s\n"+botName+"正在帮你整理~\n", uptime)),
 					message.Text("今日的人品值为", result[user]),
 					message.Text(jrrpbk),
-					message.Text("\n今日一言:\n"),
-					message.Text(helper.BytesToString(yiyan), "\n"),
 					message.Text("今日塔罗牌是: \n归类于", cardtype, reasons[rand.Intn(len(reasons))], position[p], " 的 ", name, "\n"),
 					message.Text("\n其意义为：\n", info, "\n", vme50))
 			} else {
