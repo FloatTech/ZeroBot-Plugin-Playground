@@ -1,6 +1,6 @@
 // Package cybercat 云养猫
 package cybercat
-
+import "errors"
 import (
 	"fmt"
 	"os"
@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
+    "strconv"
 
 	fcext "github.com/FloatTech/floatbox/ctxext"
 	"github.com/FloatTech/floatbox/file"
@@ -50,6 +51,14 @@ type catdb struct {
 	sql.Sqlite
 }
 
+type breedInfo struct {
+    TypeName    string
+    Temperament string
+    Description string
+    ImageURL    string
+    Err         error
+}
+
 type catInfo struct {
 	User      int64   // 主人
 	Name      string  // 喵喵名称
@@ -65,44 +74,85 @@ type catInfo struct {
 }
 
 func (inf *catInfo) avatar(gid int64) string {
-	cache := path.Join(engine.DataFolder(), "cache")
-	imgname := fmt.Sprintf("%d_%d", inf.User, gid)
-	imgfile := filepath.Join(cache, inf.Type+imgname+".png")
-	aimgfile := filepath.Join(file.BOTPATH, imgfile)
+    // 构建缓存文件路径
+    cache := path.Join(engine.DataFolder(), "cache")
+    imgname := fmt.Sprintf("%d_%d", inf.User, gid)
+    imgfile := filepath.Join(cache, inf.Type+imgname+".png")
+    aimgfile := filepath.Join(file.BOTPATH, imgfile)
 
-	if _, err := os.Stat(cache); os.IsNotExist(err) {
-		err := os.MkdirAll(cache, 0755)
-		if err != nil {
-			fmt.Println("Error creating cache directory:", err)
-			return err.Error()
+    // 确保缓存目录存在
+    _ = os.MkdirAll(cache, 0755)
+
+    // 1. 如果本地已有缓存文件，直接返回
+    if file.IsExist(aimgfile) {
+        return "file:///" + aimgfile
+    }
+
+    // 2. 优先使用已有的 Picurl（例如用户上传的猫娘图片）
+    if inf.Picurl != "" {
+        if err := downloadAndSave(inf.Picurl, aimgfile); err == nil {
+            return "file:///" + aimgfile
+        }
+        // 下载失败，继续尝试通过品种获取
+    }
+
+    // 3. 通过品种ID获取图片
+    breedID, ok := typeZH2Breeds[inf.Type]
+    if ok {
+        // 构建请求URL（使用 breed_ids 参数）
+        url := apiURL + "search?breed_ids=" + breedID + "&limit=1"
+        // 添加 API 密钥
+        if apiKey := getCatAPIKey(); apiKey != "" {
+            url += "&api_key=" + apiKey
+        }
+
+        data, err := web.GetData(url)
+        if err == nil {
+            imgURL := gjson.ParseBytes(data).Get("0.url").String()
+            if imgURL != "" {
+                if err := downloadAndSave(imgURL, aimgfile); err == nil {
+                    // 保存 URL 到数据库供下次使用
+                    inf.Picurl = imgURL
+                    go func() {
+                        gidStr := "group" + strconv.FormatInt(gid, 10)
+                        _ = catdata.insert(gidStr, inf) // 异步更新，忽略错误
+                    }()
+                    return "file:///" + aimgfile
+                }
+            }
+        }
+    }
+
+    // 4. 后备方案：随机猫图
+    result := suineko()
+	if result.Err == nil && result.ImageURL != "" {
+		if err := downloadAndSave(result.ImageURL, aimgfile); err == nil {
+			return "file:///" + aimgfile
 		}
 	}
-	if file.IsNotExist(aimgfile) {
-		breed := inf.Type
-		data, err := web.GetData(apiURL + "search?has_breeds=" + breed)
-		if err != nil {
-			fmt.Println("Error fetching avatar URL:", err)
-			return err.Error() // 返回错误信息
-		}
-		imgurl := gjson.ParseBytes(data).Get("0.url").String()
-		imgdata, err := web.GetData(imgurl)
-		if err != nil {
-			return "错误：未能解析图片URL"
-		}
-		var f *os.File
-		f, err = os.Create(aimgfile) // 使用 aimgfile 作为文件路径
-		if err != nil {
-			fmt.Println("Error creating file:", err)
-			return err.Error() // 返回错误信息
-		}
-		defer f.Close()
-		_, err = f.Write(imgdata) // 写入图片数据
-		if err != nil {
-			fmt.Println("Error writing file:", err)
-			return err.Error() // 返回错误信息
-		}
-	}
-	return "file:///" + aimgfile // 返回文件协议的完整路径
+
+    // 5. 最终后备：透明PNG（避免报错）
+    return "base64://iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+}
+
+// downloadAndSave 下载图片并保存到本地
+func downloadAndSave(url, filepath string) error {
+    data, err := web.GetData(url)
+    if err != nil {
+        return err
+    }
+    f, err := os.Create(filepath)
+    if err != nil {
+        return err
+    }
+    defer f.Close()
+    _, err = f.Write(data)
+    return err
+}
+
+// getCatAPIKey API密钥
+func getCatAPIKey() string {
+    return "live_jjmlzq8FSiuFko40Utf43EfniNWYY1MtBaCej1Fy2YRDW9nMEmtgJwOMiZzs6fXc" // 替换为真实免费密钥
 }
 
 var (
@@ -135,52 +185,67 @@ var (
 )
 
 func init() {
-	engine.OnRegex(`^吸(.*猫)$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
-		typeOfcat := ctx.State["regex_matched"].([]string)[1]
-		if typeOfcat == "猫" {
-			typeName, temperament, description, url, err := suineko()
-			if err != nil {
-				ctx.SendChain(message.Text("[ERROR]: ", err))
-				return
-			}
-			ctx.SendChain(message.Image(url), message.Text("品种: ", typeName,
-				"\n气质:\n", temperament, "\n描述:\n", description))
-			return
-		}
-		breeds, ok := typeZH2Breeds[typeOfcat]
-		if !ok {
-			ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("没有相关该品种的猫图"))
-			return
-		}
-		picurl, err := getPicByBreed(breeds)
-		if err != nil {
-			ctx.SendChain(message.Text("[ERROR]: ", err))
-			return
-		}
-		ctx.SendChain(message.Text("品种: ", typeOfcat), message.Image(picurl))
-	})
+    engine.OnRegex(`^吸(.*猫)$`).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+        typeOfcat := ctx.State["regex_matched"].([]string)[1]
+        if typeOfcat == "猫" {
+            result := suineko()
+            if result.Err != nil {
+                ctx.SendChain(message.Text("[ERROR]: ", result.Err))
+                return
+            }
+            ctx.SendChain(
+                message.Image(result.ImageURL),
+                message.Text("品种: ", result.TypeName,
+                    "\n气质:\n", result.Temperament,
+                    "\n描述:\n", result.Description),
+            )
+            return
+        }
+        breeds, ok := typeZH2Breeds[typeOfcat]
+        if !ok {
+            ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text("没有相关该品种的猫图"))
+            return
+        }
+        picurl, err := getPicByBreed(breeds)
+        if err != nil {
+            ctx.SendChain(message.Text("[ERROR]: ", err))
+            return
+        }
+        ctx.SendChain(message.Text("品种: ", typeOfcat), message.Image(picurl))
+    })
 }
 
-func suineko() (typeName, temperament, description, url string, err error) {
-	data, err := web.GetData(apiURL + "search?has_breeds=1")
-	if err != nil {
-		return
-	}
-	picID := gjson.ParseBytes(data).Get("0.id").String()
-	picdata, err := web.GetData(apiURL + picID)
-	if err != nil {
-		return
-	}
-	name := gjson.ParseBytes(picdata).Get("breeds.0.name").String()
-	return typeEN2ZH[name], gjson.ParseBytes(picdata).Get("breeds.0.temperament").String(), gjson.ParseBytes(picdata).Get("breeds.0.description").String(), gjson.ParseBytes(picdata).Get("url").String(), nil
+
+func suineko() breedInfo {
+    data, err := web.GetData(apiURL + "search?has_breeds=1")
+    if err != nil {
+        return breedInfo{Err: err}
+    }
+    picID := gjson.ParseBytes(data).Get("0.id").String()
+    picdata, err := web.GetData(apiURL + picID)
+    if err != nil {
+        return breedInfo{Err: err}
+    }
+    name := gjson.ParseBytes(picdata).Get("breeds.0.name").String()
+    return breedInfo{
+        TypeName:    typeEN2ZH[name],
+        Temperament: gjson.ParseBytes(picdata).Get("breeds.0.temperament").String(),
+        Description: gjson.ParseBytes(picdata).Get("breeds.0.description").String(),
+        ImageURL:    gjson.ParseBytes(picdata).Get("url").String(),
+        Err:         nil,
+    }
 }
 
 func getPicByBreed(catBreed string) (url string, err error) {
-	data, err := web.GetData(apiURL + "search?breed_ids=" + catBreed)
-	if err != nil {
-		return
-	}
-	return gjson.ParseBytes(data).Get("0.url").String(), nil
+    data, err := web.GetData(apiURL + "search?breed_ids=" + catBreed)
+    if err != nil {
+        return
+    }
+    url = gjson.ParseBytes(data).Get("0.url").String()
+    if url == "" {
+        err = errors.New("no image found")
+    }
+    return
 }
 
 func (sql *catdb) insert(gid string, dbInfo *catInfo) error {
