@@ -19,9 +19,9 @@
 ## 完善教程
 目前开发教程还不是很全面，欢迎大家编辑此README完善它，让更多人轻松加入zbp大家庭！
 
-目前提供的样板有 example 中的
+目前提供的教程有
 
-- [江林版本](example/JiangRed/message.go)
-- [小锅饭版本](example/xiaoguofan/example.go)
+- [江林版本](plugin/exJiangRed/message.go)
+- [小锅饭版本](plugin/exXiaoGuoFan/example.go)
 - [小锅饭的ZerobotCourse](https://github.com/guohuiyuan/ZerobotCourse)
 - [夹子的版本(半成品)](doc)

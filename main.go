@@ -19,13 +19,13 @@ import (
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/abineundo" // 设置插件优先级&更改控制台属性
 
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/anotherfortune"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chatgpt"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chinesebqb"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/cybercat"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/draw" // 服务详情
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/exJiangRed"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/exxiaoguofan"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fadian"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fgopickup"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fyzhq"
@@ -61,7 +61,7 @@ var config zbpcfg
 
 func init() {
 	sus := make([]int64, 0, 16)
-	// 解析命令行参数hahahah
+	// 解析命令行参数
 	d := flag.Bool("d", false, "Enable debug level log and higher.")
 	w := flag.Bool("w", false, "Enable warning level log and higher.")
 	h := flag.Bool("h", false, "Display this help.")
