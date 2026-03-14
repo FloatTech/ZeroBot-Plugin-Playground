@@ -19,37 +19,101 @@ import (
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/abineundo" // 设置插件优先级&更改控制台属性
 
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/anotherfortune"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chatgpt"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chinesebqb"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/cybercat"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/draw" // 服务详情
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fadian"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fgopickup"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fyzhq"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/games"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/klala" // 星穹铁道面板/图鉴插件
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/kokomi"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/moegozh"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/movies"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/ottoshout"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/partygame"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/playwright"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/qqci"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/qqclean"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/recall" // SGK2401
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/slash"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/subweibo"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/tgyj"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vote"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/youdaotranslate"
+	// ---------以下插件均可通过前面加 // 注释，注释后停用并不加载插件--------- //
+	// ----------------------插件优先级按顺序从高到低---------------------- //
+	//                                                                  //
+	//                                                                  //
+	//                                                                  //
+	//                                                                  //
+	//                                                                  //
+	// ----------------------------高优先级区---------------------------- //
+	// vvvvvvvvvvvvvvvvvvvvvvvvvvvv高优先级区vvvvvvvvvvvvvvvvvvvvvvvvvvvv //
+	//               vvvvvvvvvvvvvv高优先级区vvvvvvvvvvvvvv               //
+	//                      vvvvvvv高优先级区vvvvvvv                      //
+	//                          vvvvvvvvvvvvvv                          //
+	//                               vvvv                               //
 
-	// 程序主体
+	//                               ^^^^                               //
+	//                          ^^^^^^^^^^^^^^                          //
+	//                      ^^^^^^^高优先级区^^^^^^^                      //
+	//               ^^^^^^^^^^^^^^高优先级区^^^^^^^^^^^^^^               //
+	// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^高优先级区^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
+	// ----------------------------高优先级区---------------------------- //
+	//                                                                  //
+	//                                                                  //
+	//                                                                  //
+	//                                                                  //
+	//                                                                  //
+	// ----------------------------中优先级区---------------------------- //
+	// vvvvvvvvvvvvvvvvvvvvvvvvvvvv中优先级区vvvvvvvvvvvvvvvvvvvvvvvvvvvv //
+	//               vvvvvvvvvvvvvv中优先级区vvvvvvvvvvvvvv               //
+	//                      vvvvvvv中优先级区vvvvvvv                      //
+	//                          vvvvvvvvvvvvvv                          //
+	//                               vvvv                               //
+
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/anotherfortune"  // 另一个今日人品
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chatgpt"         // ChatGPT对话
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/chinesebqb"      // 表情包
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/cybercat"        // 云养猫
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/draw"            // 服务详情
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/exJiangRed"      // 江林的插件编写教学
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/exXiaoGuoFan"    // 小锅饭的示例
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fadian"          // 每日发癫
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fgopickup"       // FGO卡池查询
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fyzhq"           // 发音转换器
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/games"           // 游戏系统
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/klala"           // 星穹铁道面板/图鉴查询
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/kokomi"          // 原神面板查询
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/moegozh"         // VITS模型拟声迫真中文
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/movies"          // 电影查询
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/ottoshout"       // otto鬼叫
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/partygame"       // 轮盘赌
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/playwright"      // 网页截图
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/qqci"            // 简易CI/CD
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/qqclean"         // QQ号清理
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/recall"          // 回复撤回
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/rsshub"          // RssHub订阅
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/slash"           // Slash自交互
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/subweibo"        // 订阅微博消息
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/tgyj"            // 同归于尽
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/vote"            // 投票
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/youdaotranslate" // 有道翻译
+
+	// _ "github.com/FloatTech/ZeroBot-Plugin/plugin/wtf"           // 鬼东西
+
+	//                               ^^^^                               //
+	//                          ^^^^^^^^^^^^^^                          //
+	//                      ^^^^^^^中优先级区^^^^^^^                      //
+	//               ^^^^^^^^^^^^^^中优先级区^^^^^^^^^^^^^^               //
+	// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^中优先级区^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
+	// ----------------------------中优先级区---------------------------- //
+	//                                                                  //
+	//                                                                  //
+	//                                                                  //
+	//                                                                  //
+	//                                                                  //
+	// ----------------------------低优先级区---------------------------- //
+	// vvvvvvvvvvvvvvvvvvvvvvvvvvvv低优先级区vvvvvvvvvvvvvvvvvvvvvvvvvvvv //
+	//               vvvvvvvvvvvvvv低优先级区vvvvvvvvvvvvvv               //
+	//                      vvvvvvv低优先级区vvvvvvv                      //
+	//                          vvvvvvvvvvvvvv                          //
+	//                               vvvv                               //
+
+	//                               ^^^^                               //
+	//                          ^^^^^^^^^^^^^^                          //
+	//                      ^^^^^^^低优先级区^^^^^^^                      //
+	//               ^^^^^^^^^^^^^^低优先级区^^^^^^^^^^^^^^               //
+	// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^低优先级区^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
+	// ----------------------------低优先级区---------------------------- //
+	//                                                                  //
+	//                                                                  //
+	//                                                                  //
+	//                                                                  //
+	//                                                                  //
+	// -----------------------以下为内置依赖，勿动------------------------ //
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/driver"
+	// -----------------------以上为内置依赖，勿动------------------------ //
 )
 
 type zbpcfg struct {

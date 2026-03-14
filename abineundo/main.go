@@ -52,8 +52,8 @@ const (
 
 var (
 	priore       = regexp.MustCompile(`^\t// -{28}(高|中|低)优先级区-{28} //$`)
-	mainpluginre = regexp.MustCompile(`^\t_ "github\.com/FloatTech/ZeroBot-Plugin/plugin/(\w+)"\s+// `)
-	custpluginre = regexp.MustCompile(`^\t_ "github\.com/FloatTech/ZeroBot-Plugin/custom/plugin/(\w+)"\s+// `)
+	mainpluginre = regexp.MustCompile(`^\t_ "github\.com/FloatTech/ZeroBot-Plugin-Playground/plugin/(\w+)"\s+// `)
+	custpluginre = regexp.MustCompile(`^\t_ "github\.com/FloatTech/ZeroBot-Plugin-Playground/custom/plugin/(\w+)"\s+// `)
 )
 
 func init() {

@@ -39,5 +39,5 @@
 ## 引用
 
 - [ZerobotCourse](https://github.com/guohuiyuan/ZerobotCourse)
-- [example/JiangRed](example/JiangRed/message.go)
+- [plugin/exJiangRed](plugin/exJiangRed/message.go)
 - [khl.py](https://github.com/TWT233/khl.py)
