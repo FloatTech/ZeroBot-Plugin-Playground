@@ -19,7 +19,7 @@ var examplelimit = ctxext.NewLimiterManager(time.Second*10, 1)
 // 这里就是插件主体了
 func init() {
 	// 既然是zbp, 那就从接入control开始, 在这里注册你的插件以及设置是否默认开启和填写帮助和数据存放路径
-	engine := control.Register("example", &ctrl.Options[*zero.Ctx]{
+	engine := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		// 控制插件是否默认启用 true为默认不启用 false反之
 		DisableOnDefault: false,
 		// 插件的简介

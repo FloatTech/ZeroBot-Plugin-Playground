@@ -14,7 +14,7 @@ import (
 
 var (
 	// so noisy and try not to use this.
-	engine = control.Register("slash", &ctrl.Options[*zero.Ctx]{
+	engine = control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: true,
 		Help:             "slash Plugin, Origin from https://github.com/Rongronggg9/SlashBot\n",
 	})

@@ -73,7 +73,7 @@ func init() {
 }
 
 func init() { // 主函数
-	en := control.Register("draw", &ctrl.Options[*zero.Ctx]{
+	en := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "服务详情",
 		Help:             "- 服务详情\n",

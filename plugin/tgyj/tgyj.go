@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	engine := control.Register("tgyj", &ctrl.Options[*zero.Ctx]{
+	engine := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "同归于尽",
 		Help:             "同归于尽@xxx",

@@ -16,7 +16,7 @@ import (
 )
 
 func init() {
-	en := control.Register("ytdlp", &ctrl.Options[*zero.Ctx]{
+	en := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault:  false,
 		Brief:             "ytdlp 下载器",
 		Help:              "/yt-dlp [youtube-video-link]",

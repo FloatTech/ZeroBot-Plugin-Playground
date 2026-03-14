@@ -21,7 +21,7 @@ const (
 )
 
 func init() { // 主函数
-	en := control.Register("klala", &ctrl.Options[*zero.Ctx]{
+	en := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "星穹铁道图鉴查询",
 		Help: "- *(强制)更新图鉴\n" +

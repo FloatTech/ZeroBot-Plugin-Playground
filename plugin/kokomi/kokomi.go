@@ -19,7 +19,7 @@ const (
 )
 
 func init() {
-	en := control.Register("kokomi", &ctrl.Options[*zero.Ctx]{
+	en := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "原神面板查询",
 		Help: "- 绑定xxx\n" +

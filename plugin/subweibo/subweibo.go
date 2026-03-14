@@ -19,7 +19,7 @@ import (
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
 
-var engine = control.Register("weiboMessage", &ctrl.Options[*zero.Ctx]{
+var engine = control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 	DisableOnDefault: false,
 	Brief:            "订阅微博消息",
 	Help: "- 开启订阅 [UID] 开始接收订阅消息\n" +

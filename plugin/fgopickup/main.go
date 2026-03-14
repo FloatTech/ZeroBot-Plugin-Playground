@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	engine := control.Register("fgopickup", &ctrl.Options[*zero.Ctx]{
+	engine := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "Fate/Grand Order",
 		Help: "- fgo未来视 (查询未来卡池)\n" +

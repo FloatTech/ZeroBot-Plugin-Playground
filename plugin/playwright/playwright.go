@@ -27,7 +27,7 @@ const (
 )
 
 func init() {
-	engine := control.Register("playwright", &ctrl.Options[*zero.Ctx]{
+	engine := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "网页截图",
 		Help: "- /网页截图 -p https://zhuanlan.zhihu.com/p/497349204 -w 600 -h 800\n" +

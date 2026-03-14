@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	engine := control.Register("qqclean", &ctrl.Options[*zero.Ctx]{
+	engine := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "qq号清理",
 		Help:             "清理群聊@bot (清理bot不是管理员的群)\n(当群聊数小于20时自动同意加群)\n清理好友@bot (清理bot 5级以下的好友)\n(自动同意好友邀请)",

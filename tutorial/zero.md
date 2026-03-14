@@ -19,7 +19,7 @@ import (
 
 func init() {
 	// 既然是zbp, 那就从接入control开始, 在这里注册你的插件以及设置是否默认开启和填写帮助
-	engine := control.Register("example", &ctrl.Options[*zero.Ctx]{
+	engine := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		// 控制插件是否默认启用 true为默认不启用 false反之
 		DisableOnDefault: false,
 		// 插件的帮助 管理员发送 /用法 example 可见
@@ -38,7 +38,7 @@ func init() {
 其中 
 
 ```go
-	engine := control.Register("example", &ctrl.Options[*zero.Ctx]{
+	engine := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Help: "- example 插件的帮助",
 	})

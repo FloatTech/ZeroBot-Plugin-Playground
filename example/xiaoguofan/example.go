@@ -21,7 +21,7 @@ var (
 )
 
 func init() {
-	engine := control.Register("example2", &ctrl.Options[*zero.Ctx]{
+	engine := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "小锅饭的示例",
 		Help: "- hello\n- 完全匹配\n- 完全匹配组1 | 完全匹配组2\n- 关键词你好\n- /命令\n- 前缀你好\n- 你好后缀\n" +

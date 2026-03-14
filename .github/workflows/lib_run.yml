@@ -1,0 +1,103 @@
+name: Run Library
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+      go-version:
+        required: false
+        type: string
+        default: '^1.25'
+      fetch-depth:
+        required: false
+        type: number
+        default: 0
+      submodules:
+        required: false
+        type: string
+        default: 'recursive'
+jobs:
+  real_run:
+    name: Run on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 2
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+      fail-fast: true
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@master
+        with:
+          go-version: "${{ inputs.go-version }}"
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@master
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: ${{ inputs.fetch-depth }}
+          submodules: ${{ inputs.submodules }}
+
+      - name: Prepare Necessary Runtime Files
+        run: |
+          go generate main.go
+          go mod tidy
+
+      - name: Run the Program (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          go run main.go > output.log 2>&1 &
+          PID=$!
+          FOUND=false
+          for i in $(seq 1 60); do
+            if grep -q '\[ws\] 连接到Websocket服务器' output.log 2>/dev/null; then
+              FOUND=true
+              break
+            fi
+            sleep 1
+          done
+          kill $PID 2>/dev/null || true
+          wait $PID 2>/dev/null || true
+          echo ""
+          echo "Run log:"
+          cat output.log
+          echo ""
+          if [ "$FOUND" = true ]; then
+            echo "Success: Found target output"
+            exit 0
+          else
+            echo "Failure: Timeout after 60s without finding target output"
+            exit 1
+          fi
+
+      - name: Run the Program (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $proc = Start-Process -FilePath "go" -ArgumentList "run", "main.go" -NoNewWindow -PassThru -RedirectStandardOutput "stdout.log" -RedirectStandardError "stderr.log"
+          $found = $false
+          for ($i = 0; $i -lt 60; $i++) {
+            Start-Sleep -Seconds 1
+            $content = ""
+            if (Test-Path "stdout.log") { $content += Get-Content "stdout.log" -Raw -ErrorAction SilentlyContinue }
+            if (Test-Path "stderr.log") { $content += Get-Content "stderr.log" -Raw -ErrorAction SilentlyContinue }
+            if ($content -match '\[ws\] 连接到Websocket服务器') {
+              $found = $true
+              break
+            }
+          }
+          taskkill /F /T /PID $proc.Id 2>$null
+          Write-Host ""
+          Write-Host "Run log:"
+          if (Test-Path "stdout.log") { Get-Content "stdout.log" }
+          if (Test-Path "stderr.log") { Get-Content "stderr.log" }
+          Write-Host ""
+          if ($found) {
+            Write-Host "Success: Found target output"
+            exit 0
+          } else {
+            Write-Host "Failure: Timeout after 60s without finding target output"
+            exit 1
+          }

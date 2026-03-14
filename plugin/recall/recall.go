@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	engine := control.Register("recall", &ctrl.Options[*zero.Ctx]{
+	engine := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "Recall",
 		Help: "Reply a message with 'recall' or 'Recall' to recall it.\n" +

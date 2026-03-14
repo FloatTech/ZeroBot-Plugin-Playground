@@ -31,7 +31,7 @@ const (
 var todayPic = ttl.NewCache[uint64, []byte](time.Hour * 12)
 
 func init() {
-	control.Register("movies", &ctrl.Options[*zero.Ctx]{
+	control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "电影查询",
 		Help: "- 今日电影\n" +

@@ -25,7 +25,7 @@ import (
 )
 
 func init() {
-	engine := control.Register("qqci", &ctrl.Options[*zero.Ctx]{
+	engine := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "简易cicd",
 		Help: "- /qqci -a zbp -r git@github.com:FloatTech/ZeroBot-Plugin -dir /usr/local/service -cmd \"zpb\"  -act insert\n" +

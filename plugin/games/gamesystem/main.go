@@ -48,7 +48,7 @@ type GameStatus struct {
 
 var (
 	// 插件主体
-	gamesystem = control.Register("gamesystem", &ctrl.Options[*zero.Ctx]{
+	gamesystem = control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "游戏系统",
 		Help:             "- 游戏列表\n- 上架[游戏名]\n- 下架[游戏名]",

@@ -1,6 +1,8 @@
 // Package main ZeroBot-Plugin-Playground main file
 package main
 
+//go:generate go run github.com/FloatTech/ZeroBot-Plugin-Playground/abineundo/ref -r .
+
 import (
 	"encoding/json"
 	"flag"
@@ -15,7 +17,7 @@ import (
 	"github.com/FloatTech/floatbox/process"
 	"github.com/sirupsen/logrus"
 
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/console"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/abineundo" // 设置插件优先级&更改控制台属性
 
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/JiangRed"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/example/xiaoguofan"

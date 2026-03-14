@@ -19,7 +19,7 @@ const (
 )
 
 func init() { // 插件主体
-	engine := control.Register("ottoshout", &ctrl.Options[*zero.Ctx]{
+	engine := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault:  false,
 		Brief:             "otto鬼叫",
 		Help:              "- 电棍说 xxx",

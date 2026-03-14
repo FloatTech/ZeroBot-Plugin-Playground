@@ -32,7 +32,7 @@ var (
 )
 
 func init() { // 插件主体
-	engine := control.Register("truthordare", &ctrl.Options[*zero.Ctx]{
+	engine := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Help:             "真心话大冒险\n- 来点乐子[@xxx]\n- 饶恕[@xxx]\n- 惩罚[@xxx]\n- 反省[@xxx]",
 		PublicDataFolder: "Truthordare",

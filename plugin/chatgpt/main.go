@@ -22,7 +22,7 @@ type sessionKey struct {
 
 var (
 	cache  = ttl.NewCache[sessionKey, []chatMessage](time.Minute * 15)
-	engine = control.Register("chatgpt", &ctrl.Options[*zero.Ctx]{
+	engine = control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "chatgpt",
 		Help: "-@bot chatgpt [对话内容]\n" +

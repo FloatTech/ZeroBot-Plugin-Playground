@@ -21,7 +21,7 @@ const (
 )
 
 func init() {
-	en := control.Register("ghrepo", &ctrl.Options[*zero.Ctx]{
+	en := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "GitHub 仓库链接解析",
 		Help:             "群内接收到 GitHub 仓库链接时自动解析并发送仓库信息的图片。",

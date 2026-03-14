@@ -18,7 +18,7 @@ import (
 )
 
 func init() { // 插件主体
-	engine := control.Register("chinesebqb", &ctrl.Options[*zero.Ctx]{
+	engine := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "表情包",
 		Help: "- 表情包 [xxx]\n" +

@@ -25,7 +25,7 @@ var speakers = map[string]uint{
 }
 
 func init() {
-	en := control.Register("moegoezh", &ctrl.Options[*zero.Ctx]{
+	en := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "VITS模型拟声迫真中文",
 		Help: "- 让[宁宁|爱瑠|芳乃|茉子|丛雨|小春|七海]用中文说(中文)\n" +

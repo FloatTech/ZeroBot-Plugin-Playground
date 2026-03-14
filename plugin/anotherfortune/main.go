@@ -45,7 +45,7 @@ var (
 )
 
 func init() {
-	engine := control.Register("anotherfortune", &ctrl.Options[*zero.Ctx]{
+	engine := control.AutoRegister(&ctrl.Options[*zero.Ctx]{
 		DisableOnDefault:  false,
 		Brief:             "另一个今日人品",
 		Help:              "仿照鱼子酱的今日人品w",
