@@ -1,5 +1,5 @@
 # ZeroBot-Plugin-Playground
-[English](https://github.com/FloatTech/ZeroBot-Plugin-Playground/blob/main/README-en.md) | 简体中文
+[English](README-en.md) | 简体中文
 
 快来这里上传你的奇思妙想吧！好的想法将会被合并入主仓库哦~
 
@@ -21,7 +21,7 @@
 
 目前提供的样板有 example 中的
 
-- [江林版本](https://github.com/FloatTech/ZeroBot-Plugin-Playground/blob/main/example/JiangRed/message.go)
-- [小锅饭版本](https://github.com/FloatTech/ZeroBot-Plugin-Playground/blob/main/example/xiaoguofan/example.go)
+- [江林版本](example/JiangRed/message.go)
+- [小锅饭版本](example/xiaoguofan/example.go)
 - [小锅饭的ZerobotCourse](https://github.com/guohuiyuan/ZerobotCourse)
-- [夹子的版本(半成品)](https://github.com/FloatTech/ZeroBot-Plugin-Playground/tree/main/tutorial)
+- [夹子的版本(半成品)](doc)

@@ -2,14 +2,14 @@ name: PushLint
 on:
   push:
     branches:
-      - master
+      - main
     tags:
       - 'v*'
 jobs:
   golangci:
     uses: ./.github/workflows/lib_lint.yml
     with:
-      ref: master
+      ref: main
       commit_back: true
 
   runmain:
@@ -17,4 +17,4 @@ jobs:
     if: ${{ !contains(github.event.pull_request.title, '.go') }}
     uses: ./.github/workflows/lib_run.yml
     with:
-      ref: master
+      ref: main

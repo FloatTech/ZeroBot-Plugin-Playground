@@ -10,9 +10,9 @@
 
 这边咱就教你如何使用并且编写自己想要的插件呢~
 
-- [**ep1: Hey ya~ Hello World~**](https://github.com/FloatTech/ZeroBot-Plugin-Playground/blob/main/tutorial/zero.md)
+- [**ep1: Hey ya~ Hello World~**](doc/zero.md)
 
-- [**ep2:浅尝辄止~尝试做一个好看的拼盘吧w**](https://github.com/FloatTech/ZeroBot-Plugin-Playground/blob/main/tutorial/first.md)
+- [**ep2:浅尝辄止~尝试做一个好看的拼盘吧w**](doc/first.md)
 
 ## 既然有了一个想法~那么我们应该整点小工具去做这些工作
 
@@ -39,5 +39,5 @@
 ## 引用
 
 - [ZerobotCourse](https://github.com/guohuiyuan/ZerobotCourse)
-- [example/JiangRed](https://github.com/FloatTech/ZeroBot-Plugin-Playground/blob/main/example/JiangRed/message.go)
+- [example/JiangRed](example/JiangRed/message.go)
 - [khl.py](https://github.com/TWT233/khl.py)
