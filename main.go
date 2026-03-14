@@ -25,7 +25,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/cybercat"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/draw" // 服务详情
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/exJiangRed"
-	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/exxiaoguofan"
+	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/exXiaoGuoFan"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fadian"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fgopickup"
 	_ "github.com/FloatTech/ZeroBot-Plugin-Playground/plugin/fyzhq"
